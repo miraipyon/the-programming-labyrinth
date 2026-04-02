@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://wxv1ypl2xvl3"]
 
 [ext_resource type="Script" uid="uid://cpquejn716y2r" path="res://scenes/entities/Enemy.gd" id="1_enemy"]
-[ext_resource type="Texture2D" path="res://assets/sprites/tiny_dungeon/Tiles/tile_0110.png" id="2_m8eof"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(28, 28)
@@ -12,7 +11,6 @@ script = ExtResource("1_enemy")
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1298897964]
 scale = Vector2(2, 2)
-texture = ExtResource("2_m8eof")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1428232341]
 shape = SubResource("RectangleShape2D_1")

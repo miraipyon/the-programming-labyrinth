@@ -5,7 +5,7 @@ extends Area2D
 signal chest_opened(loot_item_id: String)
 
 # --- Exports ---
-@export var chest_type: String = "normal"  # "normal" or "rare"
+@export var chest_type: String = "normal"
 
 # --- Sprites ---
 const CHEST_CLOSED := "res://assets/sprites/tiny_dungeon/Tiles/tile_0063.png"
@@ -18,30 +18,42 @@ var is_opened: bool = false
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("chest")
-	# TODO: Khởi tạo hình ảnh
-	pass
+	_update_appearance()
 
 
 # --- Interaction ---
 func open_chest() -> String:
-	# Hàm được gọi bởi Player hoặc MazeManager khi tương tác
 	if is_opened:
 		return ""
 	
-	# TODO: Đánh dấu rương đã mở (is_opened = true)
+	is_opened = true
+	var loot_id: String = ""
 	
-	# TODO: Gửi yêu cầu ramdom nhặt đồ đến DataManager (tùy vào chest_type) -> lấy loot_id
+	if DataManager:
+		loot_id = DataManager.roll_loot(chest_type)
 	
-	# TODO: Nếu nhặt được đồ -> Báo cho InventoryManager thêm đồ vô dạng tạm thời
-	# VÀ báo tín hiệu chest_opened(loot_id)
+	if not loot_id.is_empty() and InventoryManager:
+		InventoryManager.add_item_temporary(loot_id)
+		chest_opened.emit(loot_id)
 	
-	# TODO: Đổi hình dạng cái rương thành đã mở ra
-	
-	return ""
+	_update_appearance()
+	return loot_id
 
 
 # --- Appearance ---
 func _update_appearance() -> void:
-	# TODO: Nếu rương đang đóng -> Gán ảnh CHEST_CLOSED, đổi màu theo loại rương (normal/rare)
-	# TODO: Nếu mở -> Gán ảnh CHEST_OPEN, chỉnh màu hơi tối hoặc mờ đi
-	pass
+	if not has_node("Sprite"): return
+	
+	if is_opened:
+		if ResourceLoader.exists(CHEST_OPEN):
+			$Sprite.texture = load(CHEST_OPEN)
+		$Sprite.modulate = Color(0.7, 0.7, 0.7, 0.8)
+	else:
+		if ResourceLoader.exists(CHEST_CLOSED):
+			$Sprite.texture = load(CHEST_CLOSED)
+		if chest_type == "rare":
+			$Sprite.modulate = Color(0.4, 0.8, 1.0)
+		else:
+			$Sprite.modulate = Color.WHITE
+		
+	$Sprite.scale = Vector2(2, 2)

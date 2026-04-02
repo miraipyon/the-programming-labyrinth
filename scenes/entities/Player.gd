@@ -18,28 +18,36 @@ var interactable_nearby: Node2D = null  # Chest gần nhất để interact
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("player")
-	# TODO: Tải hình ảnh làm sprite nếu tồn tại (PLAYER_SPRITE)
-	# TODO: Kết nối tín hiệu Game_State_changed từ GameManager để biết khi nào cho đi/dừng
-	pass
+	
+	if has_node("Sprite"):
+		if ResourceLoader.exists(PLAYER_SPRITE):
+			$Sprite.texture = load(PLAYER_SPRITE)
+		$Sprite.scale = Vector2(2, 2)
+		
+	if GameManager:
+		GameManager.game_state_changed.connect(_on_game_state_changed)
 
 
 func _physics_process(delta: float) -> void:
-	# TODO: Nếu không được di chuyển (can_move == false) thì return
+	if not can_move:
+		velocity = Vector2.ZERO
+		return
 	
-	# TODO: Lấy input từ các nút ASDW hoặc mũi tên (move_up, move_down, move_left, move_right)
-	# HINT: Dùng Input.get_axis()
+	var input_dir := Vector2.ZERO
+	input_dir.x = Input.get_axis("move_left", "move_right")
+	input_dir.y = Input.get_axis("move_up", "move_down")
 	
-	# TODO: Normalize vector input nếu di chuyển chéo để tốc độ luôn bằng nhau
+	if input_dir.length() > 1.0:
+		input_dir = input_dir.normalized()
 	
-	# TODO: Gán velocity = input_dir * move_speed
-	# Gọi hàm move_and_slide()
-	pass
+	velocity = input_dir * move_speed
+	move_and_slide()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# TODO: Nếu phím 'interact' được bấm VÀ có interactable_nearby (đang đứng gần rương):
-	# - Bắn tín hiệu chest_interacted với tham số interactable_nearby
-	pass
+	if event.is_action_pressed("interact") and interactable_nearby != null:
+		if interactable_nearby.is_in_group("chest"):
+			chest_interacted.emit(interactable_nearby)
 
 
 # --- State Actions ---
@@ -54,12 +62,24 @@ func enable_movement() -> void:
 
 # --- Callbacks ---
 func _on_game_state_changed(new_state: GameManager.GameState) -> void:
-	# TODO: Nếu new_state == PLAYING -> enable_movement()
-	# Nếu new_state == COMBAT hoặc PAUSED -> disable_movement()
-	pass
+	if new_state == GameManager.GameState.PLAYING:
+		enable_movement()
+	elif new_state == GameManager.GameState.COMBAT or new_state == GameManager.GameState.PAUSED:
+		disable_movement()
 
 
-# TODO: Định nghĩa các hàm xử lý va chạm của Area2D (DetectionArea)
-# - _on_detection_area_body_entered(body) -> kiểm tra is_in_group("enemy") -> emit encounter_triggered
-# - _on_detection_area_area_entered(area) -> kiểm tra is_in_group("chest") -> gán vào interactable_nearby, hoặc is_in_group("portal") -> emit portal_reached
-# - _on_detection_area_area_exited(area) -> xoá interactable_nearby
+func _on_detection_area_body_entered(body: Node2D) -> void:
+	if body.is_in_group("enemy"):
+		encounter_triggered.emit(body)
+
+
+func _on_detection_area_area_entered(area: Area2D) -> void:
+	if area.is_in_group("chest"):
+		interactable_nearby = area
+	elif area.is_in_group("portal"):
+		portal_reached.emit()
+
+
+func _on_detection_area_area_exited(area: Area2D) -> void:
+	if area == interactable_nearby:
+		interactable_nearby = null

@@ -29,39 +29,56 @@ var is_defeated: bool = false
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("enemy")
-	# TODO: Nếu enemy_id không rỗng -> láy data từ DataManager và cập nhật hình dạng
-	pass
+	if not enemy_id.is_empty():
+		enemy_data = DataManager.get_enemy_data(enemy_id)
+		_update_appearance()
 
 
 # --- Setup ---
 func setup(p_enemy_id: String, p_bug_id: String, pos: Vector2) -> void:
-	# Hàm này được gọi từ MazeManager để cài đặt con quái lúc khởi tạo
-	# TODO: Lưu enemy_id, bug_id, position
-	# TODO: Lấy thông tin quái từ DataManager bằng enemy_id
-	# TODO: Cập nhật hình ảnh _update_appearance()
-	pass
+	enemy_id = p_enemy_id
+	bug_id = p_bug_id
+	position = pos
+	
+	if DataManager:
+		enemy_data = DataManager.get_enemy_data(enemy_id)
+		
+	_update_appearance()
 
 
 # --- Combat Info ---
 func get_hit_base() -> int:
-	# TODO: Trả về chỉ số "hit_base" của quái vật từ enemy_data
-	return 20
+	return enemy_data.get("hit_base", 20)
 
 
 func get_bug_data() -> Dictionary:
-	# TODO: Nhờ DataManager lấy thông tin bài tập code bằng bug_id
+	if DataManager:
+		return DataManager.get_bug_by_id(bug_id)
 	return {}
 
 
 func defeat() -> void:
-	# TODO: Chuyển is_defeated = true
-	# TODO: Tắt chức năng hình ảnh (visible = false) và Disable khu vực va chạm để tắt tương tác
-	pass
+	is_defeated = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	if has_node("CollisionShape"):
+		$CollisionShape.set_deferred("disabled", true)
 
 
 # --- Appearance ---
 func _update_appearance() -> void:
-	# TODO: Viết logic lấy đường dẫn ảnh dựa theo SPRITE_MAP
-	# TODO: Nếu hình ảnh tồn tại -> Tải ảnh đè vào Sprite2D
-	# TODO: Thay đổi scale (kích thước) nếu quái có "tier" = "strong" (2.5) hoặc "tier" = "boss" (x3)
-	pass
+	if not has_node("Sprite"):
+		return
+		
+	var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
+	if not sprite_path.is_empty() and ResourceLoader.exists(sprite_path):
+		$Sprite.texture = load(sprite_path)
+		$Sprite.modulate = Color.WHITE
+		
+	var tier: String = enemy_data.get("tier", "normal")
+	if tier == "boss":
+		$Sprite.scale = Vector2(3, 3)
+	elif tier == "strong":
+		$Sprite.scale = Vector2(2.5, 2.5)
+	else:
+		$Sprite.scale = Vector2(2, 2)

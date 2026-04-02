@@ -14,8 +14,11 @@ var is_active: bool = true
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("portal")
-	# TODO: Cài hình ảnh và scale x2
-	pass
+	if has_node("Sprite"):
+		if ResourceLoader.exists(PORTAL_SPRITE):
+			$Sprite.texture = load(PORTAL_SPRITE)
+		$Sprite.scale = Vector2(2, 2)
+	activate()
 
 
 # --- Setup ---
@@ -25,10 +28,12 @@ func setup(pos: Vector2) -> void:
 
 # --- Visuals ---
 func activate() -> void:
-	# TODO: Chuyển active -> xài Modulate để cửa có ánh sáng (ví dụ hơi xám trắng hay xanh)
-	pass
+	is_active = true
+	if has_node("Sprite"):
+		$Sprite.modulate = Color(0.8, 1.0, 0.8, 1.0)
 
 
 func deactivate() -> void:
-	# TODO: Bị bất hoạt thì dùng Modulate để cửa mờ mịt đi
-	pass
+	is_active = false
+	if has_node("Sprite"):
+		$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.7)
