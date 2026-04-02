@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://cpitqx8uuwn2e"]
+
+[ext_resource type="Script" uid="uid://dnys5o2x8d3dg" path="res://scenes/entities/Portal.gd" id="1_portal"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiny_dungeon/Tiles/tile_0009.png" id="2_kkajt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(32, 32)
+
+[node name="Portal" type="Area2D" unique_id=1301479942]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_portal")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1035875905]
+scale = Vector2(2, 2)
+texture = ExtResource("2_kkajt")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=7087220]
+shape = SubResource("RectangleShape2D_1")

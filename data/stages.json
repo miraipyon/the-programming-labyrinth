@@ -1,85 +1,146 @@
-{
-  "stages": [
-    {
-      "id": "ch1_stage1",
-      "chapter": 1,
-      "name": "The Source Forest - Entrance",
-      "time_limit_seconds": 360,
-      "encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
-      "enemy_spawns": [
-        {"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 250, "y": 180}},
-        {"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 450, "y": 150}},
-        {"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 350, "y": 350}},
-        {"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 550, "y": 300}},
-        {"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 200, "y": 450}}
-      ],
-      "chest_spawns": [
-        {"type": "normal", "position": {"x": 400, "y": 250}},
-        {"type": "normal", "position": {"x": 600, "y": 400}}
-      ],
-      "player_spawn": {"x": 64, "y": 64},
-      "portal_position": {"x": 700, "y": 500}
-    },
-    {
-      "id": "ch2_stage1",
-      "chapter": 2,
-      "name": "The Logic Ruins - Gate",
-      "time_limit_seconds": 480,
-      "encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
-      "enemy_spawns": [
-        {"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 300, "y": 200}},
-        {"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 500, "y": 180}},
-        {"enemy_id": "null_shadow", "bug_id": "ch2_logic_003", "position": {"x": 200, "y": 380}},
-        {"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_004", "position": {"x": 450, "y": 350}},
-        {"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_005", "position": {"x": 600, "y": 450}}
-      ],
-      "chest_spawns": [
-        {"type": "normal", "position": {"x": 350, "y": 300}},
-        {"type": "rare", "position": {"x": 550, "y": 250}}
-      ],
-      "player_spawn": {"x": 64, "y": 64},
-      "portal_position": {"x": 700, "y": 500}
-    },
-    {
-      "id": "ch3_stage1",
-      "chapter": 3,
-      "name": "The Array Abyss - Edge",
-      "time_limit_seconds": 600,
-      "encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
-      "enemy_spawns": [
-        {"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_001", "position": {"x": 280, "y": 200}},
-        {"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_002", "position": {"x": 480, "y": 180}},
-        {"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_003", "position": {"x": 350, "y": 370}},
-        {"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 550, "y": 320}},
-        {"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_005", "position": {"x": 200, "y": 480}}
-      ],
-      "chest_spawns": [
-        {"type": "normal", "position": {"x": 400, "y": 250}},
-        {"type": "rare", "position": {"x": 150, "y": 350}}
-      ],
-      "player_spawn": {"x": 64, "y": 64},
-      "portal_position": {"x": 700, "y": 550}
-    },
-    {
-      "id": "ch4_stage1",
-      "chapter": 4,
-      "name": "The Final Kernel - Core",
-      "time_limit_seconds": 720,
-      "encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
-      "enemy_spawns": [
-        {"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 300, "y": 200}},
-        {"enemy_id": "flow_architect", "bug_id": "ch4_flow_002", "position": {"x": 500, "y": 180}},
-        {"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 250, "y": 400}},
-        {"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 450, "y": 380}},
-        {"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 600, "y": 500}}
-      ],
-      "chest_spawns": [
-        {"type": "normal", "position": {"x": 180, "y": 300}},
-        {"type": "rare", "position": {"x": 550, "y": 300}},
-        {"type": "rare", "position": {"x": 350, "y": 480}}
-      ],
-      "player_spawn": {"x": 64, "y": 64},
-      "portal_position": {"x": 700, "y": 550}
-    }
-  ]
-}
+[
+	{
+	  "id": "ch1_stage1",
+	  "chapter": 1,
+	  "name": "The Source Forest - Entrance",
+	  "time_limit_seconds": 360,
+	  "encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+	  "enemy_spawns": [
+		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 250, "y": 180}},
+		{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 450, "y": 150}},
+		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 350, "y": 350}},
+		{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 550, "y": 300}},
+		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 200, "y": 450}}
+	  ],
+	  "chest_spawns": [
+		{"type": "normal", "position": {"x": 400, "y": 250}},
+		{"type": "normal", "position": {"x": 600, "y": 400}}
+	  ],
+	  "player_spawn": {"x": 64, "y": 64},
+	  "portal_position": {"x": 700, "y": 500}
+	},
+	{
+	  "id": "ch2_stage1",
+	  "chapter": 2,
+	  "name": "The Logic Ruins - Gate",
+	  "time_limit_seconds": 480,
+	  "encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+	  "enemy_spawns": [
+		{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 300, "y": 200}},
+		{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 500, "y": 180}},
+		{"enemy_id": "null_shadow", "bug_id": "ch2_logic_003", "position": {"x": 200, "y": 380}},
+		{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_004", "position": {"x": 450, "y": 350}},
+		{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_005", "position": {"x": 600, "y": 450}}
+	  ],
+	  "chest_spawns": [
+		{"type": "normal", "position": {"x": 350, "y": 300}},
+		{"type": "rare", "position": {"x": 550, "y": 250}}
+	  ],
+	  "player_spawn": {"x": 64, "y": 64},
+	  "portal_position": {"x": 700, "y": 500}
+	},
+	{
+	  "id": "ch3_stage1",
+	  "chapter": 3,
+	  "name": "The Array Abyss - Edge",
+	  "time_limit_seconds": 600,
+	  "encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+	  "enemy_spawns": [
+		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_001", "position": {"x": 280, "y": 200}},
+		{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_002", "position": {"x": 480, "y": 180}},
+		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_003", "position": {"x": 350, "y": 370}},
+		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 550, "y": 320}},
+		{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_005", "position": {"x": 200, "y": 480}}
+	  ],
+	  "chest_spawns": [
+		{"type": "normal", "position": {"x": 400, "y": 250}},
+		{"type": "rare", "position": {"x": 150, "y": 350}}
+	  ],
+	  "player_spawn": {"x": 64, "y": 64},
+	  "portal_position": {"x": 700, "y": 550}
+	},
+	{
+	  "id": "ch4_stage1",
+	  "chapter": 4,
+	  "name": "The Final Kernel - Core",
+	  "time_limit_seconds": 720,
+	  "encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+	  "enemy_spawns": [
+		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 300, "y": 200}},
+		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_002", "position": {"x": 500, "y": 180}},
+		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 250, "y": 400}},
+		{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 450, "y": 380}},
+		{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 600, "y": 500}}
+	  ],
+	  "chest_spawns": [
+		{"type": "normal", "position": {"x": 180, "y": 300}},
+		{"type": "rare", "position": {"x": 550, "y": 300}},
+		{"type": "rare", "position": {"x": 350, "y": 480}}
+	  ],
+	  "player_spawn": {"x": 64, "y": 64},
+	  "portal_position": {"x": 700, "y": 550}
+	},
+	{
+	  "id": "green_tea",
+	  "chapter": -1,
+	  "name": "Green Tea",
+	  "type": "consumable",
+	  "description": "Hồi máu cho bản thân",
+	  "effect": "heal",
+	  "value": 25
+	},
+	{
+	  "id": "focus_pill",
+	  "chapter": -1,
+	  "name": "Focus Pill",
+	  "type": "consumable",
+	  "description": "Phục hồi 1 ít thời gian đã mất",
+	  "effect": "restore_time",
+	  "value": 30
+	},
+	{
+	  "id": "hint_chip",
+	  "chapter": -1,
+	  "name": "Hint Chip",
+	  "type": "consumable",
+	  "description": "Highlight 1 dòng lỗi",
+	  "effect": "hint",
+	  "value": 1
+	},
+	{
+	  "id": "block_snap_chip",
+	  "chapter": -1,
+	  "name": "Block Snap Chip",
+	  "type": "consumable",
+	  "description": "Tự động xếp 1 khối lệnh vào đúng vị trí (Chapter 4 only)",
+	  "effect": "auto_snap",
+	  "value": 1
+	},
+	{
+	  "id": "github_cape",
+	  "chapter": -1,
+	  "name": "GitHub Cape",
+	  "type": "artifact",
+	  "description": "Hồi sinh 1 lần khi HP = 0",
+	  "effect": "revive",
+	  "value": 1
+	},
+	{
+	  "id": "ide_armor",
+	  "chapter": -1,
+	  "name": "IDE Armor",
+	  "type": "artifact",
+	  "description": "Giảm 20% HP_LOSS_TURN mỗi lượt bị hit",
+	  "effect": "damage_reduction",
+	  "value": 0.2
+	},
+	{
+	  "id": "runtime_patch",
+	  "chapter": -1,
+	  "name": "Runtime Patch",
+	  "type": "artifact",
+	  "description": "Bỏ qua 1 hit của quái trong màn hiện tại",
+	  "effect": "skip_hit",
+	  "value": 1
+	}
+]

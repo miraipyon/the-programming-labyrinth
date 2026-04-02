@@ -1,103 +1,101 @@
-{
-  "enemies": [
-    {
-      "id": "syntax_slime",
-      "name": "Syntax Slime",
-      "chapter": 1,
-      "tier": "normal",
-      "topic": "syntax_basic",
-      "bug_count_min": 1,
-      "bug_count_max": 2,
-      "hit_base": 20,
-      "description": "Slime nhầy nhụa sinh ra từ lỗi cú pháp cơ bản"
-    },
-    {
-      "id": "semicolon_wisp",
-      "name": "Semicolon Wisp",
-      "chapter": 1,
-      "tier": "normal",
-      "topic": "punctuation_brackets",
-      "bug_count_min": 1,
-      "bug_count_max": 2,
-      "hit_base": 20,
-      "description": "Bóng ma phát sáng từ những dấu câu và ngoặc bị sai lệch"
-    },
-    {
-      "id": "null_shadow",
-      "name": "Null Shadow",
-      "chapter": 2,
-      "tier": "medium",
-      "topic": "null_reference",
-      "bug_count_min": 2,
-      "bug_count_max": 3,
-      "hit_base": 35,
-      "description": "Bóng tối sinh ra từ các tham chiếu null"
-    },
-    {
-      "id": "branch_phantom",
-      "name": "Branch Phantom",
-      "chapter": 2,
-      "tier": "medium",
-      "topic": "wrong_branch",
-      "bug_count_min": 2,
-      "bug_count_max": 3,
-      "hit_base": 35,
-      "description": "Bóng ma xuất hiện khi nhánh điều kiện đi sai hướng"
-    },
-    {
-      "id": "type_mismatch_medusa",
-      "name": "Type-Mismatch Medusa",
-      "chapter": 2,
-      "tier": "strong",
-      "topic": "type_condition",
-      "bug_count_min": 3,
-      "bug_count_max": 4,
-      "hit_base": 50,
-      "description": "Medusa biến đổi kiểu dữ liệu khiến chương trình đông cứng"
-    },
-    {
-      "id": "infinite_golem",
-      "name": "Infinite Golem",
-      "chapter": 3,
-      "tier": "medium",
-      "topic": "array_loop",
-      "bug_count_min": 2,
-      "bug_count_max": 3,
-      "hit_base": 35,
-      "description": "Golem đá bị kẹt trong vòng lặp vô tận"
-    },
-    {
-      "id": "boundary_hydra",
-      "name": "Boundary Hydra",
-      "chapter": 3,
-      "tier": "strong",
-      "topic": "off_by_one_index",
-      "bug_count_min": 3,
-      "bug_count_max": 4,
-      "hit_base": 50,
-      "description": "Hydra nhiều đầu sinh ra từ lỗi biên mảng"
-    },
-    {
-      "id": "flow_architect",
-      "name": "Flow Architect",
-      "chapter": 4,
-      "tier": "strong",
-      "topic": "algorithm_flow",
-      "bug_count_min": 3,
-      "bug_count_max": 5,
-      "hit_base": 50,
-      "description": "Kiến trúc sư tạo ra những luồng xử lý rối rắm"
-    },
-    {
-      "id": "logic_bomb_boss",
-      "name": "Logic Bomb Boss",
-      "chapter": 4,
-      "tier": "boss",
-      "topic": "logic_flow_combined",
-      "bug_count_min": 4,
-      "bug_count_max": 6,
-      "hit_base": 70,
-      "description": "Boss cuối cùng, tổng hợp mọi loại lỗi logic và flow"
-    }
-  ]
-}
+[
+	{
+	  "id": "syntax_slime",
+	  "name": "Syntax Slime",
+	  "chapter": 1,
+	  "tier": "normal",
+	  "topic": "syntax_basic",
+	  "bug_count_min": 1,
+	  "bug_count_max": 2,
+	  "hit_base": 20,
+	  "description": "Slime nhầy nhụa sinh ra từ lỗi cú pháp cơ bản"
+	},
+	{
+	  "id": "semicolon_wisp",
+	  "name": "Semicolon Wisp",
+	  "chapter": 1,
+	  "tier": "normal",
+	  "topic": "punctuation_brackets",
+	  "bug_count_min": 1,
+	  "bug_count_max": 2,
+	  "hit_base": 20,
+	  "description": "Bóng ma phát sáng từ những dấu câu và ngoặc bị sai lệch"
+	},
+	{
+	  "id": "null_shadow",
+	  "name": "Null Shadow",
+	  "chapter": 2,
+	  "tier": "medium",
+	  "topic": "null_reference",
+	  "bug_count_min": 2,
+	  "bug_count_max": 3,
+	  "hit_base": 35,
+	  "description": "Bóng tối sinh ra từ các tham chiếu null"
+	},
+	{
+	  "id": "branch_phantom",
+	  "name": "Branch Phantom",
+	  "chapter": 2,
+	  "tier": "medium",
+	  "topic": "wrong_branch",
+	  "bug_count_min": 2,
+	  "bug_count_max": 3,
+	  "hit_base": 35,
+	  "description": "Bóng ma xuất hiện khi nhánh điều kiện đi sai hướng"
+	},
+	{
+	  "id": "type_mismatch_medusa",
+	  "name": "Type-Mismatch Medusa",
+	  "chapter": 2,
+	  "tier": "strong",
+	  "topic": "type_condition",
+	  "bug_count_min": 3,
+	  "bug_count_max": 4,
+	  "hit_base": 50,
+	  "description": "Medusa biến đổi kiểu dữ liệu khiến chương trình đông cứng"
+	},
+	{
+	  "id": "infinite_golem",
+	  "name": "Infinite Golem",
+	  "chapter": 3,
+	  "tier": "medium",
+	  "topic": "array_loop",
+	  "bug_count_min": 2,
+	  "bug_count_max": 3,
+	  "hit_base": 35,
+	  "description": "Golem đá bị kẹt trong vòng lặp vô tận"
+	},
+	{
+	  "id": "boundary_hydra",
+	  "name": "Boundary Hydra",
+	  "chapter": 3,
+	  "tier": "strong",
+	  "topic": "off_by_one_index",
+	  "bug_count_min": 3,
+	  "bug_count_max": 4,
+	  "hit_base": 50,
+	  "description": "Hydra nhiều đầu sinh ra từ lỗi biên mảng"
+	},
+	{
+	  "id": "flow_architect",
+	  "name": "Flow Architect",
+	  "chapter": 4,
+	  "tier": "strong",
+	  "topic": "algorithm_flow",
+	  "bug_count_min": 3,
+	  "bug_count_max": 5,
+	  "hit_base": 50,
+	  "description": "Kiến trúc sư tạo ra những luồng xử lý rối rắm"
+	},
+	{
+	  "id": "logic_bomb_boss",
+	  "name": "Logic Bomb Boss",
+	  "chapter": 4,
+	  "tier": "boss",
+	  "topic": "logic_flow_combined",
+	  "bug_count_min": 4,
+	  "bug_count_max": 6,
+	  "hit_base": 70,
+	  "description": "Boss cuối cùng, tổng hợp mọi loại lỗi logic và flow"
+	}
+]

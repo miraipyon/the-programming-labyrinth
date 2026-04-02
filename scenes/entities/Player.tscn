@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://qe6k6xaf7q1f"]
+
+[ext_resource type="Script" uid="uid://gr5vi2newmdx" path="res://scenes/entities/Player.gd" id="1_player"]
+[ext_resource type="Texture2D" path="res://assets/sprites/tiny_dungeon/Tiles/tile_0099.png" id="2_o7et6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(24, 24)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 40.0
+
+[node name="Player" type="CharacterBody2D" unique_id=1197214061]
+collision_mask = 3
+script = ExtResource("1_player")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1621009996]
+scale = Vector2(2, 2)
+texture = ExtResource("2_o7et6")
+
+[node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1300106541]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1287828827]
+collision_layer = 0
+collision_mask = 6
+
+[node name="DetectionShape" type="CollisionShape2D" parent="DetectionArea" unique_id=1654440119]
+shape = SubResource("CircleShape2D_2")
+
+[connection signal="area_entered" from="DetectionArea" to="." method="_on_detection_area_area_entered"]
+[connection signal="area_exited" from="DetectionArea" to="." method="_on_detection_area_area_exited"]
+[connection signal="body_entered" from="DetectionArea" to="." method="_on_detection_area_body_entered"]

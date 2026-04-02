@@ -1,25 +1,17 @@
 {
-  "loot_tables": {
-    "normal": {
-      "description": "Rương thường - ưu tiên consumable",
-      "drops": [
-        {"item_id": "green_tea", "weight": 40},
-        {"item_id": "focus_pill", "weight": 30},
-        {"item_id": "hint_chip", "weight": 25},
-        {"item_id": "block_snap_chip", "weight": 5}
-      ]
-    },
-    "rare": {
-      "description": "Rương hiếm - tỷ lệ artifact cao hơn",
-      "drops": [
-        {"item_id": "green_tea", "weight": 15},
-        {"item_id": "focus_pill", "weight": 15},
-        {"item_id": "hint_chip", "weight": 15},
-        {"item_id": "block_snap_chip", "weight": 10},
-        {"item_id": "github_cape", "weight": 15},
-        {"item_id": "ide_armor", "weight": 15},
-        {"item_id": "runtime_patch", "weight": 15}
-      ]
-    }
-  }
+	"normal": [
+		{"item_id": "green_tea", "weight": 40},
+		{"item_id": "focus_pill", "weight": 30},
+		{"item_id": "hint_chip", "weight": 25},
+		{"item_id": "block_snap_chip", "weight": 5}
+	],
+	"rare": [
+		{"item_id": "green_tea", "weight": 15},
+		{"item_id": "focus_pill", "weight": 15},
+		{"item_id": "hint_chip", "weight": 15},
+		{"item_id": "block_snap_chip", "weight": 10},
+		{"item_id": "github_cape", "weight": 15},
+		{"item_id": "ide_armor", "weight": 15},
+		{"item_id": "runtime_patch", "weight": 15}
+	]
 }

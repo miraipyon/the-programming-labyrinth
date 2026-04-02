@@ -9,7 +9,7 @@ signal item_use_requested(item_id: String)
 func _ready() -> void:
 	visible = false
 	close_button.pressed.connect(func(): visible = false)
-	InventoryManager.inventory_updated.connect(_refresh)
+	InventoryManager.inventory_changed.connect(_refresh)
 
 
 func toggle() -> void:

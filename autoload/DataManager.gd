@@ -8,65 +8,105 @@ var stages_data: Array = []       # Từ data/stages.json
 var game_rules: Dictionary = {}   # Từ data/game_rules.json
 var loot_tables: Dictionary = {}  # Từ data/loot_tables.json
 
-
 func _ready() -> void:
-	# TODO: Gọi _load_all_data() để nạp dữ liệu khi game khởi động
-	pass
-
+	_load_all_data()
 
 func _load_all_data() -> void:
-	# TODO: Đọc từng file JSON và gán vào biến cache phía trên
-	# HINT: Dùng hàm helper _load_json(path) bên dưới
-	# Cần load: game_rules.json, enemies.json, bugs.json, stages.json, loot_tables.json
-	# In ra console: "[DataManager] All data loaded. Enemies: X, Bugs: Y, Stages: Z"
-	pass
+	var rules = _load_json("res://data/game_rules.json")
+	game_rules = rules
 
+	var enemies = _load_json("res://data/enemies.json")
+	enemies_data = enemies
+	
+	var bugs = _load_json("res://data/bugs.json")
+	bugs_data = bugs
+
+	var stages = _load_json("res://data/stages.json")
+	stages_data = stages
+
+	var loot = _load_json("res://data/loot_tables.json")
+	loot_tables = loot
+
+	print("[DataManager] All data loaded. Enemies: %d, Bugs: %d, Stages: %d" % [enemies_data.size(), bugs_data.size(), stages_data.size()])
 
 func _load_json(path: String) -> Variant:
-	# TODO: Đọc file JSON và trả về dữ liệu đã parse
-	# Bước 1: Kiểm tra file tồn tại bằng FileAccess.file_exists(path)
-	# Bước 2: Mở file bằng FileAccess.open(path, FileAccess.READ)
-	# Bước 3: Đọc nội dung bằng file.get_as_text()
-	# Bước 4: Parse JSON bằng JSON.new() và json.parse(text)
-	# Bước 5: Trả về json.data
-	return null
+	if not FileAccess.file_exists(path):
+		push_warning("[DataManager] Missing file: %s" % path)
+		return null
 
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("[DataManager] Cannot open file: %s" % path)
+		return null
+
+	var text := file.get_as_text()
+	var json := JSON.new()
+	var err := json.parse(text)
+	if err != OK:
+		push_warning("[DataManager] JSON parse error in %s at line %d: %s" % [path, json.get_error_line(), json.get_error_message()])
+		return null
+
+	return json.data
 
 # --- Query API ---
 func get_enemy_data(enemy_id: String) -> Dictionary:
-	# TODO: Tìm trong enemies_data, trả về dict có "id" == enemy_id
+	for enemy in enemies_data:
+		if str(enemy["id"]) == str(enemy_id):
+			return enemy
+			
 	return {}
-
-
+	
 func get_bug_by_id(bug_id: String) -> Dictionary:
-	# TODO: Tìm trong bugs_data, trả về dict có "id" == bug_id
+	for bug in bugs_data:
+		if str(bug["id"]) == str(bug_id):
+			return bug
+			
 	return {}
-
 
 func get_bugs_by_chapter(chapter: int) -> Array:
-	# TODO: Lọc bugs_data, trả về array các bug có "chapter" == chapter
-	return []
-
+	var results = []
+	
+	for bug in bugs_data:
+		if int(bug.get("chapter")) == chapter:
+			results.append(bug)
+			
+	return results
 
 func get_stage_data(stage_id: String) -> Dictionary:
-	# TODO: Tìm trong stages_data, trả về dict có "id" == stage_id
+	for stage in stages_data:
+		if str(stage["id"]) == str(stage_id):
+			return stage
+			
 	return {}
-
 
 func get_stages_by_chapter(chapter: int) -> Array:
-	# TODO: Lọc stages_data, trả về array các stage có "chapter" == chapter
-	return []
-
+	var results = []
+	
+	for stage in stages_data:
+		if int(stage.get("chapter")) == chapter:
+			results.append(stage)
+			
+	return results
 
 func get_item_data(item_id: String) -> Dictionary:
-	# TODO: Tìm trong game_rules["items"], trả về dict có "id" == item_id
+	for item in stages_data:
+		if str(item["id"]) == str(item_id):
+			return item
+			
 	return {}
 
-
 func roll_loot(chest_type: String) -> String:
-	# TODO: Random loot từ loot_tables theo chest_type
-	# Bước 1: Lấy loot_tables[chest_type] -> array các {"id": "x", "weight": n}
-	# Bước 2: Tính tổng weight
-	# Bước 3: Random số từ 0 đến tổng weight
-	# Bước 4: Duyệt array, trừ dần weight, khi <= 0 thì trả về id đó
+	var drops = loot_tables[chest_type]
+	var total_weight = 0
+	
+	for drop in drops:
+		total_weight += drop["weight"]
+	
+	var roll = randi() % total_weight
+	
+	for drop in drops:
+		if roll < drop["weight"]:
+			return drop["item_id"]
+		roll -= drop["weight"]
+		
 	return ""
