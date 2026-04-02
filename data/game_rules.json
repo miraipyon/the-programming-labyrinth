@@ -1,0 +1,71 @@
+{
+  "player": {
+    "hp_start": 100,
+    "wrong_line_penalty": 5
+  },
+  "time_limits_seconds": {
+    "chapter_1": 360,
+    "chapter_2": 480,
+    "chapter_3": 600,
+    "chapter_4": 720
+  },
+  "hit_base": {
+    "normal": 20,
+    "medium": 35,
+    "strong": 50,
+    "boss": 70
+  },
+  "items": {
+    "green_tea": {
+      "name": "Green Tea",
+      "type": "consumable",
+      "description": "Hồi máu cho bản thân",
+      "effect": "heal",
+      "value": 25
+    },
+    "focus_pill": {
+      "name": "Focus Pill",
+      "type": "consumable",
+      "description": "Phục hồi 1 ít thời gian đã mất",
+      "effect": "restore_time",
+      "value": 30
+    },
+    "hint_chip": {
+      "name": "Hint Chip",
+      "type": "consumable",
+      "description": "Highlight 1 dòng lỗi",
+      "effect": "hint",
+      "value": 1
+    },
+    "block_snap_chip": {
+      "name": "Block Snap Chip",
+      "type": "consumable",
+      "description": "Tự động xếp 1 khối lệnh vào đúng vị trí (Chapter 4 only)",
+      "effect": "auto_snap",
+      "value": 1
+    }
+  },
+  "artifacts": {
+    "github_cape": {
+      "name": "GitHub Cape",
+      "type": "artifact",
+      "description": "Hồi sinh 1 lần khi HP = 0",
+      "effect": "revive",
+      "value": 1
+    },
+    "ide_armor": {
+      "name": "IDE Armor",
+      "type": "artifact",
+      "description": "Giảm 20% HP_LOSS_TURN mỗi lượt bị hit",
+      "effect": "damage_reduction",
+      "value": 0.2
+    },
+    "runtime_patch": {
+      "name": "Runtime Patch",
+      "type": "artifact",
+      "description": "Bỏ qua 1 hit của quái trong màn hiện tại",
+      "effect": "skip_hit",
+      "value": 1
+    }
+  }
+}

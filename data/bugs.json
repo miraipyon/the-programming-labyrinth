@@ -1,0 +1,578 @@
+{
+  "bugs": [
+    {
+      "id": "ch1_syntax_001",
+      "chapter": 1,
+      "language": "pseudocode",
+      "topic": "syntax_basic",
+      "difficulty": "easy",
+      "snippet": [
+        "let score = 100",
+        "let name = \"Player\"",
+        "print(\"Hello, \" + name",
+        "print(\"Score: \" + score)"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "Thiếu dấu đóng ngoặc ở cuối dòng",
+          "wrong_code": "print(\"Hello, \" + name",
+          "accepted_fixes": [
+            "print(\"Hello, \" + name)"
+          ],
+          "distractors": [
+            "print(\"Hello, \" + name;",
+            "print \"Hello, \" + name)"
+          ]
+        }
+      ],
+      "explanation": "Mỗi lệnh gọi hàm cần có đủ cặp ngoặc mở-đóng ()."
+    },
+    {
+      "id": "ch1_syntax_002",
+      "chapter": 1,
+      "language": "pseudocode",
+      "topic": "syntax_basic",
+      "difficulty": "easy",
+      "snippet": [
+        "let health = 100;",
+        "let damage = 25;",
+        "health = health - damge;",
+        "print(health);"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "Sai tên biến: damge thay vì damage",
+          "wrong_code": "health = health - damge;",
+          "accepted_fixes": [
+            "health = health - damage;"
+          ],
+          "distractors": [
+            "health = health - Damage;",
+            "health = health + damage;"
+          ]
+        }
+      ],
+      "explanation": "Tên biến phải khớp chính xác với lúc khai báo."
+    },
+    {
+      "id": "ch1_syntax_003",
+      "chapter": 1,
+      "language": "pseudocode",
+      "topic": "punctuation_brackets",
+      "difficulty": "easy",
+      "snippet": [
+        "let x = 10;",
+        "let y = 20;",
+        "if (x > y {",
+        "  print(\"x is bigger\");",
+        "}"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "Thiếu dấu đóng ngoặc tròn sau điều kiện if",
+          "wrong_code": "if (x > y {",
+          "accepted_fixes": [
+            "if (x > y) {"
+          ],
+          "distractors": [
+            "if x > y) {",
+            "if (x > y) ["
+          ]
+        }
+      ],
+      "explanation": "Câu lệnh if cần đầy đủ cặp ngoặc tròn () bao quanh điều kiện."
+    },
+    {
+      "id": "ch1_syntax_004",
+      "chapter": 1,
+      "language": "pseudocode",
+      "topic": "syntax_basic",
+      "difficulty": "easy",
+      "snippet": [
+        "let greeting = \"Hello World\";",
+        "Let count = 5;",
+        "print(greeting);",
+        "print(count);"
+      ],
+      "bugs": [
+        {
+          "line": 1,
+          "description": "Từ khóa 'let' phải viết thường, không phải 'Let'",
+          "wrong_code": "Let count = 5;",
+          "accepted_fixes": [
+            "let count = 5;"
+          ],
+          "distractors": [
+            "LET count = 5;",
+            "var count = 5;"
+          ]
+        }
+      ],
+      "explanation": "Từ khóa phân biệt chữ hoa chữ thường. 'Let' khác 'let'."
+    },
+    {
+      "id": "ch1_syntax_005",
+      "chapter": 1,
+      "language": "pseudocode",
+      "topic": "punctuation_brackets",
+      "difficulty": "easy",
+      "snippet": [
+        "let message = \"Hi;",
+        "print(message);"
+      ],
+      "bugs": [
+        {
+          "line": 0,
+          "description": "Thiếu dấu ngoặc kép đóng chuỗi",
+          "wrong_code": "let message = \"Hi;",
+          "accepted_fixes": [
+            "let message = \"Hi\";"
+          ],
+          "distractors": [
+            "let message = Hi\";",
+            "let message = 'Hi;"
+          ]
+        }
+      ],
+      "explanation": "Chuỗi ký tự phải được bao bởi cặp dấu ngoặc kép mở và đóng."
+    },
+    {
+      "id": "ch2_logic_001",
+      "chapter": 2,
+      "language": "pseudocode",
+      "topic": "wrong_branch",
+      "difficulty": "medium",
+      "snippet": [
+        "let hp = 50;",
+        "let max_hp = 100;",
+        "if (hp < 0) {",
+        "  print(\"Still alive!\");",
+        "} else {",
+        "  print(\"Game Over!\");",
+        "}"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "Điều kiện sống/chết bị đảo ngược",
+          "wrong_code": "if (hp < 0) {",
+          "accepted_fixes": [
+            "if (hp > 0) {"
+          ],
+          "distractors": [
+            "if (hp == 0) {",
+            "if (hp <= 0) {"
+          ]
+        }
+      ],
+      "explanation": "Người chơi còn sống khi HP > 0, không phải HP < 0."
+    },
+    {
+      "id": "ch2_logic_002",
+      "chapter": 2,
+      "language": "pseudocode",
+      "topic": "wrong_branch",
+      "difficulty": "medium",
+      "snippet": [
+        "let age = 15;",
+        "if (age > 18) {",
+        "  print(\"Chưa đủ tuổi\");",
+        "} else {",
+        "  print(\"Đủ tuổi\");",
+        "}"
+      ],
+      "bugs": [
+        {
+          "line": 1,
+          "description": "Nhánh if-else bị đảo ngược: age > 18 lại in 'Chưa đủ tuổi'",
+          "wrong_code": "if (age > 18) {",
+          "accepted_fixes": [
+            "if (age < 18) {",
+            "if (age <= 17) {"
+          ],
+          "distractors": [
+            "if (age >= 18) {",
+            "if (age == 18) {"
+          ]
+        }
+      ],
+      "explanation": "Khi age > 18 nghĩa là đủ tuổi, nhưng code lại in 'Chưa đủ tuổi'. Cần đảo điều kiện."
+    },
+    {
+      "id": "ch2_logic_003",
+      "chapter": 2,
+      "language": "pseudocode",
+      "topic": "null_reference",
+      "difficulty": "medium",
+      "snippet": [
+        "let player = null;",
+        "let playerName = player.name;",
+        "print(playerName);"
+      ],
+      "bugs": [
+        {
+          "line": 1,
+          "description": "Truy cập thuộc tính .name trên biến null gây crash",
+          "wrong_code": "let playerName = player.name;",
+          "accepted_fixes": [
+            "let playerName = player != null ? player.name : \"Unknown\";"
+          ],
+          "distractors": [
+            "let playerName = player.Name;",
+            "let playerName = null.name;"
+          ]
+        }
+      ],
+      "explanation": "Không thể truy cập thuộc tính trên biến null. Cần kiểm tra null trước khi dùng."
+    },
+    {
+      "id": "ch2_logic_004",
+      "chapter": 2,
+      "language": "pseudocode",
+      "topic": "type_condition",
+      "difficulty": "medium",
+      "snippet": [
+        "let score = \"100\";",
+        "let bonus = 50;",
+        "let total = score + bonus;",
+        "print(total);"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "score là chuỗi \"100\" nên cộng với số 50 sẽ thành \"10050\" thay vì 150",
+          "wrong_code": "let total = score + bonus;",
+          "accepted_fixes": [
+            "let total = int(score) + bonus;",
+            "let total = toNumber(score) + bonus;"
+          ],
+          "distractors": [
+            "let total = score - bonus;",
+            "let total = score * bonus;"
+          ]
+        }
+      ],
+      "explanation": "Khi cộng chuỗi với số, kết quả là nối chuỗi. Cần chuyển đổi kiểu trước."
+    },
+    {
+      "id": "ch2_logic_005",
+      "chapter": 2,
+      "language": "pseudocode",
+      "topic": "wrong_branch",
+      "difficulty": "hard",
+      "snippet": [
+        "let temperature = 38;",
+        "let status = \"\";",
+        "if (temperature < 36) {",
+        "  status = \"Hạ thân nhiệt\";",
+        "} else if (temperature > 37.5) {",
+        "  status = \"Bình thường\";",
+        "} else {",
+        "  status = \"Sốt\";",
+        "}",
+        "print(status);"
+      ],
+      "bugs": [
+        {
+          "line": 5,
+          "description": "Nhãn 'Bình thường' và 'Sốt' bị gán sai nhánh",
+          "wrong_code": "  status = \"Bình thường\";",
+          "accepted_fixes": [
+            "  status = \"Sốt\";"
+          ]
+        },
+        {
+          "line": 7,
+          "description": "Nhãn 'Sốt' lẽ ra phải là 'Bình thường'",
+          "wrong_code": "  status = \"Sốt\";",
+          "accepted_fixes": [
+            "  status = \"Bình thường\";"
+          ],
+          "distractors": [
+            "  status = \"Hạ thân nhiệt\";",
+            "  status = \"Nguy hiểm\";"
+          ]
+        }
+      ],
+      "explanation": "Nhiệt độ > 37.5 là sốt, không phải bình thường. Hai giá trị gán bị đảo nhau."
+    },
+    {
+      "id": "ch3_runtime_001",
+      "chapter": 3,
+      "language": "pseudocode",
+      "topic": "array_loop",
+      "difficulty": "hard",
+      "snippet": [
+        "let scores = [10, 20, 30, 40, 50];",
+        "let total = 0;",
+        "let i = 0;",
+        "while (i <= 5) {",
+        "  total = total + scores[i];",
+        "  i = i + 1;",
+        "}",
+        "print(total);"
+      ],
+      "bugs": [
+        {
+          "line": 3,
+          "description": "Lỗi off-by-one: truy cập index 5 vượt biên mảng (0-4)",
+          "wrong_code": "while (i <= 5) {",
+          "accepted_fixes": [
+            "while (i < 5) {",
+            "while (i <= 4) {"
+          ],
+          "distractors": [
+            "while (i < 4) {",
+            "while (i <= 6) {"
+          ]
+        }
+      ],
+      "explanation": "Mảng 5 phần tử có index từ 0 đến 4. Điều kiện i <= 5 sẽ truy cập index 5 gây lỗi."
+    },
+    {
+      "id": "ch3_runtime_002",
+      "chapter": 3,
+      "language": "pseudocode",
+      "topic": "array_loop",
+      "difficulty": "hard",
+      "snippet": [
+        "let items = [\"sword\", \"shield\", \"potion\"];",
+        "let i = 0;",
+        "while (i < items.length) {",
+        "  print(items[i]);",
+        "}",
+        "print(\"Done!\");"
+      ],
+      "bugs": [
+        {
+          "line": 3,
+          "description": "Thiếu i = i + 1 trong vòng lặp, gây vòng lặp vô tận",
+          "wrong_code": "  print(items[i]);",
+          "accepted_fixes": [
+            "  print(items[i]);\n  i = i + 1;"
+          ],
+          "distractors": [
+            "  print(items[i + 1]);",
+            "  print(items);"
+          ]
+        }
+      ],
+      "explanation": "Vòng lặp while cần tăng biến đếm i để tránh lặp vô hạn."
+    },
+    {
+      "id": "ch3_runtime_003",
+      "chapter": 3,
+      "language": "pseudocode",
+      "topic": "off_by_one_index",
+      "difficulty": "hard",
+      "snippet": [
+        "let names = [\"An\", \"Bình\", \"Cường\"];",
+        "let last = names[names.length];",
+        "print(last);"
+      ],
+      "bugs": [
+        {
+          "line": 1,
+          "description": "names.length = 3, nhưng index hợp lệ là 0-2. Cần trừ 1",
+          "wrong_code": "let last = names[names.length];",
+          "accepted_fixes": [
+            "let last = names[names.length - 1];"
+          ],
+          "distractors": [
+            "let last = names[names.length + 1];",
+            "let last = names[0];"
+          ]
+        }
+      ],
+      "explanation": "Phần tử cuối mảng có index = length - 1, không phải length."
+    },
+    {
+      "id": "ch3_runtime_004",
+      "chapter": 3,
+      "language": "pseudocode",
+      "topic": "array_loop",
+      "difficulty": "hard",
+      "snippet": [
+        "let numbers = [5, 3, 8, 1, 9];",
+        "let max_val = 0;",
+        "for (let i = 1; i < numbers.length; i++) {",
+        "  if (numbers[i] > max_val) {",
+        "    max_val = numbers[i];",
+        "  }",
+        "}",
+        "print(max_val);"
+      ],
+      "bugs": [
+        {
+          "line": 1,
+          "description": "max_val khởi tạo = 0, nhưng nên bắt đầu bằng phần tử đầu tiên",
+          "wrong_code": "let max_val = 0;",
+          "accepted_fixes": [
+            "let max_val = numbers[0];"
+          ],
+          "distractors": [
+            "let max_val = -1;",
+            "let max_val = numbers[1];"
+          ]
+        },
+        {
+          "line": 2,
+          "description": "Vòng lặp bắt đầu từ i=1 nhưng nếu max_val = numbers[0] thì đúng, nếu max_val = 0 thì sai vì bỏ qua phần tử đầu",
+          "wrong_code": "for (let i = 1; i < numbers.length; i++) {",
+          "accepted_fixes": [
+            "for (let i = 0; i < numbers.length; i++) {"
+          ],
+          "distractors": [
+            "for (let i = 1; i <= numbers.length; i++) {",
+            "for (let i = 0; i <= numbers.length; i++) {"
+          ]
+        }
+      ],
+      "explanation": "Tìm max cần khởi tạo bằng phần tử đầu tiên và duyệt từ index 0 hoặc 1 tương ứng."
+    },
+    {
+      "id": "ch3_runtime_005",
+      "chapter": 3,
+      "language": "pseudocode",
+      "topic": "off_by_one_index",
+      "difficulty": "very_hard",
+      "snippet": [
+        "let arr = [10, 20, 30, 40, 50];",
+        "let reversed = [];",
+        "for (let i = arr.length; i >= 0; i--) {",
+        "  reversed.push(arr[i]);",
+        "}",
+        "print(reversed);"
+      ],
+      "bugs": [
+        {
+          "line": 2,
+          "description": "Bắt đầu từ arr.length sẽ truy cập vượt biên. Cần arr.length - 1",
+          "wrong_code": "for (let i = arr.length; i >= 0; i--) {",
+          "accepted_fixes": [
+            "for (let i = arr.length - 1; i >= 0; i--) {"
+          ],
+          "distractors": [
+            "for (let i = arr.length; i > 0; i--) {",
+            "for (let i = arr.length - 1; i > 0; i--) {"
+          ]
+        }
+      ],
+      "explanation": "Khi duyệt ngược mảng, bắt đầu từ length - 1 vì index cuối cùng = length - 1."
+    },
+    {
+      "id": "ch4_flow_001",
+      "chapter": 4,
+      "language": "pseudocode",
+      "topic": "algorithm_flow",
+      "difficulty": "hard",
+      "type": "block_assembly",
+      "goal": "Tính tổng các số chẵn trong mảng numbers",
+      "blocks": [
+        "let numbers = [1, 2, 3, 4, 5, 6];",
+        "let sum = 0;",
+        "for (let i = 0; i < numbers.length; i++) {",
+        "  if (numbers[i] % 2 == 0) {",
+        "    sum = sum + numbers[i];",
+        "  }",
+        "}",
+        "print(sum);"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
+      "explanation": "Duyệt mảng, kiểm tra từng phần tử chia hết cho 2, cộng dồn vào sum."
+    },
+    {
+      "id": "ch4_flow_002",
+      "chapter": 4,
+      "language": "pseudocode",
+      "topic": "algorithm_flow",
+      "difficulty": "hard",
+      "type": "block_assembly",
+      "goal": "Tìm giá trị lớn nhất trong mảng data",
+      "blocks": [
+        "let data = [7, 2, 9, 4, 1];",
+        "let max_val = data[0];",
+        "for (let i = 1; i < data.length; i++) {",
+        "  if (data[i] > max_val) {",
+        "    max_val = data[i];",
+        "  }",
+        "}",
+        "print(max_val);"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
+      "explanation": "Khởi tạo max bằng phần tử đầu, duyệt từ phần tử thứ 2, cập nhật nếu tìm được lớn hơn."
+    },
+    {
+      "id": "ch4_flow_003",
+      "chapter": 4,
+      "language": "pseudocode",
+      "topic": "algorithm_flow",
+      "difficulty": "hard",
+      "type": "block_assembly",
+      "goal": "Đếm số lần ký tự 'a' xuất hiện trong chuỗi text",
+      "blocks": [
+        "let text = \"banana\";",
+        "let count = 0;",
+        "for (let i = 0; i < text.length; i++) {",
+        "  if (text[i] == 'a') {",
+        "    count = count + 1;",
+        "  }",
+        "}",
+        "print(count);"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
+      "explanation": "Duyệt từng ký tự, so sánh với 'a', nếu khớp thì tăng biến đếm."
+    },
+    {
+      "id": "ch4_flow_004",
+      "chapter": 4,
+      "language": "pseudocode",
+      "topic": "algorithm_flow",
+      "difficulty": "very_hard",
+      "type": "block_assembly",
+      "goal": "Kiểm tra xem số n có phải số nguyên tố không",
+      "blocks": [
+        "let n = 17;",
+        "let is_prime = true;",
+        "if (n < 2) {",
+        "  is_prime = false;",
+        "}",
+        "for (let i = 2; i * i <= n; i++) {",
+        "  if (n % i == 0) {",
+        "    is_prime = false;",
+        "  }",
+        "}",
+        "print(is_prime);"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "explanation": "Kiểm tra n < 2 trước, rồi thử chia cho các số từ 2 đến căn n. Nếu chia hết thì không phải nguyên tố."
+    },
+    {
+      "id": "ch4_flow_005",
+      "chapter": 4,
+      "language": "pseudocode",
+      "topic": "logic_flow_combined",
+      "difficulty": "very_hard",
+      "type": "block_assembly",
+      "goal": "Sắp xếp mảng arr theo thứ tự tăng dần (Bubble Sort)",
+      "blocks": [
+        "let arr = [5, 3, 8, 1, 2];",
+        "for (let i = 0; i < arr.length - 1; i++) {",
+        "  for (let j = 0; j < arr.length - 1 - i; j++) {",
+        "    if (arr[j] > arr[j + 1]) {",
+        "      let temp = arr[j];",
+        "      arr[j] = arr[j + 1];",
+        "      arr[j + 1] = temp;",
+        "    }",
+        "  }",
+        "}",
+        "print(arr);"
+      ],
+      "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "explanation": "Bubble Sort: so sánh từng cặp liền kề, hoán đổi nếu sai thứ tự, lặp lại cho đến khi sắp xong."
+    }
+  ]
+}
