@@ -34,7 +34,7 @@ func _ready() -> void:
 	_load_save()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("pause"):
+	if event.is_action_pressed("pause") and not event.is_echo():
 		if current_state == GameState.PLAYING:
 			pause_game() 
 		elif current_state == GameState.PAUSED:
@@ -42,13 +42,14 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # --- State Management ---
 func set_state(new_state: GameState) -> void:
+	if current_state == new_state:
+		return
+
 	var old_state = current_state
 	current_state = new_state
-	
-	if current_state == GameState.PAUSED:
-		get_tree().paused = true
-	elif current_state == GameState.PLAYING:
-		get_tree().paused = false
+
+	# Chỉ pause khi đang ở state PAUSED, các state khác luôn unpause.
+	get_tree().paused = (current_state == GameState.PAUSED)
 	
 	# Phát signal thông báo trạng thái mới (để UI hoặc Player bắt được)
 	game_state_changed.emit(current_state)
@@ -70,10 +71,18 @@ func go_to_main_menu() -> void:
 
 # Ham nay hien tai chua co MazeLevel.tscn
 func start_stage(chapter: int, stage_id: String) -> void:
-	current_chapter = chapter
-	current_stage_id = stage_id
+	current_chapter = clampi(chapter, 1, TOTAL_CHAPTERS)
+	current_stage_id = stage_id.strip_edges()
+	if current_stage_id.is_empty():
+		current_stage_id = _default_stage_for_chapter(current_chapter)
+
+	var scene_path := "res://scenes/maze/MazeLevel.tscn"
+	if not FileAccess.file_exists(scene_path):
+		push_warning("[GameManager] Missing scene: %s" % scene_path)
+		return
+
 	set_state(GameState.PLAYING)
-	_change_scene("res://scenes/maze/MazeLevel.tscn")
+	_change_scene(scene_path)
 
 func trigger_game_over(reason: String) -> void:
 	set_state(GameState.GAME_OVER)
@@ -91,17 +100,16 @@ func exit_combat() -> void:
 
 # --- Chapter Progression ---
 func unlock_chapter(chapter: int) -> void:
-	if chapter <= TOTAL_CHAPTERS and not chapters_unlocked.has(chapter):
-		chapters_unlocked.append(chapter)
+	var chapter_safe := clampi(chapter, 1, TOTAL_CHAPTERS)
+	if not chapters_unlocked.has(chapter_safe):
+		chapters_unlocked.append(chapter_safe)
 		chapters_unlocked.sort()
-		chapter_unlocked.emit(chapter)
+		chapter_unlocked.emit(chapter_safe)
 		_save_game()
-		print("[GameManager] Đã mở khóa Chapter: ", chapter)
+		print("[GameManager] Đã mở khóa Chapter: ", chapter_safe)
 
 func is_chapter_unlocked(chapter: int) -> bool:
-	if chapters_unlocked.has(chapter):
-		return true
-	return false
+	return chapters_unlocked.has(chapter)
 
 # --- Save / Load ---
 func _save_game() -> void:
@@ -127,11 +135,17 @@ func _save_game() -> void:
 func _load_save() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("[GameManager] No save file found. Start a new game.")
+		current_chapter = 1
+		chapters_unlocked = [1]
+		current_stage_id = _default_stage_for_chapter(current_chapter)
 		return
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file == null:
 		print("[GameManager] Error: Cannot open save file for reading.")
+		current_chapter = 1
+		chapters_unlocked = [1]
+		current_stage_id = _default_stage_for_chapter(current_chapter)
 		return
 
 	var json_text = file.get_as_text()
@@ -142,35 +156,67 @@ func _load_save() -> void:
 	
 	if error != OK:
 		print("[GameManager] JSON parsing error: ", json.get_error_message())
+		current_chapter = 1
+		chapters_unlocked = [1]
+		current_stage_id = _default_stage_for_chapter(current_chapter)
 		return
 
 	var data = json.data
 	if typeof(data) == TYPE_DICTIONARY:
-		current_chapter = data.get("current_chapter")
-		current_stage_id = data.get("current_stage_id")
+		current_chapter = clampi(int(data.get("current_chapter", 1)), 1, TOTAL_CHAPTERS)
+		current_stage_id = str(data.get("current_stage_id", "")).strip_edges()
+		if current_stage_id.is_empty():
+			current_stage_id = _default_stage_for_chapter(current_chapter)
 		
+		chapters_unlocked.clear()
 		if data.has("chapters_unlocked"):
-			chapters_unlocked.clear()
-			for chapter in data["chapters_unlocked"]:
-				chapters_unlocked.append(int(chapter))
+			var loaded_chapters: Variant = data["chapters_unlocked"]
+			if typeof(loaded_chapters) == TYPE_ARRAY:
+				for chapter in loaded_chapters:
+					var chapter_int := clampi(int(chapter), 1, TOTAL_CHAPTERS)
+					if not chapters_unlocked.has(chapter_int):
+						chapters_unlocked.append(chapter_int)
+
+		if chapters_unlocked.is_empty():
+			chapters_unlocked.append(1)
+
+		if not chapters_unlocked.has(current_chapter):
+			chapters_unlocked.append(current_chapter)
+
+		chapters_unlocked.sort()
 		
 		print("[GameManager] Saved data loaded successfully!")
+	else:
+		current_chapter = 1
+		chapters_unlocked = [1]
+		current_stage_id = _default_stage_for_chapter(current_chapter)
 
 func save_on_stage_clear() -> void:
-	current_chapter += 1
+	var next_chapter := mini(current_chapter + 1, TOTAL_CHAPTERS)
+	current_chapter = next_chapter
+
+	if not chapters_unlocked.has(next_chapter):
+		chapters_unlocked.append(next_chapter)
+		chapters_unlocked.sort()
+		chapter_unlocked.emit(next_chapter)
+
+	current_stage_id = _default_stage_for_chapter(current_chapter)
 	_save_game()
 	print("[GameManager] Stage Clear! Progress saved to Chapter: ", current_chapter)
 
 # --- Internal ---
 func _change_scene(scene_path: String) -> void:
-	# TODO: Emit scene_transition_started
-	# Gọi get_tree().change_scene_to_file(scene_path)
-	# Await 1 frame rồi emit scene_transition_finished
+	if not FileAccess.file_exists(scene_path):
+		push_warning("[GameManager] Scene file does not exist: %s" % scene_path)
+		scene_transition_finished.emit()
+		return
+
 	scene_transition_started.emit()
 	
 	var error = get_tree().change_scene_to_file(scene_path)
 	if error != OK:
 		print("[GameManager] Scene switching error: ", error)
+		scene_transition_finished.emit()
 		return
 		
 	await get_tree().process_frame
@@ -178,4 +224,8 @@ func _change_scene(scene_path: String) -> void:
 	scene_transition_finished.emit()
 	
 	print("[GameManager] Đã nạp xong: ", scene_path)
+
+
+func _default_stage_for_chapter(chapter: int) -> String:
+	return "ch%d_stage1" % clampi(chapter, 1, TOTAL_CHAPTERS)
 	

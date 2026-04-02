@@ -6,22 +6,39 @@ var event_log: Array[Dictionary] = []
 
 
 func _log_event(event_type: String, data: Dictionary) -> void:
-	# TODO: Tạo entry = {"type": event_type, "time": Time.get_ticks_msec(), ...data}
-	# Thêm vào event_log
-	# In ra console: "[Telemetry] event_type"
-	pass
+	# Tạo một bản sao của dictionary data để tránh vô tình thay đổi dữ liệu gốc
+	var entry = data.duplicate()
+	
+	# Gắn thêm type và mốc thời gian (tính bằng mili-giây từ khi game bắt đầu chạy)
+	entry["type"] = event_type
+	entry["time"] = Time.get_ticks_msec()
+	
+	# Thêm vào mảng event_log
+	event_log.append(entry)
+	
+	# In ra console để theo dõi trực tiếp trong quá trình test game
+	print("[Telemetry] ", event_type)
 
 
 func log_encounter_result(bug_id: String, success: bool, time_taken: float) -> void:
-	# TODO: Gọi _log_event("encounter_result", {bug_id, success, time_taken})
-	pass
+	# Đóng gói các tham số thành một Dictionary và truyền cho _log_event
+	_log_event("encounter_result", {
+		"bug_id": bug_id,
+		"success": success,
+		"time_taken": time_taken
+	})
 
 
 func log_stage_clear(stage_id: String, time_remaining: float, hp_remaining: int) -> void:
-	# TODO: Gọi _log_event("stage_clear", {stage_id, time_remaining, hp_remaining})
-	pass
+	_log_event("stage_clear", {
+		"stage_id": stage_id,
+		"time_remaining": time_remaining,
+		"hp_remaining": hp_remaining
+	})
 
 
 func log_game_over(reason: String, stage_id: String) -> void:
-	# TODO: Gọi _log_event("game_over", {reason, stage_id})
-	pass
+	_log_event("game_over", {
+		"reason": reason,
+		"stage_id": stage_id
+	})

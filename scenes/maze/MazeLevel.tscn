@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cmessifsayocp"]
+
+[ext_resource type="Script" uid="uid://bkua3gbo0rc8i" path="res://scenes/maze/MazeLevel.gd" id="1_maze_script"]
+
+[node name="MazeLevel" type="Node2D" unique_id=1878127544]
+script = ExtResource("1_maze_script")
