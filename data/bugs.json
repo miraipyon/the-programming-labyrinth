@@ -9,23 +9,24 @@
 		"let score = 100",
 		"let name = \"Player\"",
 		"print(\"Hello, \" + name",
-        "print(\"Score: \" + score)"
+		"print(\"Score: \" + score)"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "Thiếu dấu đóng ngoặc ở cuối dòng",
+		  "description": "Thiếu dấu đóng ngoặc ) ở cuối lệnh print",
 		  "wrong_code": "print(\"Hello, \" + name",
 		  "accepted_fixes": [
-            "print(\"Hello, \" + name)"
+			"print(\"Hello, \" + name)"
 		  ],
 		  "distractors": [
 			"print(\"Hello, \" + name;",
-            "print \"Hello, \" + name)"
+			"print \"Hello, \" + name)",
+			"print(\"Hello, \" + name]"
 		  ]
 		}
 	  ],
-	  "explanation": "Mỗi lệnh gọi hàm cần có đủ cặp ngoặc mở-đóng ()."
+	  "explanation": "Mỗi lệnh gọi hàm cần đủ cặp ngoặc mở-đóng (). Dòng 2 mở ngoặc nhưng không đóng."
 	},
 	{
 	  "id": "ch1_syntax_002",
@@ -37,23 +38,24 @@
 		"let health = 100;",
 		"let damage = 25;",
 		"health = health - damge;",
-        "print(health);"
+		"print(health);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "Sai tên biến: damge thay vì damage",
+		  "description": "Sai tên biến: 'damge' thay vì 'damage'",
 		  "wrong_code": "health = health - damge;",
 		  "accepted_fixes": [
-            "health = health - damage;"
+			"health = health - damage;"
 		  ],
 		  "distractors": [
 			"health = health - Damage;",
-            "health = health + damage;"
+			"health = health + damage;",
+			"health = damage - health;"
 		  ]
 		}
 	  ],
-	  "explanation": "Tên biến phải khớp chính xác với lúc khai báo."
+	  "explanation": "Tên biến phân biệt chữ hoa/thường và phải khớp chính xác với khai báo. 'damge' ≠ 'damage'."
 	},
 	{
 	  "id": "ch1_syntax_003",
@@ -66,23 +68,24 @@
 		"let y = 20;",
 		"if (x > y {",
 		"  print(\"x is bigger\");",
-        "}"
+		"}"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "Thiếu dấu đóng ngoặc tròn sau điều kiện if",
+		  "description": "Thiếu dấu đóng ngoặc tròn ) sau điều kiện if",
 		  "wrong_code": "if (x > y {",
 		  "accepted_fixes": [
-            "if (x > y) {"
+			"if (x > y) {"
 		  ],
 		  "distractors": [
 			"if x > y) {",
-            "if (x > y) ["
+			"if (x > y) [",
+			"if (x > y]{"
 		  ]
 		}
 	  ],
-	  "explanation": "Câu lệnh if cần đầy đủ cặp ngoặc tròn () bao quanh điều kiện."
+	  "explanation": "Câu lệnh if cần đủ cặp ngoặc tròn () bao quanh điều kiện rồi mới đến { mở block."
 	},
 	{
 	  "id": "ch1_syntax_004",
@@ -94,23 +97,24 @@
 		"let greeting = \"Hello World\";",
 		"Let count = 5;",
 		"print(greeting);",
-        "print(count);"
+		"print(count);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 1,
-		  "description": "Từ khóa 'let' phải viết thường, không phải 'Let'",
+		  "description": "Từ khóa khai báo biến phải viết thường 'let', không phải 'Let'",
 		  "wrong_code": "Let count = 5;",
 		  "accepted_fixes": [
-            "let count = 5;"
+			"let count = 5;"
 		  ],
 		  "distractors": [
 			"LET count = 5;",
-            "var count = 5;"
+			"var count = 5;",
+			"Var count = 5;"
 		  ]
 		}
 	  ],
-	  "explanation": "Từ khóa phân biệt chữ hoa chữ thường. 'Let' khác 'let'."
+	  "explanation": "Ngôn ngữ phân biệt chữ hoa/thường. Từ khóa 'Let' và 'LET' đều sai, phải dùng 'let'."
 	},
 	{
 	  "id": "ch1_syntax_005",
@@ -120,23 +124,24 @@
 	  "difficulty": "easy",
 	  "snippet": [
 		"let message = \"Hi;",
-        "print(message);"
+		"print(message);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 0,
-		  "description": "Thiếu dấu ngoặc kép đóng chuỗi",
+		  "description": "Chuỗi ký tự thiếu dấu ngoặc kép đóng trước dấu chấm phẩy",
 		  "wrong_code": "let message = \"Hi;",
 		  "accepted_fixes": [
-            "let message = \"Hi\";"
+			"let message = \"Hi\";"
 		  ],
 		  "distractors": [
 			"let message = Hi\";",
-            "let message = 'Hi;"
+			"let message = 'Hi';",
+			"let message = \"Hi"
 		  ]
 		}
 	  ],
-	  "explanation": "Chuỗi ký tự phải được bao bởi cặp dấu ngoặc kép mở và đóng."
+	  "explanation": "Chuỗi ký tự phải được bao bởi cặp dấu ngoặc kép mở-đóng. Dòng 0 mở \" nhưng không đóng trước dấu ;"
 	},
 	{
 	  "id": "ch2_logic_001",
@@ -151,23 +156,24 @@
 		"  print(\"Still alive!\");",
 		"} else {",
 		"  print(\"Game Over!\");",
-        "}"
+		"}"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "Điều kiện sống/chết bị đảo ngược",
+		  "description": "Điều kiện sống/chết bị đảo ngược: hp < 0 không bao giờ đúng khi hp = 50",
 		  "wrong_code": "if (hp < 0) {",
 		  "accepted_fixes": [
-            "if (hp > 0) {"
+			"if (hp > 0) {"
 		  ],
 		  "distractors": [
 			"if (hp == 0) {",
-            "if (hp <= 0) {"
+			"if (hp <= 0) {",
+			"if (hp >= 0) {"
 		  ]
 		}
 	  ],
-	  "explanation": "Người chơi còn sống khi HP > 0, không phải HP < 0."
+	  "explanation": "Người chơi còn sống khi HP > 0. Điều kiện hp < 0 sẽ luôn cho kết quả ngược khi hp = 50."
 	},
 	{
 	  "id": "ch2_logic_002",
@@ -176,29 +182,33 @@
 	  "topic": "wrong_branch",
 	  "difficulty": "medium",
 	  "snippet": [
-		"let age = 15;",
-		"if (age > 18) {",
-		"  print(\"Chưa đủ tuổi\");",
+		"let score = 85;",
+		"let grade = \"\";",
+		"if (score >= 90) {",
+		"  grade = \"A\";",
+		"} else if (score = 80) {",
+		"  grade = \"B\";",
 		"} else {",
-		"  print(\"Đủ tuổi\");",
-        "}"
+		"  grade = \"C\";",
+		"}",
+		"print(grade);"
 	  ],
 	  "bugs": [
 		{
-		  "line": 1,
-		  "description": "Nhánh if-else bị đảo ngược: age > 18 lại in 'Chưa đủ tuổi'",
-		  "wrong_code": "if (age > 18) {",
+		  "line": 4,
+		  "description": "Dùng phép gán '=' thay vì so sánh '>=' hoặc '>=': score = 80 gán lại biến, không kiểm tra giá trị",
+		  "wrong_code": "} else if (score = 80) {",
 		  "accepted_fixes": [
-			"if (age < 18) {",
-            "if (age <= 17) {"
+			"} else if (score >= 80) {"
 		  ],
 		  "distractors": [
-			"if (age >= 18) {",
-            "if (age == 18) {"
+			"} else if (score == 80) {",
+			"} else if (score > 80) {",
+			"} else if (score <= 80) {"
 		  ]
 		}
 	  ],
-	  "explanation": "Khi age > 18 nghĩa là đủ tuổi, nhưng code lại in 'Chưa đủ tuổi'. Cần đảo điều kiện."
+	  "explanation": "Trong câu lệnh điều kiện phải dùng toán tử so sánh (>=, ==, >, <). Dùng '=' là phép gán, không phải so sánh và gây lỗi logic nghiêm trọng."
 	},
 	{
 	  "id": "ch2_logic_003",
@@ -209,23 +219,24 @@
 	  "snippet": [
 		"let player = null;",
 		"let playerName = player.name;",
-        "print(playerName);"
+		"print(playerName);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 1,
-		  "description": "Truy cập thuộc tính .name trên biến null gây crash",
+		  "description": "Truy cập thuộc tính .name trên biến null gây lỗi NullPointerException",
 		  "wrong_code": "let playerName = player.name;",
 		  "accepted_fixes": [
-            "let playerName = player != null ? player.name : \"Unknown\";"
+			"let playerName = player != null ? player.name : \"Unknown\";"
 		  ],
 		  "distractors": [
 			"let playerName = player.Name;",
-            "let playerName = null.name;"
+			"let playerName = null.name;",
+			"let playerName = player?.name;"
 		  ]
 		}
 	  ],
-	  "explanation": "Không thể truy cập thuộc tính trên biến null. Cần kiểm tra null trước khi dùng."
+	  "explanation": "Không thể truy cập thuộc tính trên biến null, phải kiểm tra null trước. Dùng toán tử ternary để xử lý trường hợp null an toàn."
 	},
 	{
 	  "id": "ch2_logic_004",
@@ -237,24 +248,25 @@
 		"let score = \"100\";",
 		"let bonus = 50;",
 		"let total = score + bonus;",
-        "print(total);"
+		"print(total);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "score là chuỗi \"100\" nên cộng với số 50 sẽ thành \"10050\" thay vì 150",
+		  "description": "score là chuỗi nên cộng với số cho kết quả nối chuỗi \"10050\" thay vì 150",
 		  "wrong_code": "let total = score + bonus;",
 		  "accepted_fixes": [
 			"let total = int(score) + bonus;",
-            "let total = toNumber(score) + bonus;"
+			"let total = toNumber(score) + bonus;"
 		  ],
 		  "distractors": [
 			"let total = score - bonus;",
-            "let total = score * bonus;"
+			"let total = score * bonus;",
+			"let total = str(score) + bonus;"
 		  ]
 		}
 	  ],
-	  "explanation": "Khi cộng chuỗi với số, kết quả là nối chuỗi. Cần chuyển đổi kiểu trước."
+	  "explanation": "Chuỗi + số = nối chuỗi. Phải chuyển đổi kiểu (type cast) score sang số nguyên trước khi cộng."
 	},
 	{
 	  "id": "ch2_logic_005",
@@ -272,31 +284,37 @@
 		"} else {",
 		"  status = \"Sốt\";",
 		"}",
-        "print(status);"
+		"print(status);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 5,
-		  "description": "Nhãn 'Bình thường' và 'Sốt' bị gán sai nhánh",
+		  "description": "Nhánh temperature > 37.5 gán 'Bình thường' nhưng phải là 'Sốt'",
 		  "wrong_code": "  status = \"Bình thường\";",
 		  "accepted_fixes": [
-            "  status = \"Sốt\";"
+			"  status = \"Sốt\";"
+		  ],
+		  "distractors": [
+			"  status = \"Hạ thân nhiệt\";",
+			"  status = \"Nguy hiểm\";",
+			"  status = \"Cảm cúm\";"
 		  ]
 		},
 		{
 		  "line": 7,
-		  "description": "Nhãn 'Sốt' lẽ ra phải là 'Bình thường'",
+		  "description": "Nhánh else còn lại (36 <= temp <= 37.5) gán 'Sốt' nhưng phải là 'Bình thường'",
 		  "wrong_code": "  status = \"Sốt\";",
 		  "accepted_fixes": [
-            "  status = \"Bình thường\";"
+			"  status = \"Bình thường\";"
 		  ],
 		  "distractors": [
 			"  status = \"Hạ thân nhiệt\";",
-            "  status = \"Nguy hiểm\";"
+			"  status = \"Nguy hiểm\";",
+			"  status = \"Ổn định\";"
 		  ]
 		}
 	  ],
-	  "explanation": "Nhiệt độ > 37.5 là sốt, không phải bình thường. Hai giá trị gán bị đảo nhau."
+	  "explanation": "Nhiệt độ > 37.5 là sốt, 36-37.5 là bình thường. Hai nhãn trạng thái bị hoán đổi cho nhau."
 	},
 	{
 	  "id": "ch3_runtime_001",
@@ -312,24 +330,25 @@
 		"  total = total + scores[i];",
 		"  i = i + 1;",
 		"}",
-        "print(total);"
+		"print(total);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 3,
-		  "description": "Lỗi off-by-one: truy cập index 5 vượt biên mảng (0-4)",
+		  "description": "Lỗi off-by-one: điều kiện i <= 5 truy cập index 5 nhưng mảng chỉ có index 0-4",
 		  "wrong_code": "while (i <= 5) {",
 		  "accepted_fixes": [
 			"while (i < 5) {",
-            "while (i <= 4) {"
+			"while (i <= 4) {"
 		  ],
 		  "distractors": [
 			"while (i < 4) {",
-            "while (i <= 6) {"
+			"while (i <= 6) {",
+			"while (i < scores.length + 1) {"
 		  ]
 		}
 	  ],
-	  "explanation": "Mảng 5 phần tử có index từ 0 đến 4. Điều kiện i <= 5 sẽ truy cập index 5 gây lỗi."
+	  "explanation": "Mảng 5 phần tử có index hợp lệ từ 0 đến 4. Điều kiện i <= 5 cho phép truy cập index 5 gây lỗi vượt biên."
 	},
 	{
 	  "id": "ch3_runtime_002",
@@ -343,23 +362,24 @@
 		"while (i < items.length) {",
 		"  print(items[i]);",
 		"}",
-        "print(\"Done!\");"
+		"print(\"Done!\");"
 	  ],
 	  "bugs": [
 		{
 		  "line": 3,
-		  "description": "Thiếu i = i + 1 trong vòng lặp, gây vòng lặp vô tận",
+		  "description": "Thiếu lệnh tăng biến đếm i bên trong vòng lặp, gây vòng lặp vô tận",
 		  "wrong_code": "  print(items[i]);",
 		  "accepted_fixes": [
-            "  print(items[i]);\n  i = i + 1;"
+			"  print(items[i]);\n  i = i + 1;"
 		  ],
 		  "distractors": [
 			"  print(items[i + 1]);",
-            "  print(items);"
+			"  print(items);",
+			"  i = i - 1;\n  print(items[i]);"
 		  ]
 		}
 	  ],
-	  "explanation": "Vòng lặp while cần tăng biến đếm i để tránh lặp vô hạn."
+	  "explanation": "Biến đếm i không bao giờ tăng nên điều kiện i < items.length luôn đúng, vòng lặp chạy mãi mãi."
 	},
 	{
 	  "id": "ch3_runtime_003",
@@ -370,23 +390,24 @@
 	  "snippet": [
 		"let names = [\"An\", \"Bình\", \"Cường\"];",
 		"let last = names[names.length];",
-        "print(last);"
+		"print(last);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 1,
-		  "description": "names.length = 3, nhưng index hợp lệ là 0-2. Cần trừ 1",
+		  "description": "names.length = 3 nhưng index tối đa hợp lệ là 2 (length - 1); index 3 vượt biên",
 		  "wrong_code": "let last = names[names.length];",
 		  "accepted_fixes": [
-            "let last = names[names.length - 1];"
+			"let last = names[names.length - 1];"
 		  ],
 		  "distractors": [
 			"let last = names[names.length + 1];",
-            "let last = names[0];"
+			"let last = names[0];",
+			"let last = names[names.length - 2];"
 		  ]
 		}
 	  ],
-	  "explanation": "Phần tử cuối mảng có index = length - 1, không phải length."
+	  "explanation": "Index cuối mảng = length - 1. names.length = 3 nên index hợp lệ là 0, 1, 2. Dùng names[3] sẽ vượt biên."
 	},
 	{
 	  "id": "ch3_runtime_004",
@@ -396,41 +417,30 @@
 	  "difficulty": "hard",
 	  "snippet": [
 		"let numbers = [5, 3, 8, 1, 9];",
-		"let max_val = 0;",
-		"for (let i = 1; i < numbers.length; i++) {",
+		"let max_val = numbers[0];",
+		"for (let i = 0; i < numbers.length; i++) {",
 		"  if (numbers[i] > max_val) {",
 		"    max_val = numbers[i];",
 		"  }",
 		"}",
-        "print(max_val);"
+		"print(max_val);"
 	  ],
 	  "bugs": [
 		{
-		  "line": 1,
-		  "description": "max_val khởi tạo = 0, nhưng nên bắt đầu bằng phần tử đầu tiên",
-		  "wrong_code": "let max_val = 0;",
-		  "accepted_fixes": [
-            "let max_val = numbers[0];"
-		  ],
-		  "distractors": [
-			"let max_val = -1;",
-            "let max_val = numbers[1];"
-		  ]
-		},
-		{
 		  "line": 2,
-		  "description": "Vòng lặp bắt đầu từ i=1 nhưng nếu max_val = numbers[0] thì đúng, nếu max_val = 0 thì sai vì bỏ qua phần tử đầu",
-		  "wrong_code": "for (let i = 1; i < numbers.length; i++) {",
+		  "description": "Vòng lặp bắt đầu từ i=0 so sánh numbers[0] với chính max_val = numbers[0], không sai nhưng lãng phí; cần bắt đầu từ i=1 để hiệu quả và đúng pattern tìm max chuẩn",
+		  "wrong_code": "for (let i = 0; i < numbers.length; i++) {",
 		  "accepted_fixes": [
-            "for (let i = 0; i < numbers.length; i++) {"
+			"for (let i = 1; i < numbers.length; i++) {"
 		  ],
 		  "distractors": [
+			"for (let i = 0; i <= numbers.length; i++) {",
 			"for (let i = 1; i <= numbers.length; i++) {",
-            "for (let i = 0; i <= numbers.length; i++) {"
+			"for (let i = 2; i < numbers.length; i++) {"
 		  ]
 		}
 	  ],
-	  "explanation": "Tìm max cần khởi tạo bằng phần tử đầu tiên và duyệt từ index 0 hoặc 1 tương ứng."
+	  "explanation": "Khi max_val đã khởi tạo bằng numbers[0], vòng lặp nên bắt đầu từ i=1 để bỏ qua phần tử đã dùng làm mốc, tránh so sánh thừa và đúng pattern tìm max chuẩn."
 	},
 	{
 	  "id": "ch3_runtime_005",
@@ -444,23 +454,24 @@
 		"for (let i = arr.length; i >= 0; i--) {",
 		"  reversed.push(arr[i]);",
 		"}",
-        "print(reversed);"
+		"print(reversed);"
 	  ],
 	  "bugs": [
 		{
 		  "line": 2,
-		  "description": "Bắt đầu từ arr.length sẽ truy cập vượt biên. Cần arr.length - 1",
+		  "description": "Vòng lặp bắt đầu từ arr.length (= 5) thay vì arr.length - 1 (= 4), index 5 vượt biên mảng",
 		  "wrong_code": "for (let i = arr.length; i >= 0; i--) {",
 		  "accepted_fixes": [
-            "for (let i = arr.length - 1; i >= 0; i--) {"
+			"for (let i = arr.length - 1; i >= 0; i--) {"
 		  ],
 		  "distractors": [
 			"for (let i = arr.length; i > 0; i--) {",
-            "for (let i = arr.length - 1; i > 0; i--) {"
+			"for (let i = arr.length - 1; i > 0; i--) {",
+			"for (let i = arr.length + 1; i >= 0; i--) {"
 		  ]
 		}
 	  ],
-	  "explanation": "Khi duyệt ngược mảng, bắt đầu từ length - 1 vì index cuối cùng = length - 1."
+	  "explanation": "Duyệt ngược mảng phải bắt đầu từ index cuối = arr.length - 1. Bắt đầu từ arr.length truy cập index vượt biên ngay vòng đầu tiên."
 	},
 	{
 	  "id": "ch4_flow_001",
@@ -469,7 +480,7 @@
 	  "topic": "algorithm_flow",
 	  "difficulty": "hard",
 	  "type": "block_assembly",
-	  "goal": "Tính tổng các số chẵn trong mảng numbers",
+	  "goal": "Tính tổng các số chẵn trong mảng numbers = [1, 2, 3, 4, 5, 6]. Kết quả đúng: 12.",
 	  "blocks": [
 		"let numbers = [1, 2, 3, 4, 5, 6];",
 		"let sum = 0;",
@@ -478,10 +489,10 @@
 		"    sum = sum + numbers[i];",
 		"  }",
 		"}",
-        "print(sum);"
+		"print(sum);"
 	  ],
 	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Duyệt mảng, kiểm tra từng phần tử chia hết cho 2, cộng dồn vào sum."
+	  "explanation": "Khai báo mảng và sum=0 trước, rồi vòng for duyệt từng phần tử, kiểm tra chẵn (% 2 == 0), cộng dồn vào sum, cuối cùng in kết quả."
 	},
 	{
 	  "id": "ch4_flow_002",
@@ -490,7 +501,7 @@
 	  "topic": "algorithm_flow",
 	  "difficulty": "hard",
 	  "type": "block_assembly",
-	  "goal": "Tìm giá trị lớn nhất trong mảng data",
+	  "goal": "Tìm giá trị lớn nhất trong mảng data = [7, 2, 9, 4, 1]. Kết quả đúng: 9.",
 	  "blocks": [
 		"let data = [7, 2, 9, 4, 1];",
 		"let max_val = data[0];",
@@ -499,10 +510,10 @@
 		"    max_val = data[i];",
 		"  }",
 		"}",
-        "print(max_val);"
+		"print(max_val);"
 	  ],
 	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Khởi tạo max bằng phần tử đầu, duyệt từ phần tử thứ 2, cập nhật nếu tìm được lớn hơn."
+	  "explanation": "Khởi tạo max_val = data[0], duyệt từ i=1 để bỏ qua phần tử đã dùng làm mốc, cập nhật max khi tìm được phần tử lớn hơn."
 	},
 	{
 	  "id": "ch4_flow_003",
@@ -511,7 +522,7 @@
 	  "topic": "algorithm_flow",
 	  "difficulty": "hard",
 	  "type": "block_assembly",
-	  "goal": "Đếm số lần ký tự 'a' xuất hiện trong chuỗi text",
+	  "goal": "Đếm số lần ký tự 'a' xuất hiện trong chuỗi text = \"banana\". Kết quả đúng: 3.",
 	  "blocks": [
 		"let text = \"banana\";",
 		"let count = 0;",
@@ -520,10 +531,10 @@
 		"    count = count + 1;",
 		"  }",
 		"}",
-        "print(count);"
+		"print(count);"
 	  ],
 	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Duyệt từng ký tự, so sánh với 'a', nếu khớp thì tăng biến đếm."
+	  "explanation": "Duyệt từng ký tự trong chuỗi, so sánh với 'a', tăng biến đếm khi khớp. Thứ tự: khai báo → khởi tạo count → for loop → if → cộng → đóng ngoặc → print."
 	},
 	{
 	  "id": "ch4_flow_004",
@@ -532,7 +543,7 @@
 	  "topic": "algorithm_flow",
 	  "difficulty": "very_hard",
 	  "type": "block_assembly",
-	  "goal": "Kiểm tra xem số n có phải số nguyên tố không",
+	  "goal": "Kiểm tra số n = 17 có phải số nguyên tố không. Kết quả đúng: true.",
 	  "blocks": [
 		"let n = 17;",
 		"let is_prime = true;",
@@ -544,10 +555,10 @@
 		"    is_prime = false;",
 		"  }",
 		"}",
-        "print(is_prime);"
+		"print(is_prime);"
 	  ],
 	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-	  "explanation": "Kiểm tra n < 2 trước, rồi thử chia cho các số từ 2 đến căn n. Nếu chia hết thì không phải nguyên tố."
+	  "explanation": "Kiểm tra n < 2 trước (không phải nguyên tố), rồi thử chia cho các số từ 2 đến căn bậc hai của n (i*i <= n). Nếu chia hết thì không phải nguyên tố."
 	},
 	{
 	  "id": "ch4_flow_005",
@@ -556,7 +567,7 @@
 	  "topic": "logic_flow_combined",
 	  "difficulty": "very_hard",
 	  "type": "block_assembly",
-	  "goal": "Sắp xếp mảng arr theo thứ tự tăng dần (Bubble Sort)",
+	  "goal": "Sắp xếp mảng arr = [5, 3, 8, 1, 2] theo thứ tự tăng dần bằng Bubble Sort. Kết quả đúng: [1, 2, 3, 5, 8].",
 	  "blocks": [
 		"let arr = [5, 3, 8, 1, 2];",
 		"for (let i = 0; i < arr.length - 1; i++) {",
@@ -568,9 +579,9 @@
 		"    }",
 		"  }",
 		"}",
-        "print(arr);"
+		"print(arr);"
 	  ],
 	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-	  "explanation": "Bubble Sort: so sánh từng cặp liền kề, hoán đổi nếu sai thứ tự, lặp lại cho đến khi sắp xong."
+	  "explanation": "Bubble Sort: vòng ngoài i chạy length-1 lần, vòng trong j chạy length-1-i lần (vì phần tử cuối mỗi lượt đã đúng vị trí). Hoán đổi cặp arr[j] > arr[j+1] qua biến temp."
 	}
 ]

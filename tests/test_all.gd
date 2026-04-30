@@ -516,7 +516,7 @@ func _test_menu_and_stage_flow() -> void:
 	vv.add_child(cont)
 	root.add_child(victory)
 	await process_frame
-	_assert_true(loot.text.find("green_tea") != -1, "VictoryScreen lists temporary loot")
+	_assert_true(loot.text.find("Green Tea") != -1, "VictoryScreen lists temporary loot with display name")
 	victory.call("_on_continue_pressed")
 	await process_frame
 	var permanent_variant: Variant = inventory_manager.get("permanent_inventory")

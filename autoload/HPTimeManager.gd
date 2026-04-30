@@ -15,6 +15,9 @@ var current_hp: int = 100
 var time_remaining: float = 0.0
 var timer_active: bool = false
 var active_artifacts: Dictionary = {}
+# Consumables used in the maze (outside combat) are buffered here
+# and applied at the start of the next encounter.
+var pending_consumables: Array[Dictionary] = []
 
 # --- Constants (từ GDD) ---
 # WRONG_LINE_PENALTY = 5 HP (mất máu khi chọn sai dòng)
@@ -51,6 +54,7 @@ func init_for_stage(chapter: int) -> void:
 
 	timer_active = false # Đảm bảo timer chưa chạy ngay khi vừa init
 	active_artifacts.clear()
+	pending_consumables.clear()
 
 	# Emit signal để cập nhật UI ngay lập tức
 	hp_changed.emit(current_hp, max_hp)
@@ -107,6 +111,28 @@ func calculate_hp_loss(fix_rate: float, hit_base: int) -> int:
 func apply_wrong_line_penalty() -> void:
 	# Gọi take_damage(5) — penalty khi chọn sai dòng lỗi [cite: 4]
 	take_damage(5)
+
+
+## Queue a consumable effect to be applied at the start of the next encounter.
+## Called when the player uses a consumable from the in-maze inventory UI.
+func queue_consumable_effect(effect: String, value: Variant) -> void:
+	pending_consumables.append({"effect": effect, "value": value})
+
+
+## Apply all queued consumable effects at the start of the next encounter.
+## Called by EncounterManager.start_encounter().
+func apply_pending_consumables() -> void:
+	for entry_variant in pending_consumables:
+		if typeof(entry_variant) != TYPE_DICTIONARY:
+			continue
+		var entry: Dictionary = entry_variant
+		match str(entry.get("effect", "")):
+			"heal":
+				heal(int(entry.get("value", 0)))
+			"restore_time":
+				restore_time(float(entry.get("value", 0.0)))
+			# hint and auto_snap are in-combat effects — ignore when buffered outside combat
+	pending_consumables.clear()
 
 
 func activate_artifact(item_id: String) -> Dictionary:

@@ -68,6 +68,7 @@ func _set_title_text(message: String) -> void:
 
 func _render_temporary_loot() -> void:
 	var inventory_manager: Node = _get_inventory_manager()
+	var data_manager: Node = get_node_or_null("/root/DataManager")
 	var loot_text := "Loot nhận được:\n- Không có vật phẩm mới"
 
 	if inventory_manager != null and inventory_manager.has_method("get_all_temporary"):
@@ -82,7 +83,13 @@ func _render_temporary_loot() -> void:
 				var item_id := str(key_variant)
 				var amount := int(loot_dict.get(key_variant, 0))
 				if amount > 0:
-					lines.append("- %s x%d" % [item_id, amount])
+					var display_name := item_id
+					if data_manager != null and data_manager.has_method("get_item_data"):
+						var item_variant: Variant = data_manager.call("get_item_data", item_id)
+						if typeof(item_variant) == TYPE_DICTIONARY:
+							var item_data: Dictionary = item_variant
+							display_name = str(item_data.get("name", item_id))
+					lines.append("- %s x%d" % [display_name, amount])
 
 			if not lines.is_empty():
 				loot_text = "Loot nhận được:\n" + "\n".join(lines)

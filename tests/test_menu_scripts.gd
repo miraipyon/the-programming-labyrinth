@@ -277,7 +277,7 @@ func _test_victory_script(root: Window, failures: Array[String]) -> void:
 	var loot_node: Node = victory_screen.get_node_or_null("VBox/LootLabel")
 	if loot_node is Label:
 		var label: Label = loot_node
-		if label.text.find("green_tea") == -1:
+		if label.text.find("Green Tea") == -1:
 			failures.append("VictoryScreen loot text missing item id")
 	else:
 		failures.append("VictoryScreen fixture missing LootLabel")

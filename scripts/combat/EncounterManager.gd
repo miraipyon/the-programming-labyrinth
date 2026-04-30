@@ -48,6 +48,11 @@ func start_encounter(enemy_node: Node2D) -> void:
 	turn_count = 1
 	encounter_started_at_msec = Time.get_ticks_msec()
 
+	# Apply any consumables used in the maze before this encounter
+	var hptm_pre: Node = get_node_or_null("/root/HPTimeManager")
+	if hptm_pre != null and hptm_pre.has_method("apply_pending_consumables"):
+		hptm_pre.call("apply_pending_consumables")
+
 	var game_manager: Node = get_node_or_null("/root/GameManager")
 	if game_manager != null and game_manager.has_method("enter_combat"):
 		game_manager.call("enter_combat")

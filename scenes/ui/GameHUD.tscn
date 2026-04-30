@@ -21,7 +21,7 @@ text = "HP: 100 / 100"
 
 [node name="HPBar" type="ProgressBar" parent="TopBar"]
 layout_mode = 2
-custom_minimum_size = Vector2(240, 24)
+custom_minimum_size = Vector2(200, 24)
 max_value = 100.0
 value = 100.0
 
@@ -34,3 +34,13 @@ text = "Time: 06:00"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Explore the labyrinth"
+
+[node name="ArtifactBar" type="Label" parent="TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+visible = false
+
+[node name="InventoryButton" type="Button" parent="TopBar"]
+layout_mode = 2
+custom_minimum_size = Vector2(120, 24)
+text = "📦 Inventory"
