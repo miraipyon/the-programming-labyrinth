@@ -402,7 +402,7 @@ func _test_maze_system() -> void:
 	var cam_node: Node = maze_level.get_node_or_null("Camera2D")
 	if cam_node is Camera2D:
 		var cam: Camera2D = cam_node
-		_assert_eq(cam.zoom, Vector2(0.75, 0.75), "MazeLevel camera zoom is 0.75")
+		_assert_eq(cam.zoom, Vector2(2.0, 2.0), "MazeLevel camera zoom is 2.0")
 		_assert_true(cam.limit_right > 0 and cam.limit_bottom > 0, "MazeLevel camera limits set from stage bounds")
 	else:
 		_fail("MazeLevel missing Camera2D after load")

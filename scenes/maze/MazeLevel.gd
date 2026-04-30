@@ -27,8 +27,9 @@ const GAME_OVER_SCREEN_SCENE := preload("res://scenes/menus/GameOverScreen.tscn"
 @onready var loot_popup: CanvasLayer = get_node_or_null("LootPopup")
 @onready var turn_result_panel: PanelContainer = get_node_or_null("TurnResultPanel")
 @onready var camera: Camera2D = get_node_or_null("Camera2D")
+var overlay_layer: CanvasLayer = null
 
-const CAMERA_ZOOM := Vector2(0.75, 0.75)
+const CAMERA_ZOOM := Vector2(2.0, 2.0)
 
 
 # --- Lifecycle ---
@@ -40,6 +41,12 @@ func _ready() -> void:
 
 
 func _ensure_runtime_nodes() -> void:
+	if overlay_layer == null:
+		overlay_layer = CanvasLayer.new()
+		overlay_layer.name = "OverlayLayer"
+		overlay_layer.layer = 100
+		add_child(overlay_layer)
+
 	if maze_manager == null:
 		maze_manager = Node2D.new()
 		maze_manager.name = "MazeManager"
@@ -337,12 +344,16 @@ func show_victory_screen() -> void:
 	_prepare_overlay_screen(screen)
 	if screen.get_node_or_null("VBox/ContinueButton") == null:
 		_add_basic_victory_layout(screen)
-	add_child(screen)
+	
+	if overlay_layer != null:
+		overlay_layer.add_child(screen)
+	else:
+		add_child(screen)
 
 
 func show_game_over_screen(reason: String) -> void:
 	if _has_overlay("GameOverScreen"):
-		var existing := get_node_or_null("GameOverScreen")
+		var existing := overlay_layer.get_node_or_null("GameOverScreen") if overlay_layer != null else get_node_or_null("GameOverScreen")
 		if existing != null and existing.has_method("set_reason"):
 			existing.call("set_reason", reason)
 		return
@@ -352,13 +363,22 @@ func show_game_over_screen(reason: String) -> void:
 	_prepare_overlay_screen(screen)
 	if screen.get_node_or_null("VBox/RetryButton") == null:
 		_add_basic_game_over_layout(screen)
-	add_child(screen)
+		
+	if overlay_layer != null:
+		overlay_layer.add_child(screen)
+	else:
+		add_child(screen)
+		
 	if screen.has_method("set_reason"):
 		screen.call("set_reason", reason)
 
 
 func _has_overlay(node_name: String) -> bool:
-	var node := get_node_or_null(node_name)
+	if overlay_layer == null:
+		var node := get_node_or_null(node_name)
+		return node != null and is_instance_valid(node)
+	
+	var node := overlay_layer.get_node_or_null(node_name)
 	return node != null and is_instance_valid(node)
 
 
@@ -443,11 +463,15 @@ func show_pause_screen() -> void:
 	_prepare_overlay_screen(screen)
 	if screen.get_node_or_null("VBox/ResumeButton") == null:
 		_add_basic_pause_layout(screen)
-	add_child(screen)
+		
+	if overlay_layer != null:
+		overlay_layer.add_child(screen)
+	else:
+		add_child(screen)
 
 
 func _hide_pause_screen() -> void:
-	var pause_screen := get_node_or_null("PauseMenu")
+	var pause_screen := overlay_layer.get_node_or_null("PauseMenu") if overlay_layer != null else get_node_or_null("PauseMenu")
 	if pause_screen != null:
 		pause_screen.queue_free()
 

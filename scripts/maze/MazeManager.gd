@@ -295,35 +295,30 @@ func _spawn_maze_visuals() -> void:
 	move_child(visual_root, 0)
 
 	var bounds := _get_stage_bounds()
-	var floor_texture := load("res://assets/sprites/tiles/tile_00.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_00.png") else null
-	var wall_texture := load("res://assets/sprites/tiles/tile_10.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_10.png") else null
-	var obstacle_texture := load("res://assets/sprites/tiles/tile_50.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_50.png") else null
+	
+	# Solid floor (light gray/white)
+	var floor_rect := ColorRect.new()
+	floor_rect.color = Color(0.92, 0.92, 0.94)
+	floor_rect.position = Vector2.ZERO
+	floor_rect.size = bounds.size
+	floor_rect.z_index = -20
+	visual_root.add_child(floor_rect)
 
-	if floor_texture != null:
-		for x in range(0, int(bounds.size.x), 64):
-			for y in range(0, int(bounds.size.y), 64):
-				var tile := Sprite2D.new()
-				tile.texture = floor_texture
-				tile.position = Vector2(x + 32, y + 32)
-				tile.scale = Vector2(4, 4)
-				tile.z_index = -20
-				visual_root.add_child(tile)
+	_add_boundary(Vector2(bounds.size.x / 2.0, -16), Vector2(bounds.size.x, 32))
+	_add_boundary(Vector2(bounds.size.x / 2.0, bounds.size.y + 16), Vector2(bounds.size.x, 32))
+	_add_boundary(Vector2(-16, bounds.size.y / 2.0), Vector2(32, bounds.size.y))
+	_add_boundary(Vector2(bounds.size.x + 16, bounds.size.y / 2.0), Vector2(32, bounds.size.y))
 
-	_add_boundary(Vector2(bounds.size.x / 2.0, -16), Vector2(bounds.size.x, 32), wall_texture)
-	_add_boundary(Vector2(bounds.size.x / 2.0, bounds.size.y + 16), Vector2(bounds.size.x, 32), wall_texture)
-	_add_boundary(Vector2(-16, bounds.size.y / 2.0), Vector2(32, bounds.size.y), wall_texture)
-	_add_boundary(Vector2(bounds.size.x + 16, bounds.size.y / 2.0), Vector2(32, bounds.size.y), wall_texture)
-
-	var has_custom_walls := _spawn_stage_walls(wall_texture)
-	var has_custom_obstacles := _spawn_stage_obstacles(obstacle_texture)
+	var has_custom_walls := _spawn_stage_walls()
+	var has_custom_obstacles := _spawn_stage_obstacles()
 
 	if not has_custom_walls:
-		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.35), Vector2(bounds.size.x * 0.45, 32), wall_texture)
-		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.65), Vector2(bounds.size.x * 0.45, 32), wall_texture)
+		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.35), Vector2(bounds.size.x * 0.45, 32))
+		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.65), Vector2(bounds.size.x * 0.45, 32))
 
 	if not has_custom_obstacles:
-		_add_obstacle(Vector2(bounds.size.x - 96, 128), Vector2(56, 56), obstacle_texture)
-		_add_obstacle(Vector2(128, bounds.size.y - 96), Vector2(56, 56), obstacle_texture)
+		_add_obstacle(Vector2(bounds.size.x - 96, 128), Vector2(56, 56))
+		_add_obstacle(Vector2(128, bounds.size.y - 96), Vector2(56, 56))
 
 
 func _get_stage_bounds() -> Rect2:
@@ -359,7 +354,7 @@ func _get_stage_bounds() -> Rect2:
 	return Rect2(Vector2.ZERO, max_pos)
 
 
-func _spawn_stage_walls(wall_texture: Texture2D) -> bool:
+func _spawn_stage_walls() -> bool:
 	var walls_variant: Variant = stage_data.get("wall_spawns", [])
 	if typeof(walls_variant) != TYPE_ARRAY:
 		return false
@@ -372,12 +367,12 @@ func _spawn_stage_walls(wall_texture: Texture2D) -> bool:
 		var wall: Dictionary = wall_variant
 		var pos := _extract_position(wall.get("position", wall), Vector2.ZERO)
 		var size := _extract_size(wall.get("size", {}), Vector2(48, 48))
-		_add_wall_segment(pos, size, wall_texture)
+		_add_wall_segment(pos, size)
 		added += 1
 	return added > 0
 
 
-func _spawn_stage_obstacles(obstacle_texture: Texture2D) -> bool:
+func _spawn_stage_obstacles() -> bool:
 	var obstacles_variant: Variant = stage_data.get("obstacle_spawns", [])
 	if typeof(obstacles_variant) != TYPE_ARRAY:
 		return false
@@ -390,7 +385,7 @@ func _spawn_stage_obstacles(obstacle_texture: Texture2D) -> bool:
 		var obstacle: Dictionary = obstacle_variant
 		var pos := _extract_position(obstacle.get("position", obstacle), Vector2.ZERO)
 		var size := _extract_size(obstacle.get("size", {}), Vector2(56, 56))
-		_add_obstacle(pos, size, obstacle_texture)
+		_add_obstacle(pos, size)
 		added += 1
 	return added > 0
 
@@ -404,7 +399,7 @@ func _extract_size(raw: Variant, fallback: Vector2) -> Vector2:
 	return Vector2(float(size_dict.get("x", fallback.x)), float(size_dict.get("y", fallback.y)))
 
 
-func _add_boundary(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> void:
+func _add_boundary(pos: Vector2, size: Vector2) -> void:
 	var body := StaticBody2D.new()
 	body.name = "Boundary"
 	body.collision_layer = 1
@@ -416,17 +411,17 @@ func _add_boundary(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> void
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	if wall_texture != null:
-		var sprite := Sprite2D.new()
-		sprite.texture = wall_texture
-		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
-		sprite.z_index = -5
-		body.add_child(sprite)
+	var rect := ColorRect.new()
+	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
+	rect.size = size
+	rect.position = -size / 2.0
+	rect.z_index = -5
+	body.add_child(rect)
 
 	visual_root.add_child(body)
 
 
-func _add_obstacle(pos: Vector2, size: Vector2, obstacle_texture: Texture2D) -> void:
+func _add_obstacle(pos: Vector2, size: Vector2) -> void:
 	var body := StaticBody2D.new()
 	body.name = "Obstacle"
 	body.collision_layer = 1
@@ -438,17 +433,17 @@ func _add_obstacle(pos: Vector2, size: Vector2, obstacle_texture: Texture2D) -> 
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	if obstacle_texture != null:
-		var sprite := Sprite2D.new()
-		sprite.texture = obstacle_texture
-		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
-		sprite.z_index = -2
-		body.add_child(sprite)
+	var rect := ColorRect.new()
+	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
+	rect.size = size
+	rect.position = -size / 2.0
+	rect.z_index = -2
+	body.add_child(rect)
 
 	visual_root.add_child(body)
 
 
-func _add_wall_segment(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> void:
+func _add_wall_segment(pos: Vector2, size: Vector2) -> void:
 	var body := StaticBody2D.new()
 	body.name = "InnerWall"
 	body.collision_layer = 1
@@ -460,11 +455,11 @@ func _add_wall_segment(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> 
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	if wall_texture != null:
-		var sprite := Sprite2D.new()
-		sprite.texture = wall_texture
-		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
-		sprite.z_index = -4
-		body.add_child(sprite)
+	var rect := ColorRect.new()
+	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
+	rect.size = size
+	rect.position = -size / 2.0
+	rect.z_index = -4
+	body.add_child(rect)
 
 	visual_root.add_child(body)
