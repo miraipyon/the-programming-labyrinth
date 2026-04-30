@@ -54,7 +54,7 @@ def get_distances(maze, start_r, start_c):
         
         for dr, dc in [(1,0), (-1,0), (0,1), (0,-1)]:
             nr, nc = r + dr, c + dc
-            if maze[nr][nc] == 0 and (nr, nc) not in distances:
+            if 0 <= nr < len(maze) and 0 <= nc < len(maze[0]) and maze[nr][nc] == 0 and (nr, nc) not in distances:
                 distances[(nr, nc)] = d + 1
                 queue.append((nr, nc))
                 
@@ -75,7 +75,7 @@ def get_dead_ends(maze):
     return dead_ends
 
 def main():
-    random.seed(999) # Fixed seed for reproducible perfect mazes
+    random.seed(888) # New seed for new layouts
     TS = 64
     
     with open('data/stages.json', 'r', encoding='utf-8') as f:
@@ -91,14 +91,10 @@ def main():
     for stage in stages:
         ch = stage.get("chapter", 1)
         
-        if ch == 1:
-            wt, ht = 19, 19
-        elif ch == 2:
-            wt, ht = 25, 25
-        elif ch == 3:
-            wt, ht = 31, 31
-        else:
-            wt, ht = 39, 39
+        if ch == 1: wt, ht = 19, 19
+        elif ch == 2: wt, ht = 25, 25
+        elif ch == 3: wt, ht = 31, 31
+        else: wt, ht = 39, 39
             
         maze = generate_perfect_maze(wt, ht)
         
@@ -112,37 +108,61 @@ def main():
                 break
         if player_t is None: player_t = (1, 1)
         
+        # Carve entrance
+        pr, pc = player_t
+        if pr == 1: maze[0][pc] = 0
+        elif pr == ht-2: maze[ht-1][pc] = 0
+        elif pc == 1: maze[pr][0] = 0
+        elif pc == wt-2: maze[pr][wt-1] = 0
+        
         distances = get_distances(maze, player_t[0], player_t[1])
         
         # Find farthest point for portal
-        portal_t = max(distances.items(), key=lambda x: x[1])[0]
+        portal_t = max([t for t in distances.keys() if t[0]>0 and t[0]<ht-1 and t[1]>0 and t[1]<wt-1], key=lambda x: distances[x])
         
-        # Place chests in dead ends
+        # Carve exit
+        pr, pc = portal_t
+        # Find nearest edge to carve
+        if pr == 1: maze[0][pc] = 0
+        elif pr == ht-2: maze[ht-1][pc] = 0
+        elif pc == 1: maze[pr][0] = 0
+        elif pc == wt-2: maze[pr][wt-1] = 0
+        else:
+            # If not at absolute edge, carve to nearest edge
+            dists_to_edge = [(pr, (0, pc)), (ht-1-pr, (ht-1, pc)), (pc, (pr, 0)), (wt-1-pc, (pr, wt-1))]
+            dists_to_edge.sort(key=lambda x: x[0])
+            edge_r, edge_c = dists_to_edge[0][1]
+            if edge_r == 0: 
+                for r in range(0, pr): maze[r][pc] = 0
+            elif edge_r == ht-1:
+                for r in range(pr+1, ht): maze[r][pc] = 0
+            elif edge_c == 0:
+                for c in range(0, pc): maze[pr][c] = 0
+            elif edge_c == wt-1:
+                for c in range(pc+1, wt): maze[pr][c] = 0
+        
+        # Dead ends
         dead_ends = get_dead_ends(maze)
         if player_t in dead_ends: dead_ends.remove(player_t)
         if portal_t in dead_ends: dead_ends.remove(portal_t)
         
-        # Sort dead ends by distance to player (descending)
         dead_ends.sort(key=lambda t: distances.get(t, 0), reverse=True)
         
         chest_spawns = []
         num_chests = random.randint(3, 5)
         placed_chests = set()
-        
         for i in range(min(num_chests, len(dead_ends))):
             t = dead_ends[i]
             ctype = "rare" if random.random() < 0.35 else "normal"
-            chest_spawns.append({
-                "type": ctype,
-                "position": {"x": t[1] * TS + TS//2, "y": t[0] * TS + TS//2}
-            })
+            chest_spawns.append({"type": ctype, "position": {"x": t[1] * TS + TS//2, "y": t[0] * TS + TS//2}})
             placed_chests.add(t)
             
-        # Place enemies using greedy max-min distance to spread them out
+        # Enemies
         available_for_enemies = [
             t for t in distances.keys()
             if t != player_t and t != portal_t and t not in placed_chests
-            and distances[t] > (wt + ht) // 3 # Away from player
+            and distances[t] > (wt + ht) // 3
+            and 0 < t[0] < ht-1 and 0 < t[1] < wt-1
         ]
         
         enemy_tiles = []
@@ -150,11 +170,9 @@ def main():
         num_enemies = len(encounters)
         
         if len(available_for_enemies) >= num_enemies:
-            # Pick first enemy near the middle distance to start the spread
             first = random.choice(available_for_enemies)
             enemy_tiles.append(first)
             available_for_enemies.remove(first)
-            
             for _ in range(num_enemies - 1):
                 best_t = None
                 max_min_dist = -1
@@ -167,8 +185,7 @@ def main():
                     enemy_tiles.append(best_t)
                     available_for_enemies.remove(best_t)
         else:
-            # Fallback if too small
-            enemy_tiles = random.sample([t for t in distances.keys() if t != player_t and t != portal_t], num_enemies)
+            enemy_tiles = random.sample([t for t in distances.keys() if t != player_t and t != portal_t and 0 < t[0] < ht-1 and 0 < t[1] < wt-1], num_enemies)
             
         enemy_spawns = []
         for i, enc in enumerate(encounters):

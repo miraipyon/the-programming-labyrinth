@@ -64,10 +64,18 @@ func get_bug_data() -> Dictionary:
 
 func defeat() -> void:
 	is_defeated = true
-	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
 	if has_node("CollisionShape"):
 		$CollisionShape.set_deferred("disabled", true)
+
+	if has_node("Sprite"):
+		var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
+		if not sprite_path.is_empty():
+			var die_path := sprite_path.replace("idle.png", "die.png")
+			if ResourceLoader.exists(die_path):
+				$Sprite.texture = load(die_path)
+			else:
+				$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.5)
 
 
 # --- Appearance ---

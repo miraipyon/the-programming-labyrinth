@@ -304,11 +304,6 @@ func _spawn_maze_visuals() -> void:
 	floor_rect.z_index = -20
 	visual_root.add_child(floor_rect)
 
-	_add_boundary(Vector2(bounds.size.x / 2.0, -16), Vector2(bounds.size.x, 32))
-	_add_boundary(Vector2(bounds.size.x / 2.0, bounds.size.y + 16), Vector2(bounds.size.x, 32))
-	_add_boundary(Vector2(-16, bounds.size.y / 2.0), Vector2(32, bounds.size.y))
-	_add_boundary(Vector2(bounds.size.x + 16, bounds.size.y / 2.0), Vector2(32, bounds.size.y))
-
 	var has_custom_walls := _spawn_stage_walls()
 	var has_custom_obstacles := _spawn_stage_obstacles()
 
