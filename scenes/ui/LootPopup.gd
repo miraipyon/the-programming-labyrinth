@@ -11,6 +11,7 @@ var _desc_label: Label = null
 func _ready() -> void:
 	# Tạm thời tắt popup khi mới Play game
 	visible = false
+	_ensure_layout()
 
 	_name_label = _find_label(["Panel/VBox/ItemName", "ItemName", "VBox/ItemName", "NameLabel"])
 	_desc_label = _find_label(["Panel/VBox/ItemDesc", "ItemDesc", "VBox/ItemDesc", "DescLabel"])
@@ -67,6 +68,33 @@ func _hide_popup() -> void:
 	visible = false
 	if _auto_hide_timer != null:
 		_auto_hide_timer.stop()
+
+
+func _ensure_layout() -> void:
+	if _find_label(["Panel/VBox/ItemName", "ItemName", "VBox/ItemName", "NameLabel"]) != null:
+		return
+
+	var panel := PanelContainer.new()
+	panel.name = "Panel"
+	panel.anchor_left = 0.36
+	panel.anchor_top = 0.72
+	panel.anchor_right = 0.64
+	panel.anchor_bottom = 0.92
+	add_child(panel)
+
+	var vbox := VBoxContainer.new()
+	vbox.name = "VBox"
+	panel.add_child(vbox)
+
+	var item_name := Label.new()
+	item_name.name = "ItemName"
+	item_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(item_name)
+
+	var item_desc := Label.new()
+	item_desc.name = "ItemDesc"
+	item_desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(item_desc)
 
 
 func _find_label(paths: Array[String]) -> Label:

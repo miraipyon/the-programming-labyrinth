@@ -1,0 +1,52 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/menus/GameOverScreen.gd" id="1_game_over"]
+
+[node name="GameOverScreen" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_game_over")
+
+[node name="Backdrop" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.02, 0.03, 0.86)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(420, 220)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -110.0
+offset_right = 210.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="ReasonLabel" type="Label" parent="VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Game Over"
+autowrap_mode = 3
+
+[node name="RetryButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "Retry"
+
+[node name="QuitButton" type="Button" parent="VBox"]
+layout_mode = 2
+text = "Quit"

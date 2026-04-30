@@ -10,16 +10,21 @@ signal encounter_triggered(enemy: Node2D)
 
 # --- Constants: Sprite mapping: enemy_id → tile file ---
 const SPRITE_MAP := {
-	"syntax_slime": "res://assets/sprites/tiny_dungeon/Tiles/tile_0110.png",
-	"semicolon_wisp": "res://assets/sprites/tiny_dungeon/Tiles/tile_0096.png",
-	"null_shadow": "res://assets/sprites/tiny_dungeon/Tiles/tile_0113.png",
-	"branch_phantom": "res://assets/sprites/tiny_dungeon/Tiles/tile_0098.png",
-	"type_mismatch_medusa": "res://assets/sprites/tiny_dungeon/Tiles/tile_0099.png",
-	"infinite_golem": "res://assets/sprites/tiny_dungeon/Tiles/tile_0112.png",
-	"boundary_hydra": "res://assets/sprites/tiny_dungeon/Tiles/tile_0111.png",
-	"flow_architect": "res://assets/sprites/tiny_dungeon/Tiles/tile_0097.png",
-	"logic_bomb_boss": "res://assets/sprites/tiny_dungeon/Tiles/tile_0087.png",
+	"syntax_slime": "res://assets/sprites/monsters/syntax_slime/idle.png",
+	"semicolon_wisp": "res://assets/sprites/monsters/semicolon_wisp/idle.png",
+	"null_shadow": "res://assets/sprites/monsters/null_shadow/idle.png",
+	"branch_phantom": "res://assets/sprites/monsters/branch_phantom/idle.png",
+	"type_mismatch_medusa": "res://assets/sprites/monsters/type_mismatch_medusa/idle.png",
+	"infinite_golem": "res://assets/sprites/monsters/infinite_golem/idle.png",
+	"boundary_hydra": "res://assets/sprites/monsters/boundary_hydra/idle.png",
+	"flow_architect": "res://assets/sprites/monsters/flow_architect/idle.png",
+	"logic_bomb_boss": "res://assets/sprites/monsters/logic_bomb_boss/idle.png",
 }
+
+# Target visual sizes per tier (pixels in world-space before camera zoom)
+const TARGET_PX_NORMAL: float = 52.0
+const TARGET_PX_STRONG: float = 64.0
+const TARGET_PX_BOSS: float = 84.0
 
 # --- State ---
 var enemy_data: Dictionary = {}
@@ -39,10 +44,10 @@ func setup(p_enemy_id: String, p_bug_id: String, pos: Vector2) -> void:
 	enemy_id = p_enemy_id
 	bug_id = p_bug_id
 	position = pos
-	
+
 	if DataManager:
 		enemy_data = DataManager.get_enemy_data(enemy_id)
-		
+
 	_update_appearance()
 
 
@@ -69,16 +74,29 @@ func defeat() -> void:
 func _update_appearance() -> void:
 	if not has_node("Sprite"):
 		return
-		
+
 	var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
 	if not sprite_path.is_empty() and ResourceLoader.exists(sprite_path):
 		$Sprite.texture = load(sprite_path)
 		$Sprite.modulate = Color.WHITE
-		
+
 	var tier: String = enemy_data.get("tier", "normal")
+	var target_px: float = TARGET_PX_NORMAL
 	if tier == "boss":
-		$Sprite.scale = Vector2(3, 3)
+		target_px = TARGET_PX_BOSS
 	elif tier == "strong":
-		$Sprite.scale = Vector2(2.5, 2.5)
-	else:
-		$Sprite.scale = Vector2(2, 2)
+		target_px = TARGET_PX_STRONG
+	_apply_target_scale($Sprite, target_px)
+
+
+# --- Visual Scale ---
+func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
+	if sprite == null:
+		return
+	var tex: Texture2D = sprite.texture
+	if tex == null:
+		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
+		return
+	var tex_size := float(maxi(tex.get_width(), 1))
+	var s := target_px / tex_size
+	sprite.scale = Vector2(s, s)

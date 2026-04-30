@@ -8,8 +8,10 @@ signal chest_opened(loot_item_id: String)
 @export var chest_type: String = "normal"
 
 # --- Sprites ---
-const CHEST_CLOSED := "res://assets/sprites/tiny_dungeon/Tiles/tile_0063.png"
-const CHEST_OPEN := "res://assets/sprites/tiny_dungeon/Tiles/tile_0064.png"
+const NORMAL_CHEST_CLOSED := "res://assets/sprites/chests/silver_chest/silver_chest_1.png"
+const NORMAL_CHEST_OPEN := "res://assets/sprites/chests/silver_chest/silver_chest_2.png"
+const RARE_CHEST_CLOSED := "res://assets/sprites/chests/gold_chest/gold_chest_1.png"
+const RARE_CHEST_OPEN := "res://assets/sprites/chests/gold_chest/gold_chest_2.png"
 
 # --- State ---
 var is_opened: bool = false
@@ -25,17 +27,17 @@ func _ready() -> void:
 func open_chest() -> String:
 	if is_opened:
 		return ""
-	
+
 	is_opened = true
 	var loot_id: String = ""
-	
+
 	if DataManager:
 		loot_id = DataManager.roll_loot(chest_type)
-	
+
 	if not loot_id.is_empty() and InventoryManager:
 		InventoryManager.add_item_temporary(loot_id)
 		chest_opened.emit(loot_id)
-	
+
 	_update_appearance()
 	return loot_id
 
@@ -43,17 +45,33 @@ func open_chest() -> String:
 # --- Appearance ---
 func _update_appearance() -> void:
 	if not has_node("Sprite"): return
-	
+
+	var closed_sprite := RARE_CHEST_CLOSED if chest_type == "rare" else NORMAL_CHEST_CLOSED
+	var open_sprite := RARE_CHEST_OPEN if chest_type == "rare" else NORMAL_CHEST_OPEN
+
 	if is_opened:
-		if ResourceLoader.exists(CHEST_OPEN):
-			$Sprite.texture = load(CHEST_OPEN)
+		if ResourceLoader.exists(open_sprite):
+			$Sprite.texture = load(open_sprite)
 		$Sprite.modulate = Color(0.7, 0.7, 0.7, 0.8)
 	else:
-		if ResourceLoader.exists(CHEST_CLOSED):
-			$Sprite.texture = load(CHEST_CLOSED)
+		if ResourceLoader.exists(closed_sprite):
+			$Sprite.texture = load(closed_sprite)
 		if chest_type == "rare":
 			$Sprite.modulate = Color(0.4, 0.8, 1.0)
 		else:
 			$Sprite.modulate = Color.WHITE
-		
-	$Sprite.scale = Vector2(2, 2)
+
+	_apply_target_scale($Sprite, 44.0)
+
+
+# --- Visual Scale ---
+func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
+	if sprite == null:
+		return
+	var tex: Texture2D = sprite.texture
+	if tex == null:
+		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
+		return
+	var tex_size := float(maxi(tex.get_width(), 1))
+	var s := target_px / tex_size
+	sprite.scale = Vector2(s, s)

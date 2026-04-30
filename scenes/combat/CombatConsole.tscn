@@ -1,0 +1,62 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scenes/combat/CombatConsole.gd" id="1_console"]
+[ext_resource type="PackedScene" path="res://scenes/combat/CodeFixUI.tscn" id="2_code_fix"]
+[ext_resource type="PackedScene" path="res://scenes/combat/BlockAssemblyUI.tscn" id="3_block_ui"]
+
+[node name="CombatConsole" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_console")
+
+[node name="CombatRoot" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="CombatRoot"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.06
+anchor_right = 0.92
+anchor_bottom = 0.94
+
+[node name="VBox" type="VBoxContainer" parent="CombatRoot/Panel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="EnemyLabel" type="Label" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+text = "Enemy"
+
+[node name="TurnLabel" type="Label" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+text = "Turn 1"
+
+[node name="QuickInventory" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CodeFixUI" parent="CombatRoot/Panel/VBox" instance=ExtResource("2_code_fix")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BlockAssemblyUI" parent="CombatRoot/Panel/VBox" instance=ExtResource("3_block_ui")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StatusLabel" type="Label" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+
+[node name="SubmitButton" type="Button" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+text = "Submit"

@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/LootPopup.gd" id="1_loot"]
+
+[node name="LootPopup" type="CanvasLayer"]
+visible = false
+layer = 20
+script = ExtResource("1_loot")
+
+[node name="Panel" type="PanelContainer" parent="."]
+anchors_preset = -1
+anchor_left = 0.36
+anchor_top = 0.72
+anchor_right = 0.64
+anchor_bottom = 0.92
+
+[node name="VBox" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ItemName" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "Item"
+
+[node name="ItemDesc" type="Label" parent="Panel/VBox"]
+layout_mode = 2
+text = "Description"
+autowrap_mode = 3

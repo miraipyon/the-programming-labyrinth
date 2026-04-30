@@ -8,6 +8,7 @@ var low_time_threshold: float = 30.0
 
 
 func _ready() -> void:
+	_ensure_layout()
 	hp_label = _find_label(["HPLabel", "VBox/HPLabel", "TopBar/HPLabel", "Stats/HPLabel"])
 	time_label = _find_label(["TimeLabel", "VBox/TimeLabel", "TopBar/TimeLabel", "Stats/TimeLabel"])
 	hp_bar = _find_range(["HPBar", "VBox/HPBar", "TopBar/HPBar", "Stats/HPBar"])
@@ -49,6 +50,51 @@ func update_time(time_left: float) -> void:
 			time_label.modulate = Color(1.0, 0.35, 0.35)
 		else:
 			time_label.modulate = Color.WHITE
+
+
+func update_status(message: String) -> void:
+	var status_label := _find_label(["StatusLabel", "VBox/StatusLabel", "TopBar/StatusLabel", "Stats/StatusLabel"])
+	if status_label != null:
+		status_label.text = message
+
+
+func _ensure_layout() -> void:
+	if _find_label(["HPLabel", "VBox/HPLabel", "TopBar/HPLabel", "Stats/HPLabel"]) != null:
+		return
+
+	var top_bar := HBoxContainer.new()
+	top_bar.name = "TopBar"
+	top_bar.anchor_left = 0.02
+	top_bar.anchor_top = 0.02
+	top_bar.anchor_right = 0.98
+	top_bar.anchor_bottom = 0.10
+	top_bar.offset_left = 0
+	top_bar.offset_top = 0
+	top_bar.offset_right = 0
+	top_bar.offset_bottom = 0
+	top_bar.add_theme_constant_override("separation", 16)
+	add_child(top_bar)
+
+	var hp_text := Label.new()
+	hp_text.name = "HPLabel"
+	hp_text.custom_minimum_size = Vector2(140, 24)
+	top_bar.add_child(hp_text)
+
+	var bar := ProgressBar.new()
+	bar.name = "HPBar"
+	bar.custom_minimum_size = Vector2(240, 24)
+	top_bar.add_child(bar)
+
+	var time_text := Label.new()
+	time_text.name = "TimeLabel"
+	time_text.custom_minimum_size = Vector2(130, 24)
+	top_bar.add_child(time_text)
+
+	var status := Label.new()
+	status.name = "StatusLabel"
+	status.text = "Explore the labyrinth"
+	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_bar.add_child(status)
 
 
 func _find_label(paths: Array[String]) -> Label:

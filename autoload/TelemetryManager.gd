@@ -8,14 +8,14 @@ var event_log: Array[Dictionary] = []
 func _log_event(event_type: String, data: Dictionary) -> void:
 	# Tạo một bản sao của dictionary data để tránh vô tình thay đổi dữ liệu gốc
 	var entry = data.duplicate()
-	
+
 	# Gắn thêm type và mốc thời gian (tính bằng mili-giây từ khi game bắt đầu chạy)
 	entry["type"] = event_type
 	entry["time"] = Time.get_ticks_msec()
-	
+
 	# Thêm vào mảng event_log
 	event_log.append(entry)
-	
+
 	# In ra console để theo dõi trực tiếp trong quá trình test game
 	print("[Telemetry] ", event_type)
 

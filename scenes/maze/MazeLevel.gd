@@ -9,8 +9,16 @@ const BLOCK_ASSEMBLY_UI_SCRIPT := preload("res://scenes/combat/BlockAssemblyUI.g
 const GAME_HUD_SCRIPT := preload("res://scenes/ui/GameHUD.gd")
 const LOOT_POPUP_SCRIPT := preload("res://scenes/ui/LootPopup.gd")
 const TURN_RESULT_SCRIPT := preload("res://scenes/ui/TurnResultPanel.gd")
+const PAUSE_MENU_SCRIPT := preload("res://scenes/menus/PauseMenu.gd")
 const VICTORY_SCREEN_SCRIPT := preload("res://scenes/menus/VictoryScreen.gd")
 const GAME_OVER_SCREEN_SCRIPT := preload("res://scenes/menus/GameOverScreen.gd")
+const COMBAT_CONSOLE_SCENE := preload("res://scenes/combat/CombatConsole.tscn")
+const GAME_HUD_SCENE := preload("res://scenes/ui/GameHUD.tscn")
+const LOOT_POPUP_SCENE := preload("res://scenes/ui/LootPopup.tscn")
+const TURN_RESULT_SCENE := preload("res://scenes/ui/TurnResultPanel.tscn")
+const PAUSE_MENU_SCENE := preload("res://scenes/menus/PauseMenu.tscn")
+const VICTORY_SCREEN_SCENE := preload("res://scenes/menus/VictoryScreen.tscn")
+const GAME_OVER_SCREEN_SCENE := preload("res://scenes/menus/GameOverScreen.tscn")
 
 @onready var maze_manager: Node2D = get_node_or_null("MazeManager")
 @onready var encounter_manager: Node = get_node_or_null("EncounterManager")
@@ -20,9 +28,12 @@ const GAME_OVER_SCREEN_SCRIPT := preload("res://scenes/menus/GameOverScreen.gd")
 @onready var turn_result_panel: PanelContainer = get_node_or_null("TurnResultPanel")
 @onready var camera: Camera2D = get_node_or_null("Camera2D")
 
+const CAMERA_ZOOM := Vector2(0.75, 0.75)
+
 
 # --- Lifecycle ---
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_ensure_runtime_nodes()
 	_connect_signals()
 	_load_current_stage()
@@ -42,38 +53,19 @@ func _ensure_runtime_nodes() -> void:
 		add_child(encounter_manager)
 
 	if combat_console == null:
-		combat_console = CanvasLayer.new()
-		combat_console.name = "CombatConsole"
-		combat_console.set_script(COMBAT_CONSOLE_SCRIPT)
+		combat_console = COMBAT_CONSOLE_SCENE.instantiate() as CanvasLayer
 		add_child(combat_console)
 
-		var code_fix_ui := Control.new()
-		code_fix_ui.name = "CodeFixUI"
-		code_fix_ui.set_script(CODE_FIX_UI_SCRIPT)
-		combat_console.add_child(code_fix_ui)
-
-		var block_assembly_ui := Control.new()
-		block_assembly_ui.name = "BlockAssemblyUI"
-		block_assembly_ui.set_script(BLOCK_ASSEMBLY_UI_SCRIPT)
-		combat_console.add_child(block_assembly_ui)
-
 	if game_hud == null:
-		game_hud = CanvasLayer.new()
-		game_hud.name = "GameHUD"
-		game_hud.set_script(GAME_HUD_SCRIPT)
+		game_hud = GAME_HUD_SCENE.instantiate() as CanvasLayer
 		add_child(game_hud)
 
 	if loot_popup == null:
-		loot_popup = CanvasLayer.new()
-		loot_popup.name = "LootPopup"
-		loot_popup.set_script(LOOT_POPUP_SCRIPT)
+		loot_popup = LOOT_POPUP_SCENE.instantiate() as CanvasLayer
 		add_child(loot_popup)
 
 	if turn_result_panel == null:
-		turn_result_panel = PanelContainer.new()
-		turn_result_panel.name = "TurnResultPanel"
-		turn_result_panel.set_script(TURN_RESULT_SCRIPT)
-		turn_result_panel.visible = false
+		turn_result_panel = TURN_RESULT_SCENE.instantiate() as PanelContainer
 		add_child(turn_result_panel)
 
 	if camera == null:
@@ -81,6 +73,7 @@ func _ensure_runtime_nodes() -> void:
 		camera.name = "Camera2D"
 		camera.enabled = true
 		add_child(camera)
+	camera.zoom = CAMERA_ZOOM
 
 
 func _connect_signals() -> void:
@@ -109,6 +102,11 @@ func _connect_signals() -> void:
 	if maze_manager != null and maze_manager.has_signal("all_enemies_defeated"):
 		if not maze_manager.is_connected("all_enemies_defeated", _on_all_enemies_defeated):
 			maze_manager.connect("all_enemies_defeated", _on_all_enemies_defeated)
+
+	var game_manager: Node = get_node_or_null("/root/GameManager")
+	if game_manager != null and game_manager.has_signal("game_state_changed"):
+		if not game_manager.is_connected("game_state_changed", _on_game_state_changed):
+			game_manager.connect("game_state_changed", _on_game_state_changed)
 
 
 func _load_current_stage() -> void:
@@ -164,6 +162,7 @@ func _load_current_stage() -> void:
 
 	if maze_manager != null and maze_manager.has_method("load_stage"):
 		maze_manager.call("load_stage", stage_data)
+		_setup_camera_for_stage(stage_data)
 
 
 func _process(delta: float) -> void:
@@ -176,20 +175,74 @@ func _process(delta: float) -> void:
 		camera.global_position = camera.global_position.lerp(target_pos, clampf(delta * 10.0, 0.0, 1.0))
 
 
+# --- Camera Setup ---
+func _setup_camera_for_stage(p_stage_data: Dictionary) -> void:
+	if camera == null:
+		return
+
+	camera.zoom = CAMERA_ZOOM
+
+	# Center camera on player immediately
+	if maze_manager != null:
+		var player: Node = maze_manager.get("player_node")
+		if player is Node2D:
+			camera.global_position = (player as Node2D).global_position
+
+	# Apply camera limits from stage bounds
+	_apply_camera_limits(p_stage_data)
+
+
+func _apply_camera_limits(p_stage_data: Dictionary) -> void:
+	if camera == null:
+		return
+
+	var bounds_variant: Variant = p_stage_data.get("bounds", {})
+	var width := 0.0
+	var height := 0.0
+	if typeof(bounds_variant) == TYPE_DICTIONARY:
+		var bd: Dictionary = bounds_variant
+		width = float(bd.get("width", 0.0))
+		height = float(bd.get("height", 0.0))
+
+	# Fall back: estimate from known entity positions
+	if width < 640.0 or height < 480.0:
+		var max_x := 832.0
+		var max_y := 640.0
+		for key in ["player_spawn", "portal_position"]:
+			var pos_v: Variant = p_stage_data.get(key, {})
+			if typeof(pos_v) == TYPE_DICTIONARY:
+				var pd: Dictionary = pos_v
+				max_x = maxf(max_x, float(pd.get("x", 0)) + 128.0)
+				max_y = maxf(max_y, float(pd.get("y", 0)) + 128.0)
+		width = max_x
+		height = max_y
+
+	camera.limit_left = 0
+	camera.limit_top = 0
+	camera.limit_right = int(width)
+	camera.limit_bottom = int(height)
+
+
 # --- Combat Events ---
 func _on_encounter_started(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 	if combat_console != null and combat_console.has_method("show_console"):
 		combat_console.call("show_console", enemy_data, bug_data)
+	if game_hud != null and game_hud.has_method("update_status"):
+		game_hud.call("update_status", "Combat: %s" % str(enemy_data.get("name", "Unknown")))
 
 
 func _on_encounter_completed(_success: bool) -> void:
 	if combat_console != null and combat_console.has_method("hide_console"):
 		combat_console.call("hide_console")
+	if game_hud != null and game_hud.has_method("update_status"):
+		game_hud.call("update_status", "Explore the labyrinth")
 
 
 func _on_turn_evaluated(result: Dictionary) -> void:
 	if turn_result_panel != null and turn_result_panel.has_method("display_result"):
 		turn_result_panel.call("display_result", result)
+	if game_hud != null and game_hud.has_method("update_status"):
+		game_hud.call("update_status", str(result.get("details", "")))
 
 
 func _on_player_turn_started(turn_number: int) -> void:
@@ -237,6 +290,8 @@ func _handle_game_over(reason: String) -> void:
 
 func _on_all_enemies_defeated() -> void:
 	print("[MazeLevel] All enemies defeated. Portal is now active.")
+	if game_hud != null and game_hud.has_method("update_status"):
+		game_hud.call("update_status", "All bugs cleared. Find the portal.")
 
 
 # --- UI Alerts ---
@@ -263,10 +318,25 @@ func show_victory_screen() -> void:
 	if _has_overlay("VictoryScreen"):
 		return
 
-	var screen := Control.new()
+	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
+	if hp_time_manager != null and hp_time_manager.has_method("stop_timer"):
+		hp_time_manager.call("stop_timer")
+
+	var game_manager: Node = get_node_or_null("/root/GameManager")
+	var telemetry_manager: Node = get_node_or_null("/root/TelemetryManager")
+	if telemetry_manager != null and telemetry_manager.has_method("log_stage_clear") and game_manager != null:
+		telemetry_manager.call(
+			"log_stage_clear",
+			str(game_manager.get("current_stage_id")),
+			float(hp_time_manager.get("time_remaining")) if hp_time_manager != null else 0.0,
+			int(hp_time_manager.get("current_hp")) if hp_time_manager != null else 0
+		)
+
+	var screen := VICTORY_SCREEN_SCENE.instantiate() as Control
 	screen.name = "VictoryScreen"
-	screen.set_script(VICTORY_SCREEN_SCRIPT)
-	_add_basic_victory_layout(screen)
+	_prepare_overlay_screen(screen)
+	if screen.get_node_or_null("VBox/ContinueButton") == null:
+		_add_basic_victory_layout(screen)
 	add_child(screen)
 
 
@@ -277,10 +347,11 @@ func show_game_over_screen(reason: String) -> void:
 			existing.call("set_reason", reason)
 		return
 
-	var screen := Control.new()
+	var screen := GAME_OVER_SCREEN_SCENE.instantiate() as Control
 	screen.name = "GameOverScreen"
-	screen.set_script(GAME_OVER_SCREEN_SCRIPT)
-	_add_basic_game_over_layout(screen)
+	_prepare_overlay_screen(screen)
+	if screen.get_node_or_null("VBox/RetryButton") == null:
+		_add_basic_game_over_layout(screen)
 	add_child(screen)
 	if screen.has_method("set_reason"):
 		screen.call("set_reason", reason)
@@ -292,9 +363,16 @@ func _has_overlay(node_name: String) -> bool:
 
 
 func _add_basic_victory_layout(screen: Control) -> void:
+	var backdrop := ColorRect.new()
+	backdrop.name = "Backdrop"
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.02, 0.06, 0.07, 0.86)
+	screen.add_child(backdrop)
+
 	var vbox := VBoxContainer.new()
 	vbox.name = "VBox"
-	vbox.anchors_preset = Control.PRESET_CENTER
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.custom_minimum_size = Vector2(420, 240)
 	vbox.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	vbox.grow_vertical = Control.GROW_DIRECTION_BOTH
 	screen.add_child(vbox)
@@ -316,9 +394,16 @@ func _add_basic_victory_layout(screen: Control) -> void:
 
 
 func _add_basic_game_over_layout(screen: Control) -> void:
+	var backdrop := ColorRect.new()
+	backdrop.name = "Backdrop"
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.08, 0.02, 0.03, 0.86)
+	screen.add_child(backdrop)
+
 	var vbox := VBoxContainer.new()
 	vbox.name = "VBox"
-	vbox.anchors_preset = Control.PRESET_CENTER
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.custom_minimum_size = Vector2(420, 220)
 	vbox.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	vbox.grow_vertical = Control.GROW_DIRECTION_BOTH
 	screen.add_child(vbox)
@@ -341,3 +426,57 @@ func _add_basic_game_over_layout(screen: Control) -> void:
 
 func _default_stage_for_chapter(chapter: int) -> String:
 	return "ch%d_stage1" % maxi(chapter, 1)
+
+
+func _on_game_state_changed(new_state: GameManager.GameState) -> void:
+	if new_state == GameManager.GameState.PAUSED:
+		show_pause_screen()
+	else:
+		_hide_pause_screen()
+
+
+func show_pause_screen() -> void:
+	if _has_overlay("PauseMenu"):
+		return
+	var screen := PAUSE_MENU_SCENE.instantiate() as Control
+	screen.name = "PauseMenu"
+	_prepare_overlay_screen(screen)
+	if screen.get_node_or_null("VBox/ResumeButton") == null:
+		_add_basic_pause_layout(screen)
+	add_child(screen)
+
+
+func _hide_pause_screen() -> void:
+	var pause_screen := get_node_or_null("PauseMenu")
+	if pause_screen != null:
+		pause_screen.queue_free()
+
+
+func _add_basic_pause_layout(screen: Control) -> void:
+	var backdrop := ColorRect.new()
+	backdrop.name = "Backdrop"
+	backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	backdrop.color = Color(0.02, 0.03, 0.05, 0.75)
+	screen.add_child(backdrop)
+
+	var vbox := VBoxContainer.new()
+	vbox.name = "VBox"
+	vbox.set_anchors_preset(Control.PRESET_CENTER)
+	vbox.custom_minimum_size = Vector2(320, 200)
+	screen.add_child(vbox)
+
+	var title := Label.new()
+	title.text = "Paused"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+
+	for button_name in ["ResumeButton", "RestartButton", "QuitButton"]:
+		var button := Button.new()
+		button.name = button_name
+		button.text = button_name.replace("Button", "")
+		vbox.add_child(button)
+
+
+func _prepare_overlay_screen(screen: Control) -> void:
+	screen.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	screen.set_anchors_preset(Control.PRESET_FULL_RECT)

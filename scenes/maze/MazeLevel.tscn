@@ -1,6 +1,29 @@
-[gd_scene format=3 uid="uid://cmessifsayocp"]
+[gd_scene load_steps=8 format=3 uid="uid://cmessifsayocp"]
 
 [ext_resource type="Script" uid="uid://bkua3gbo0rc8i" path="res://scenes/maze/MazeLevel.gd" id="1_maze_script"]
+[ext_resource type="Script" path="res://scripts/maze/MazeManager.gd" id="2_maze_manager"]
+[ext_resource type="Script" path="res://scripts/combat/EncounterManager.gd" id="3_encounter"]
+[ext_resource type="PackedScene" path="res://scenes/combat/CombatConsole.tscn" id="4_combat_console"]
+[ext_resource type="PackedScene" path="res://scenes/ui/GameHUD.tscn" id="5_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LootPopup.tscn" id="6_loot"]
+[ext_resource type="PackedScene" path="res://scenes/ui/TurnResultPanel.tscn" id="7_turn_result"]
 
 [node name="MazeLevel" type="Node2D" unique_id=1878127544]
 script = ExtResource("1_maze_script")
+
+[node name="MazeManager" type="Node2D" parent="."]
+script = ExtResource("2_maze_manager")
+
+[node name="EncounterManager" type="Node" parent="."]
+script = ExtResource("3_encounter")
+
+[node name="CombatConsole" parent="." instance=ExtResource("4_combat_console")]
+
+[node name="GameHUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="LootPopup" parent="." instance=ExtResource("6_loot")]
+
+[node name="TurnResultPanel" parent="." instance=ExtResource("7_turn_result")]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+enabled = true

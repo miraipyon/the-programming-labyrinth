@@ -146,31 +146,15 @@ func _refresh_continue_state() -> void:
 		return
 
 	var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
-	var current_chapter := maxi(int(game_manager.get("current_chapter")), 1)
-	var unlocked := _get_unlocked_chapters()
-
-	continue_button.disabled = stage_id.is_empty() or not unlocked.has(current_chapter)
+	# Continue is enabled whenever a saved stage exists, regardless of unlock state.
+	continue_button.disabled = stage_id.is_empty()
 
 
 func _get_unlocked_chapters() -> Array[int]:
-	var unlocked: Array[int] = [1]
-	var game_manager: Node = _get_game_manager()
-	if game_manager == null:
-		return unlocked
-
-	var unlocked_variant: Variant = game_manager.get("chapters_unlocked")
-	if typeof(unlocked_variant) == TYPE_ARRAY:
-		unlocked.clear()
-		for chapter_value in unlocked_variant:
-			var chapter := maxi(int(chapter_value), 1)
-			if not unlocked.has(chapter):
-				unlocked.append(chapter)
-
-	if unlocked.is_empty():
-		unlocked.append(1)
-
-	unlocked.sort()
-	return unlocked
+	# MVP/dev build: all 4 chapters are always visible and selectable.
+	# Progression (unlocking via GameManager) still advances stage-by-stage internally;
+	# this only controls what appears in the chapter picker.
+	return [1, 2, 3, 4]
 
 
 func _default_stage_for_chapter(chapter: int) -> String:

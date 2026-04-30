@@ -17,6 +17,7 @@ var enemies_alive: Array[Node2D] = []
 var chests_in_level: Array[Node2D] = []
 var portal_node: Node2D = null
 var player_node: Node2D = null
+var visual_root: Node2D = null
 
 
 # --- Lifecycle ---
@@ -37,6 +38,7 @@ func load_stage(p_stage_data: Dictionary) -> void:
 		level_ready.emit()
 		return
 
+	_spawn_maze_visuals()
 	_spawn_player()
 	_spawn_enemies()
 	_spawn_chests()
@@ -64,6 +66,10 @@ func _clear_entities() -> void:
 	if is_instance_valid(player_node):
 		player_node.queue_free()
 	player_node = null
+
+	if is_instance_valid(visual_root):
+		visual_root.queue_free()
+	visual_root = null
 
 
 func _spawn_player() -> void:
@@ -280,3 +286,185 @@ func _extract_position(raw: Variant, fallback: Vector2) -> Vector2:
 		dict = dict["position"]
 
 	return Vector2(float(dict.get("x", fallback.x)), float(dict.get("y", fallback.y)))
+
+
+func _spawn_maze_visuals() -> void:
+	visual_root = Node2D.new()
+	visual_root.name = "MazeVisuals"
+	add_child(visual_root)
+	move_child(visual_root, 0)
+
+	var bounds := _get_stage_bounds()
+	var floor_texture := load("res://assets/sprites/tiles/tile_00.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_00.png") else null
+	var wall_texture := load("res://assets/sprites/tiles/tile_10.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_10.png") else null
+	var obstacle_texture := load("res://assets/sprites/tiles/tile_50.png") if ResourceLoader.exists("res://assets/sprites/tiles/tile_50.png") else null
+
+	if floor_texture != null:
+		for x in range(0, int(bounds.size.x), 64):
+			for y in range(0, int(bounds.size.y), 64):
+				var tile := Sprite2D.new()
+				tile.texture = floor_texture
+				tile.position = Vector2(x + 32, y + 32)
+				tile.scale = Vector2(4, 4)
+				tile.z_index = -20
+				visual_root.add_child(tile)
+
+	_add_boundary(Vector2(bounds.size.x / 2.0, -16), Vector2(bounds.size.x, 32), wall_texture)
+	_add_boundary(Vector2(bounds.size.x / 2.0, bounds.size.y + 16), Vector2(bounds.size.x, 32), wall_texture)
+	_add_boundary(Vector2(-16, bounds.size.y / 2.0), Vector2(32, bounds.size.y), wall_texture)
+	_add_boundary(Vector2(bounds.size.x + 16, bounds.size.y / 2.0), Vector2(32, bounds.size.y), wall_texture)
+
+	var has_custom_walls := _spawn_stage_walls(wall_texture)
+	var has_custom_obstacles := _spawn_stage_obstacles(obstacle_texture)
+
+	if not has_custom_walls:
+		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.35), Vector2(bounds.size.x * 0.45, 32), wall_texture)
+		_add_wall_segment(Vector2(bounds.size.x * 0.5, bounds.size.y * 0.65), Vector2(bounds.size.x * 0.45, 32), wall_texture)
+
+	if not has_custom_obstacles:
+		_add_obstacle(Vector2(bounds.size.x - 96, 128), Vector2(56, 56), obstacle_texture)
+		_add_obstacle(Vector2(128, bounds.size.y - 96), Vector2(56, 56), obstacle_texture)
+
+
+func _get_stage_bounds() -> Rect2:
+	var bounds_variant: Variant = stage_data.get("bounds", {})
+	if typeof(bounds_variant) == TYPE_DICTIONARY:
+		var bounds_dict: Dictionary = bounds_variant
+		var width := float(bounds_dict.get("width", 0))
+		var height := float(bounds_dict.get("height", 0))
+		if width >= 640.0 and height >= 480.0:
+			return Rect2(Vector2.ZERO, Vector2(width, height))
+
+	var max_pos := Vector2(832, 640)
+	var candidate_positions: Array[Variant] = [
+		stage_data.get("player_spawn", {}),
+		stage_data.get("portal_position", {})
+	]
+
+	var enemy_spawns: Variant = stage_data.get("enemy_spawns", [])
+	if typeof(enemy_spawns) == TYPE_ARRAY:
+		for spawn in Array(enemy_spawns):
+			candidate_positions.append(spawn)
+
+	var chest_spawns: Variant = stage_data.get("chest_spawns", [])
+	if typeof(chest_spawns) == TYPE_ARRAY:
+		for spawn in Array(chest_spawns):
+			candidate_positions.append(spawn)
+
+	for raw in candidate_positions:
+		var pos := _extract_position(raw, Vector2.ZERO)
+		max_pos.x = maxf(max_pos.x, pos.x + 128.0)
+		max_pos.y = maxf(max_pos.y, pos.y + 128.0)
+
+	return Rect2(Vector2.ZERO, max_pos)
+
+
+func _spawn_stage_walls(wall_texture: Texture2D) -> bool:
+	var walls_variant: Variant = stage_data.get("wall_spawns", [])
+	if typeof(walls_variant) != TYPE_ARRAY:
+		return false
+
+	var walls: Array = walls_variant
+	var added := 0
+	for wall_variant in walls:
+		if typeof(wall_variant) != TYPE_DICTIONARY:
+			continue
+		var wall: Dictionary = wall_variant
+		var pos := _extract_position(wall.get("position", wall), Vector2.ZERO)
+		var size := _extract_size(wall.get("size", {}), Vector2(48, 48))
+		_add_wall_segment(pos, size, wall_texture)
+		added += 1
+	return added > 0
+
+
+func _spawn_stage_obstacles(obstacle_texture: Texture2D) -> bool:
+	var obstacles_variant: Variant = stage_data.get("obstacle_spawns", [])
+	if typeof(obstacles_variant) != TYPE_ARRAY:
+		return false
+
+	var obstacles: Array = obstacles_variant
+	var added := 0
+	for obstacle_variant in obstacles:
+		if typeof(obstacle_variant) != TYPE_DICTIONARY:
+			continue
+		var obstacle: Dictionary = obstacle_variant
+		var pos := _extract_position(obstacle.get("position", obstacle), Vector2.ZERO)
+		var size := _extract_size(obstacle.get("size", {}), Vector2(56, 56))
+		_add_obstacle(pos, size, obstacle_texture)
+		added += 1
+	return added > 0
+
+
+func _extract_size(raw: Variant, fallback: Vector2) -> Vector2:
+	if typeof(raw) == TYPE_VECTOR2:
+		return raw
+	if typeof(raw) != TYPE_DICTIONARY:
+		return fallback
+	var size_dict: Dictionary = raw
+	return Vector2(float(size_dict.get("x", fallback.x)), float(size_dict.get("y", fallback.y)))
+
+
+func _add_boundary(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> void:
+	var body := StaticBody2D.new()
+	body.name = "Boundary"
+	body.collision_layer = 1
+	body.position = pos
+
+	var shape_node := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = size
+	shape_node.shape = shape
+	body.add_child(shape_node)
+
+	if wall_texture != null:
+		var sprite := Sprite2D.new()
+		sprite.texture = wall_texture
+		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
+		sprite.z_index = -5
+		body.add_child(sprite)
+
+	visual_root.add_child(body)
+
+
+func _add_obstacle(pos: Vector2, size: Vector2, obstacle_texture: Texture2D) -> void:
+	var body := StaticBody2D.new()
+	body.name = "Obstacle"
+	body.collision_layer = 1
+	body.position = pos
+
+	var shape_node := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = size
+	shape_node.shape = shape
+	body.add_child(shape_node)
+
+	if obstacle_texture != null:
+		var sprite := Sprite2D.new()
+		sprite.texture = obstacle_texture
+		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
+		sprite.z_index = -2
+		body.add_child(sprite)
+
+	visual_root.add_child(body)
+
+
+func _add_wall_segment(pos: Vector2, size: Vector2, wall_texture: Texture2D) -> void:
+	var body := StaticBody2D.new()
+	body.name = "InnerWall"
+	body.collision_layer = 1
+	body.position = pos
+
+	var shape_node := CollisionShape2D.new()
+	var shape := RectangleShape2D.new()
+	shape.size = size
+	shape_node.shape = shape
+	body.add_child(shape_node)
+
+	if wall_texture != null:
+		var sprite := Sprite2D.new()
+		sprite.texture = wall_texture
+		sprite.scale = Vector2(maxf(size.x / 16.0, 1.0), maxf(size.y / 16.0, 1.0))
+		sprite.z_index = -4
+		body.add_child(sprite)
+
+	visual_root.add_child(body)

@@ -7,7 +7,8 @@ signal chest_interacted(chest_node: Node2D)
 signal portal_reached
 
 # --- Constants & Exports ---
-const PLAYER_SPRITE := "res://assets/sprites/tiny_dungeon/Tiles/tile_0089.png"
+const PLAYER_SPRITE := "res://assets/sprites/character/idle_1.png"
+const PLAYER_TARGET_PX: float = 48.0
 @export var move_speed: float = 200.0
 
 # --- State ---
@@ -18,12 +19,12 @@ var interactable_nearby: Node2D = null  # Chest gần nhất để interact
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("player")
-	
+
 	if has_node("Sprite"):
 		if ResourceLoader.exists(PLAYER_SPRITE):
 			$Sprite.texture = load(PLAYER_SPRITE)
-		$Sprite.scale = Vector2(2, 2)
-		
+		_apply_target_scale($Sprite, PLAYER_TARGET_PX)
+
 	if GameManager:
 		GameManager.game_state_changed.connect(_on_game_state_changed)
 
@@ -32,14 +33,14 @@ func _physics_process(delta: float) -> void:
 	if not can_move:
 		velocity = Vector2.ZERO
 		return
-	
+
 	var input_dir := Vector2.ZERO
 	input_dir.x = Input.get_axis("move_left", "move_right")
 	input_dir.y = Input.get_axis("move_up", "move_down")
-	
+
 	if input_dir.length() > 1.0:
 		input_dir = input_dir.normalized()
-	
+
 	velocity = input_dir * move_speed
 	move_and_slide()
 
@@ -58,6 +59,19 @@ func disable_movement() -> void:
 
 func enable_movement() -> void:
 	can_move = true
+
+
+# --- Visual Scale ---
+func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
+	if sprite == null:
+		return
+	var tex: Texture2D = sprite.texture
+	if tex == null:
+		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
+		return
+	var tex_size := float(maxi(tex.get_width(), 1))
+	var s := target_px / tex_size
+	sprite.scale = Vector2(s, s)
 
 
 # --- Callbacks ---

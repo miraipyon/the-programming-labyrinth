@@ -1,146 +1,649 @@
 [
 	{
-	  "id": "ch1_stage1",
-	  "chapter": 1,
-	  "name": "The Source Forest - Entrance",
-	  "time_limit_seconds": 360,
-	  "encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
-	  "enemy_spawns": [
-		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 250, "y": 180}},
-		{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 450, "y": 150}},
-		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 350, "y": 350}},
-		{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 550, "y": 300}},
-		{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 200, "y": 450}}
-	  ],
-	  "chest_spawns": [
-		{"type": "normal", "position": {"x": 400, "y": 250}},
-		{"type": "normal", "position": {"x": 600, "y": 400}}
-	  ],
-	  "player_spawn": {"x": 64, "y": 64},
-	  "portal_position": {"x": 700, "y": 500}
+		"id": "ch1_stage1",
+		"chapter": 1,
+		"name": "Source Forest - Entry Fork",
+		"time_limit_seconds": 360,
+		"encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+		"bounds": {"width": 960, "height": 720},
+		"wall_spawns": [
+			{"position": {"x": 280, "y": 170}, "size": {"x": 360, "y": 24}},
+			{"position": {"x": 520, "y": 350}, "size": {"x": 24, "y": 260}},
+			{"position": {"x": 760, "y": 500}, "size": {"x": 260, "y": 24}},
+			{"position": {"x": 170, "y": 510}, "size": {"x": 220, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 420, "y": 250}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 640, "y": 280}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 760, "y": 360}, "size": {"x": 56, "y": 56}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 210, "y": 130}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 430, "y": 140}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 620, "y": 320}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 300, "y": 460}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 790, "y": 590}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 150, "y": 360}},
+			{"type": "normal", "position": {"x": 560, "y": 580}}
+		],
+		"player_spawn": {"x": 64, "y": 64},
+		"portal_position": {"x": 880, "y": 640}
 	},
 	{
-	  "id": "ch2_stage1",
-	  "chapter": 2,
-	  "name": "The Logic Ruins - Gate",
-	  "time_limit_seconds": 480,
-	  "encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
-	  "enemy_spawns": [
-		{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 300, "y": 200}},
-		{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 500, "y": 180}},
-		{"enemy_id": "null_shadow", "bug_id": "ch2_logic_003", "position": {"x": 200, "y": 380}},
-		{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_004", "position": {"x": 450, "y": 350}},
-		{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_005", "position": {"x": 600, "y": 450}}
-	  ],
-	  "chest_spawns": [
-		{"type": "normal", "position": {"x": 350, "y": 300}},
-		{"type": "rare", "position": {"x": 550, "y": 250}}
-	  ],
-	  "player_spawn": {"x": 64, "y": 64},
-	  "portal_position": {"x": 700, "y": 500}
+		"id": "ch1_stage2",
+		"chapter": 1,
+		"name": "Source Forest - Curved Stream",
+		"time_limit_seconds": 360,
+		"encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+		"bounds": {"width": 980, "height": 700},
+		"wall_spawns": [
+			{"position": {"x": 240, "y": 240}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 430, "y": 420}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 670, "y": 220}, "size": {"x": 280, "y": 24}},
+			{"position": {"x": 820, "y": 500}, "size": {"x": 24, "y": 220}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 340, "y": 170}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 560, "y": 350}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 730, "y": 610}, "size": {"x": 56, "y": 56}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_001", "position": {"x": 170, "y": 170}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_002", "position": {"x": 370, "y": 300}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_003", "position": {"x": 600, "y": 170}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_004", "position": {"x": 710, "y": 450}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_005", "position": {"x": 900, "y": 560}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 280, "y": 520}},
+			{"type": "normal", "position": {"x": 850, "y": 290}}
+		],
+		"player_spawn": {"x": 72, "y": 84},
+		"portal_position": {"x": 920, "y": 640}
 	},
 	{
-	  "id": "ch3_stage1",
-	  "chapter": 3,
-	  "name": "The Array Abyss - Edge",
-	  "time_limit_seconds": 600,
-	  "encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
-	  "enemy_spawns": [
-		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_001", "position": {"x": 280, "y": 200}},
-		{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_002", "position": {"x": 480, "y": 180}},
-		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_003", "position": {"x": 350, "y": 370}},
-		{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 550, "y": 320}},
-		{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_005", "position": {"x": 200, "y": 480}}
-	  ],
-	  "chest_spawns": [
-		{"type": "normal", "position": {"x": 400, "y": 250}},
-		{"type": "rare", "position": {"x": 150, "y": 350}}
-	  ],
-	  "player_spawn": {"x": 64, "y": 64},
-	  "portal_position": {"x": 700, "y": 550}
+		"id": "ch1_stage3",
+		"chapter": 1,
+		"name": "Source Forest - Fallen Canopy",
+		"time_limit_seconds": 360,
+		"encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+		"bounds": {"width": 920, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 250, "y": 180}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 470, "y": 320}, "size": {"x": 24, "y": 220}},
+			{"position": {"x": 700, "y": 420}, "size": {"x": 300, "y": 24}},
+			{"position": {"x": 190, "y": 600}, "size": {"x": 240, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 340, "y": 280}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 620, "y": 520}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 800, "y": 250}, "size": {"x": 56, "y": 56}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 150, "y": 160}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 410, "y": 240}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 570, "y": 380}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 750, "y": 560}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 840, "y": 690}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 260, "y": 680}},
+			{"type": "rare", "position": {"x": 650, "y": 180}}
+		],
+		"player_spawn": {"x": 60, "y": 100},
+		"portal_position": {"x": 860, "y": 710}
 	},
 	{
-	  "id": "ch4_stage1",
-	  "chapter": 4,
-	  "name": "The Final Kernel - Core",
-	  "time_limit_seconds": 720,
-	  "encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
-	  "enemy_spawns": [
-		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 300, "y": 200}},
-		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_002", "position": {"x": 500, "y": 180}},
-		{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 250, "y": 400}},
-		{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 450, "y": 380}},
-		{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 600, "y": 500}}
-	  ],
-	  "chest_spawns": [
-		{"type": "normal", "position": {"x": 180, "y": 300}},
-		{"type": "rare", "position": {"x": 550, "y": 300}},
-		{"type": "rare", "position": {"x": 350, "y": 480}}
-	  ],
-	  "player_spawn": {"x": 64, "y": 64},
-	  "portal_position": {"x": 700, "y": 550}
+		"id": "ch1_stage4",
+		"chapter": 1,
+		"name": "Source Forest - Echo Grove",
+		"time_limit_seconds": 360,
+		"encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+		"bounds": {"width": 1040, "height": 700},
+		"wall_spawns": [
+			{"position": {"x": 310, "y": 240}, "size": {"x": 360, "y": 24}},
+			{"position": {"x": 560, "y": 470}, "size": {"x": 24, "y": 260}},
+			{"position": {"x": 840, "y": 320}, "size": {"x": 280, "y": 24}},
+			{"position": {"x": 190, "y": 560}, "size": {"x": 260, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 430, "y": 150}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 670, "y": 590}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 910, "y": 470}, "size": {"x": 56, "y": 56}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_001", "position": {"x": 160, "y": 210}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_002", "position": {"x": 370, "y": 360}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_003", "position": {"x": 620, "y": 210}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_004", "position": {"x": 770, "y": 610}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_005", "position": {"x": 980, "y": 570}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 250, "y": 460}},
+			{"type": "normal", "position": {"x": 920, "y": 220}}
+		],
+		"player_spawn": {"x": 74, "y": 76},
+		"portal_position": {"x": 980, "y": 650}
 	},
 	{
-	  "id": "green_tea",
-	  "chapter": -1,
-	  "name": "Green Tea",
-	  "type": "consumable",
-	  "description": "Hồi máu cho bản thân",
-	  "effect": "heal",
-	  "value": 25
+		"id": "ch1_stage5",
+		"chapter": 1,
+		"name": "Source Forest - Compiler Clearing",
+		"time_limit_seconds": 360,
+		"encounters": ["ch1_syntax_001", "ch1_syntax_002", "ch1_syntax_003", "ch1_syntax_004", "ch1_syntax_005"],
+		"bounds": {"width": 1080, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 340, "y": 190}, "size": {"x": 420, "y": 24}},
+			{"position": {"x": 600, "y": 370}, "size": {"x": 24, "y": 300}},
+			{"position": {"x": 860, "y": 580}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 220, "y": 620}, "size": {"x": 280, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 470, "y": 290}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 760, "y": 400}, "size": {"x": 56, "y": 56}},
+			{"position": {"x": 960, "y": 260}, "size": {"x": 56, "y": 56}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_001", "position": {"x": 190, "y": 170}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_002", "position": {"x": 430, "y": 210}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_003", "position": {"x": 650, "y": 330}},
+			{"enemy_id": "semicolon_wisp", "bug_id": "ch1_syntax_004", "position": {"x": 820, "y": 530}},
+			{"enemy_id": "syntax_slime", "bug_id": "ch1_syntax_005", "position": {"x": 980, "y": 690}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 310, "y": 700}},
+			{"type": "rare", "position": {"x": 910, "y": 350}},
+			{"type": "normal", "position": {"x": 590, "y": 650}}
+		],
+		"player_spawn": {"x": 70, "y": 82},
+		"portal_position": {"x": 1020, "y": 710}
 	},
 	{
-	  "id": "focus_pill",
-	  "chapter": -1,
-	  "name": "Focus Pill",
-	  "type": "consumable",
-	  "description": "Phục hồi 1 ít thời gian đã mất",
-	  "effect": "restore_time",
-	  "value": 30
+		"id": "ch2_stage1",
+		"chapter": 2,
+		"name": "Logic Ruins - Split Arch",
+		"time_limit_seconds": 480,
+		"encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+		"bounds": {"width": 980, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 300, "y": 220}, "size": {"x": 380, "y": 24}},
+			{"position": {"x": 540, "y": 430}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 810, "y": 310}, "size": {"x": 300, "y": 24}},
+			{"position": {"x": 170, "y": 610}, "size": {"x": 220, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 420, "y": 330}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 680, "y": 560}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 860, "y": 190}, "size": {"x": 60, "y": 60}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 210, "y": 190}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 420, "y": 170}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_003", "position": {"x": 640, "y": 350}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_004", "position": {"x": 770, "y": 540}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_005", "position": {"x": 890, "y": 690}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 230, "y": 520}},
+			{"type": "rare", "position": {"x": 780, "y": 220}}
+		],
+		"player_spawn": {"x": 68, "y": 92},
+		"portal_position": {"x": 920, "y": 700}
 	},
 	{
-	  "id": "hint_chip",
-	  "chapter": -1,
-	  "name": "Hint Chip",
-	  "type": "consumable",
-	  "description": "Highlight 1 dòng lỗi",
-	  "effect": "hint",
-	  "value": 1
+		"id": "ch2_stage2",
+		"chapter": 2,
+		"name": "Logic Ruins - Null Bridge",
+		"time_limit_seconds": 480,
+		"encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+		"bounds": {"width": 1020, "height": 740},
+		"wall_spawns": [
+			{"position": {"x": 250, "y": 300}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 500, "y": 500}, "size": {"x": 360, "y": 24}},
+			{"position": {"x": 750, "y": 230}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 910, "y": 520}, "size": {"x": 24, "y": 240}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 350, "y": 210}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 610, "y": 360}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 760, "y": 650}, "size": {"x": 60, "y": 60}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_001", "position": {"x": 170, "y": 250}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 340, "y": 420}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_003", "position": {"x": 620, "y": 240}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_004", "position": {"x": 760, "y": 560}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_005", "position": {"x": 950, "y": 640}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 300, "y": 620}},
+			{"type": "rare", "position": {"x": 900, "y": 300}}
+		],
+		"player_spawn": {"x": 80, "y": 84},
+		"portal_position": {"x": 960, "y": 690}
 	},
 	{
-	  "id": "block_snap_chip",
-	  "chapter": -1,
-	  "name": "Block Snap Chip",
-	  "type": "consumable",
-	  "description": "Tự động xếp 1 khối lệnh vào đúng vị trí (Chapter 4 only)",
-	  "effect": "auto_snap",
-	  "value": 1
+		"id": "ch2_stage3",
+		"chapter": 2,
+		"name": "Logic Ruins - Branch Sanctuary",
+		"time_limit_seconds": 480,
+		"encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+		"bounds": {"width": 940, "height": 780},
+		"wall_spawns": [
+			{"position": {"x": 270, "y": 220}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 470, "y": 420}, "size": {"x": 24, "y": 320}},
+			{"position": {"x": 720, "y": 560}, "size": {"x": 280, "y": 24}},
+			{"position": {"x": 160, "y": 640}, "size": {"x": 220, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 360, "y": 320}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 620, "y": 450}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 830, "y": 230}, "size": {"x": 60, "y": 60}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 180, "y": 170}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_002", "position": {"x": 380, "y": 270}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_003", "position": {"x": 560, "y": 380}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_004", "position": {"x": 700, "y": 620}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_005", "position": {"x": 860, "y": 710}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 260, "y": 710}},
+			{"type": "rare", "position": {"x": 720, "y": 250}},
+			{"type": "normal", "position": {"x": 560, "y": 680}}
+		],
+		"player_spawn": {"x": 64, "y": 88},
+		"portal_position": {"x": 870, "y": 730}
 	},
 	{
-	  "id": "github_cape",
-	  "chapter": -1,
-	  "name": "GitHub Cape",
-	  "type": "artifact",
-	  "description": "Hồi sinh 1 lần khi HP = 0",
-	  "effect": "revive",
-	  "value": 1
+		"id": "ch2_stage4",
+		"chapter": 2,
+		"name": "Logic Ruins - Medusa Passage",
+		"time_limit_seconds": 480,
+		"encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+		"bounds": {"width": 1060, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 320, "y": 250}, "size": {"x": 400, "y": 24}},
+			{"position": {"x": 590, "y": 460}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 860, "y": 340}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 210, "y": 610}, "size": {"x": 240, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 460, "y": 360}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 690, "y": 540}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 960, "y": 240}, "size": {"x": 60, "y": 60}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_001", "position": {"x": 190, "y": 220}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_002", "position": {"x": 420, "y": 200}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_003", "position": {"x": 650, "y": 340}},
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_004", "position": {"x": 810, "y": 560}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_005", "position": {"x": 990, "y": 690}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 320, "y": 670}},
+			{"type": "rare", "position": {"x": 920, "y": 300}}
+		],
+		"player_spawn": {"x": 74, "y": 80},
+		"portal_position": {"x": 1000, "y": 710}
 	},
 	{
-	  "id": "ide_armor",
-	  "chapter": -1,
-	  "name": "IDE Armor",
-	  "type": "artifact",
-	  "description": "Giảm 20% HP_LOSS_TURN mỗi lượt bị hit",
-	  "effect": "damage_reduction",
-	  "value": 0.2
+		"id": "ch2_stage5",
+		"chapter": 2,
+		"name": "Logic Ruins - Conditional Citadel",
+		"time_limit_seconds": 480,
+		"encounters": ["ch2_logic_001", "ch2_logic_002", "ch2_logic_003", "ch2_logic_004", "ch2_logic_005"],
+		"bounds": {"width": 1120, "height": 800},
+		"wall_spawns": [
+			{"position": {"x": 360, "y": 220}, "size": {"x": 460, "y": 24}},
+			{"position": {"x": 620, "y": 430}, "size": {"x": 24, "y": 340}},
+			{"position": {"x": 930, "y": 620}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 210, "y": 690}, "size": {"x": 260, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 520, "y": 300}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 820, "y": 430}, "size": {"x": 60, "y": 60}},
+			{"position": {"x": 1030, "y": 280}, "size": {"x": 60, "y": 60}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "branch_phantom", "bug_id": "ch2_logic_001", "position": {"x": 210, "y": 190}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_002", "position": {"x": 470, "y": 240}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_003", "position": {"x": 700, "y": 350}},
+			{"enemy_id": "null_shadow", "bug_id": "ch2_logic_004", "position": {"x": 860, "y": 610}},
+			{"enemy_id": "type_mismatch_medusa", "bug_id": "ch2_logic_005", "position": {"x": 1030, "y": 740}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 300, "y": 740}},
+			{"type": "rare", "position": {"x": 980, "y": 360}},
+			{"type": "rare", "position": {"x": 720, "y": 730}}
+		],
+		"player_spawn": {"x": 82, "y": 90},
+		"portal_position": {"x": 1060, "y": 760}
 	},
 	{
-	  "id": "runtime_patch",
-	  "chapter": -1,
-	  "name": "Runtime Patch",
-	  "type": "artifact",
-	  "description": "Bỏ qua 1 hit của quái trong màn hiện tại",
-	  "effect": "skip_hit",
-	  "value": 1
+		"id": "ch3_stage1",
+		"chapter": 3,
+		"name": "Array Abyss - Outer Ring",
+		"time_limit_seconds": 600,
+		"encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+		"bounds": {"width": 980, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 300, "y": 210}, "size": {"x": 380, "y": 24}},
+			{"position": {"x": 530, "y": 420}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 790, "y": 320}, "size": {"x": 300, "y": 24}},
+			{"position": {"x": 180, "y": 610}, "size": {"x": 240, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 420, "y": 290}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 680, "y": 540}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 860, "y": 200}, "size": {"x": 62, "y": 62}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_001", "position": {"x": 200, "y": 170}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_002", "position": {"x": 420, "y": 170}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_003", "position": {"x": 630, "y": 340}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 780, "y": 560}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_005", "position": {"x": 900, "y": 700}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 250, "y": 500}},
+			{"type": "rare", "position": {"x": 810, "y": 230}}
+		],
+		"player_spawn": {"x": 70, "y": 88},
+		"portal_position": {"x": 920, "y": 710}
+	},
+	{
+		"id": "ch3_stage2",
+		"chapter": 3,
+		"name": "Array Abyss - Offset Falls",
+		"time_limit_seconds": 600,
+		"encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+		"bounds": {"width": 1040, "height": 740},
+		"wall_spawns": [
+			{"position": {"x": 270, "y": 280}, "size": {"x": 24, "y": 280}},
+			{"position": {"x": 540, "y": 500}, "size": {"x": 380, "y": 24}},
+			{"position": {"x": 800, "y": 230}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 920, "y": 530}, "size": {"x": 24, "y": 250}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 370, "y": 190}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 620, "y": 360}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 790, "y": 640}, "size": {"x": 62, "y": 62}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_001", "position": {"x": 180, "y": 250}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_002", "position": {"x": 360, "y": 420}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_003", "position": {"x": 640, "y": 250}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_004", "position": {"x": 790, "y": 560}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_005", "position": {"x": 960, "y": 640}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 300, "y": 620}},
+			{"type": "rare", "position": {"x": 930, "y": 300}}
+		],
+		"player_spawn": {"x": 84, "y": 78},
+		"portal_position": {"x": 970, "y": 690}
+	},
+	{
+		"id": "ch3_stage3",
+		"chapter": 3,
+		"name": "Array Abyss - Broken Loop",
+		"time_limit_seconds": 600,
+		"encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+		"bounds": {"width": 960, "height": 800},
+		"wall_spawns": [
+			{"position": {"x": 280, "y": 230}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 500, "y": 430}, "size": {"x": 24, "y": 330}},
+			{"position": {"x": 740, "y": 590}, "size": {"x": 280, "y": 24}},
+			{"position": {"x": 170, "y": 670}, "size": {"x": 240, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 360, "y": 330}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 620, "y": 490}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 830, "y": 240}, "size": {"x": 62, "y": 62}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_001", "position": {"x": 180, "y": 180}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_002", "position": {"x": 390, "y": 280}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_003", "position": {"x": 560, "y": 390}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 730, "y": 640}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_005", "position": {"x": 870, "y": 750}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 250, "y": 740}},
+			{"type": "rare", "position": {"x": 730, "y": 260}},
+			{"type": "normal", "position": {"x": 560, "y": 730}}
+		],
+		"player_spawn": {"x": 66, "y": 94},
+		"portal_position": {"x": 890, "y": 760}
+	},
+	{
+		"id": "ch3_stage4",
+		"chapter": 3,
+		"name": "Array Abyss - Index Rift",
+		"time_limit_seconds": 600,
+		"encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+		"bounds": {"width": 1080, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 330, "y": 240}, "size": {"x": 420, "y": 24}},
+			{"position": {"x": 620, "y": 450}, "size": {"x": 24, "y": 290}},
+			{"position": {"x": 880, "y": 350}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 210, "y": 620}, "size": {"x": 250, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 480, "y": 360}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 720, "y": 560}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 980, "y": 240}, "size": {"x": 62, "y": 62}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_001", "position": {"x": 210, "y": 220}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_002", "position": {"x": 450, "y": 220}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_003", "position": {"x": 690, "y": 340}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_004", "position": {"x": 840, "y": 580}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_005", "position": {"x": 1010, "y": 700}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 320, "y": 680}},
+			{"type": "rare", "position": {"x": 940, "y": 300}}
+		],
+		"player_spawn": {"x": 76, "y": 86},
+		"portal_position": {"x": 1020, "y": 710}
+	},
+	{
+		"id": "ch3_stage5",
+		"chapter": 3,
+		"name": "Array Abyss - Runtime Chasm",
+		"time_limit_seconds": 600,
+		"encounters": ["ch3_runtime_001", "ch3_runtime_002", "ch3_runtime_003", "ch3_runtime_004", "ch3_runtime_005"],
+		"bounds": {"width": 1140, "height": 820},
+		"wall_spawns": [
+			{"position": {"x": 360, "y": 230}, "size": {"x": 480, "y": 24}},
+			{"position": {"x": 650, "y": 450}, "size": {"x": 24, "y": 350}},
+			{"position": {"x": 940, "y": 650}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 230, "y": 710}, "size": {"x": 270, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 530, "y": 320}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 840, "y": 460}, "size": {"x": 62, "y": 62}},
+			{"position": {"x": 1050, "y": 270}, "size": {"x": 62, "y": 62}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_001", "position": {"x": 220, "y": 200}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_002", "position": {"x": 490, "y": 250}},
+			{"enemy_id": "infinite_golem", "bug_id": "ch3_runtime_003", "position": {"x": 730, "y": 350}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_004", "position": {"x": 890, "y": 650}},
+			{"enemy_id": "boundary_hydra", "bug_id": "ch3_runtime_005", "position": {"x": 1060, "y": 760}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 340, "y": 770}},
+			{"type": "rare", "position": {"x": 990, "y": 360}},
+			{"type": "rare", "position": {"x": 730, "y": 780}}
+		],
+		"player_spawn": {"x": 84, "y": 92},
+		"portal_position": {"x": 1080, "y": 780}
+	},
+	{
+		"id": "ch4_stage1",
+		"chapter": 4,
+		"name": "Final Kernel - Outer Lattice",
+		"time_limit_seconds": 720,
+		"encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+		"bounds": {"width": 1020, "height": 780},
+		"wall_spawns": [
+			{"position": {"x": 320, "y": 240}, "size": {"x": 420, "y": 24}},
+			{"position": {"x": 590, "y": 450}, "size": {"x": 24, "y": 300}},
+			{"position": {"x": 840, "y": 350}, "size": {"x": 320, "y": 24}},
+			{"position": {"x": 180, "y": 640}, "size": {"x": 240, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 460, "y": 340}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 700, "y": 560}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 910, "y": 220}, "size": {"x": 66, "y": 66}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 210, "y": 200}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_002", "position": {"x": 450, "y": 220}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 650, "y": 370}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 790, "y": 610}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_005", "position": {"x": 930, "y": 720}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 260, "y": 550}},
+			{"type": "rare", "position": {"x": 860, "y": 290}}
+		],
+		"player_spawn": {"x": 70, "y": 86},
+		"portal_position": {"x": 950, "y": 730}
+	},
+	{
+		"id": "ch4_stage2",
+		"chapter": 4,
+		"name": "Final Kernel - Loop Nexus",
+		"time_limit_seconds": 720,
+		"encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+		"bounds": {"width": 1080, "height": 760},
+		"wall_spawns": [
+			{"position": {"x": 290, "y": 300}, "size": {"x": 24, "y": 300}},
+			{"position": {"x": 560, "y": 510}, "size": {"x": 390, "y": 24}},
+			{"position": {"x": 830, "y": 240}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 950, "y": 530}, "size": {"x": 24, "y": 240}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 390, "y": 190}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 640, "y": 370}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 820, "y": 660}, "size": {"x": 66, "y": 66}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 200, "y": 260}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_002", "position": {"x": 380, "y": 430}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 670, "y": 260}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_004", "position": {"x": 810, "y": 560}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 1000, "y": 650}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 320, "y": 630}},
+			{"type": "rare", "position": {"x": 980, "y": 300}}
+		],
+		"player_spawn": {"x": 86, "y": 80},
+		"portal_position": {"x": 1020, "y": 700}
+	},
+	{
+		"id": "ch4_stage3",
+		"chapter": 4,
+		"name": "Final Kernel - Sequence Vault",
+		"time_limit_seconds": 720,
+		"encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+		"bounds": {"width": 1000, "height": 820},
+		"wall_spawns": [
+			{"position": {"x": 300, "y": 240}, "size": {"x": 380, "y": 24}},
+			{"position": {"x": 520, "y": 450}, "size": {"x": 24, "y": 340}},
+			{"position": {"x": 770, "y": 620}, "size": {"x": 300, "y": 24}},
+			{"position": {"x": 190, "y": 700}, "size": {"x": 250, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 390, "y": 350}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 660, "y": 520}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 880, "y": 250}, "size": {"x": 66, "y": 66}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 190, "y": 190}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_002", "position": {"x": 410, "y": 300}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_003", "position": {"x": 590, "y": 410}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_004", "position": {"x": 760, "y": 670}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 900, "y": 770}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 280, "y": 760}},
+			{"type": "rare", "position": {"x": 770, "y": 290}},
+			{"type": "rare", "position": {"x": 600, "y": 760}}
+		],
+		"player_spawn": {"x": 68, "y": 96},
+		"portal_position": {"x": 920, "y": 780}
+	},
+	{
+		"id": "ch4_stage4",
+		"chapter": 4,
+		"name": "Final Kernel - Architecture Gate",
+		"time_limit_seconds": 720,
+		"encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+		"bounds": {"width": 1120, "height": 780},
+		"wall_spawns": [
+			{"position": {"x": 340, "y": 250}, "size": {"x": 440, "y": 24}},
+			{"position": {"x": 650, "y": 460}, "size": {"x": 24, "y": 300}},
+			{"position": {"x": 910, "y": 360}, "size": {"x": 340, "y": 24}},
+			{"position": {"x": 220, "y": 640}, "size": {"x": 260, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 500, "y": 360}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 760, "y": 580}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 1020, "y": 250}, "size": {"x": 66, "y": 66}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 220, "y": 220}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_002", "position": {"x": 480, "y": 230}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 730, "y": 360}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 880, "y": 620}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_005", "position": {"x": 1040, "y": 720}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 340, "y": 700}},
+			{"type": "rare", "position": {"x": 980, "y": 310}}
+		],
+		"player_spawn": {"x": 78, "y": 88},
+		"portal_position": {"x": 1060, "y": 730}
+	},
+	{
+		"id": "ch4_stage5",
+		"chapter": 4,
+		"name": "Final Kernel - Core Relay",
+		"time_limit_seconds": 720,
+		"encounters": ["ch4_flow_001", "ch4_flow_002", "ch4_flow_003", "ch4_flow_004", "ch4_flow_005"],
+		"bounds": {"width": 1180, "height": 840},
+		"wall_spawns": [
+			{"position": {"x": 380, "y": 240}, "size": {"x": 500, "y": 24}},
+			{"position": {"x": 700, "y": 470}, "size": {"x": 24, "y": 360}},
+			{"position": {"x": 990, "y": 690}, "size": {"x": 360, "y": 24}},
+			{"position": {"x": 240, "y": 740}, "size": {"x": 280, "y": 24}}
+		],
+		"obstacle_spawns": [
+			{"position": {"x": 560, "y": 350}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 880, "y": 500}, "size": {"x": 66, "y": 66}},
+			{"position": {"x": 1090, "y": 270}, "size": {"x": 66, "y": 66}}
+		],
+		"enemy_spawns": [
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_001", "position": {"x": 230, "y": 200}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_002", "position": {"x": 520, "y": 250}},
+			{"enemy_id": "flow_architect", "bug_id": "ch4_flow_003", "position": {"x": 770, "y": 360}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_004", "position": {"x": 930, "y": 680}},
+			{"enemy_id": "logic_bomb_boss", "bug_id": "ch4_flow_005", "position": {"x": 1100, "y": 790}}
+		],
+		"chest_spawns": [
+			{"type": "normal", "position": {"x": 360, "y": 790}},
+			{"type": "rare", "position": {"x": 1050, "y": 370}},
+			{"type": "rare", "position": {"x": 780, "y": 800}}
+		],
+		"player_spawn": {"x": 86, "y": 96},
+		"portal_position": {"x": 1120, "y": 800}
 	}
 ]

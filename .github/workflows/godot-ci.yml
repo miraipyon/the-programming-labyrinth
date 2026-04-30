@@ -1,0 +1,55 @@
+name: Godot CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Full Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.6.2
+          use-dotnet: false
+          include-templates: false
+
+      - name: Verify Godot
+        run: godot --version
+
+      - name: Smoke boot
+        run: godot --headless --path . --quit-after 3
+
+      - name: Test all
+        run: godot --headless --path . --script tests/test_all.gd
+
+      - name: Entity runner
+        run: godot --headless --path . tests/test_runner.tscn
+
+      - name: Combat runner
+        run: godot --headless --path . tests/test_runner_combat.tscn
+
+      - name: Maze runner
+        run: godot --headless --path . tests/test_runner_maze.tscn
+
+      - name: Inventory and artifacts runner
+        run: godot --headless --path . tests/test_runner_inventory_artifacts.tscn
+
+      - name: Combat items runner
+        run: godot --headless --path . tests/test_runner_combat_items.tscn
+
+      - name: Autoload flow
+        run: godot --headless --path . --script tests/test_autoload_flow.gd
+
+      - name: Menu scripts
+        run: godot --headless --path . --script tests/test_menu_scripts.gd
+
+      - name: Resource references
+        run: python3 scripts/check_resource_refs.py

@@ -21,7 +21,7 @@ func _load_all_data() -> void:
 	enemies_data = _extract_array(enemies, "enemies")
 	if enemies_data.is_empty():
 		push_warning("[DataManager] enemies_data is empty or invalid.")
-	
+
 	var bugs = _load_json("res://data/bugs.json")
 	bugs_data = _extract_array(bugs, "bugs")
 	if bugs_data.is_empty():
@@ -83,43 +83,43 @@ func get_enemy_data(enemy_id: String) -> Dictionary:
 	for enemy in enemies_data:
 		if typeof(enemy) == TYPE_DICTIONARY and str(enemy.get("id", "")) == str(enemy_id):
 			return enemy
-			
+
 	return {}
-	
+
 func get_bug_by_id(bug_id: String) -> Dictionary:
 	for bug in bugs_data:
 		if typeof(bug) == TYPE_DICTIONARY and str(bug.get("id", "")) == str(bug_id):
 			return bug
-			
+
 	return {}
 
 func get_bugs_by_chapter(chapter: int) -> Array:
 	var results = []
-	
+
 	for bug in bugs_data:
 		if typeof(bug) != TYPE_DICTIONARY:
 			continue
 		if int(bug.get("chapter", -1)) == chapter:
 			results.append(bug)
-			
+
 	return results
 
 func get_stage_data(stage_id: String) -> Dictionary:
 	for stage in stages_data:
 		if typeof(stage) == TYPE_DICTIONARY and str(stage.get("id", "")) == str(stage_id):
 			return stage
-			
+
 	return {}
 
 func get_stages_by_chapter(chapter: int) -> Array:
 	var results = []
-	
+
 	for stage in stages_data:
 		if typeof(stage) != TYPE_DICTIONARY:
 			continue
 		if int(stage.get("chapter", -1)) == chapter:
 			results.append(stage)
-			
+
 	return results
 
 func get_item_data(item_id: String) -> Dictionary:
