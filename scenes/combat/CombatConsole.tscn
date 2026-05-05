@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/combat/BlockAssemblyUI.tscn" id="3_block_ui"]
 
 [node name="CombatConsole" type="CanvasLayer"]
-layer = 10
+layer = 120
 script = ExtResource("1_console")
 
 [node name="CombatRoot" type="Control" parent="."]
@@ -17,27 +17,78 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Backdrop" type="ColorRect" parent="CombatRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.054902, 0.0666667, 0.105882, 0.972549)
+
+[node name="BackdropStripe" type="ColorRect" parent="CombatRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.133333, 0.180392, 0.25098, 0.0823529)
+
 [node name="Panel" type="PanelContainer" parent="CombatRoot"]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.08
-anchor_top = 0.06
-anchor_right = 0.92
-anchor_bottom = 0.94
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+clip_contents = true
 
 [node name="VBox" type="VBoxContainer" parent="CombatRoot/Panel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="EnemyLabel" type="Label" parent="CombatRoot/Panel/VBox"]
+visible = false
 layout_mode = 2
-text = "Enemy"
+text = ""
 
 [node name="TurnLabel" type="Label" parent="CombatRoot/Panel/VBox"]
+visible = false
 layout_mode = 2
-text = "Turn 1"
+text = ""
+
+[node name="BattleView" type="VBoxContainer" parent="CombatRoot/Panel/VBox"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_constants/separation = 10
+
+[node name="Portraits" type="HBoxContainer" parent="CombatRoot/Panel/VBox/BattleView"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 200
+
+[node name="PlayerPortrait" type="TextureRect" parent="CombatRoot/Panel/VBox/BattleView/Portraits"]
+custom_minimum_size = Vector2(170, 170)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyPortrait" type="TextureRect" parent="CombatRoot/Panel/VBox/BattleView/Portraits"]
+custom_minimum_size = Vector2(170, 170)
+layout_mode = 2
+flip_h = false
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BattleLineLabel" type="Label" parent="CombatRoot/Panel/VBox/BattleView"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="QuickInventory" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
 layout_mode = 2
@@ -58,5 +109,6 @@ text = ""
 autowrap_mode = 3
 
 [node name="SubmitButton" type="Button" parent="CombatRoot/Panel/VBox"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Submit"

@@ -59,7 +59,7 @@ func test_enemy():
 	assert_true(e.is_defeated == false, "Enemy starts undefeated")
 	e.defeat()
 	assert_true(e.is_defeated == true, "Enemy is defeated properly")
-	assert_eq(e.visible, false, "Enemy hides when defeated")
+	assert_eq(e.visible, true, "Enemy remains visible to show death sprite")
 	e.free()
 
 func test_chest():

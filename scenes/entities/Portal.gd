@@ -6,7 +6,7 @@ extends Area2D
 signal player_entered_portal
 
 # --- Sprites ---
-const PORTAL_SPRITE := "res://assets/sprites/tiles/tile_46.png"
+const PORTAL_SPRITE := "res://assets/tiles/tile_46.png"
 
 # --- State ---
 var is_active: bool = true
@@ -78,10 +78,11 @@ func deactivate() -> void:
 func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
 	if sprite == null:
 		return
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var tex: Texture2D = sprite.texture
 	if tex == null:
 		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
 		return
-	var tex_size := float(maxi(tex.get_width(), 1))
+	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
 	var s := target_px / tex_size
 	sprite.scale = Vector2(s, s)

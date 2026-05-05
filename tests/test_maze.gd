@@ -63,6 +63,7 @@ func test_maze_manager_spawn():
 	assert_true(is_ready[0], "level_ready signal emitted post-load")
 	assert_true(is_instance_valid(mm.player_node), "Player Node instantiated successfully")
 	assert_true(is_instance_valid(mm.portal_node), "Portal Node instantiated successfully")
+	assert_true(mm.debug_has_unique_route(), "Maze has exactly one route from player spawn to portal")
 	assert_eq(mm.enemies_alive.size(), 2, "Maze spawned exactly 2 enemies")
 	assert_eq(mm.chests_in_level.size(), 2, "Maze spawned exactly 2 chests")
 

@@ -10,21 +10,22 @@ signal encounter_triggered(enemy: Node2D)
 
 # --- Constants: Sprite mapping: enemy_id → tile file ---
 const SPRITE_MAP := {
-	"syntax_slime": "res://assets/sprites/monsters/syntax_slime/idle.png",
-	"semicolon_wisp": "res://assets/sprites/monsters/semicolon_wisp/idle.png",
-	"null_shadow": "res://assets/sprites/monsters/null_shadow/idle.png",
-	"branch_phantom": "res://assets/sprites/monsters/branch_phantom/idle.png",
-	"type_mismatch_medusa": "res://assets/sprites/monsters/type_mismatch_medusa/idle.png",
-	"infinite_golem": "res://assets/sprites/monsters/infinite_golem/idle.png",
-	"boundary_hydra": "res://assets/sprites/monsters/boundary_hydra/idle.png",
-	"flow_architect": "res://assets/sprites/monsters/flow_architect/idle.png",
-	"logic_bomb_boss": "res://assets/sprites/monsters/logic_bomb_boss/idle.png",
+	"syntax_slime": "res://assets/syntax_slime/idle.png",
+	"semicolon_wisp": "res://assets/semicolon_wisp/idle.png",
+	"null_shadow": "res://assets/null_shadow/idle.png",
+	"branch_phantom": "res://assets/branch_phantom/idle.png",
+	"type_mismatch_medusa": "res://assets/type_mismatch_medusa/idle.png",
+	"infinite_golem": "res://assets/infinite_golem/idle.png",
+	"boundary_hydra": "res://assets/boundary_hydra/idle.png",
+	"flow_architect": "res://assets/flow_architect/idle.png",
+	"logic_bomb_boss": "res://assets/logic_bomb_boss/idle.png",
 }
 
 # Target visual sizes per tier (pixels in world-space before camera zoom)
 const TARGET_PX_NORMAL: float = 52.0
 const TARGET_PX_STRONG: float = 64.0
 const TARGET_PX_BOSS: float = 84.0
+const MIN_RENDER_SCALE: float = 0.055
 
 # --- State ---
 var enemy_data: Dictionary = {}
@@ -72,8 +73,11 @@ func defeat() -> void:
 		var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
 		if not sprite_path.is_empty():
 			var die_path := sprite_path.replace("idle.png", "die.png")
+			var dead_path := sprite_path.replace("idle.png", "dead.png")
 			if ResourceLoader.exists(die_path):
 				$Sprite.texture = load(die_path)
+			elif ResourceLoader.exists(dead_path):
+				$Sprite.texture = load(dead_path)
 			else:
 				$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.5)
 
@@ -101,10 +105,12 @@ func _update_appearance() -> void:
 func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
 	if sprite == null:
 		return
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var tex: Texture2D = sprite.texture
 	if tex == null:
-		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
+		var fallback_scale := maxf(target_px / 64.0, MIN_RENDER_SCALE)
+		sprite.scale = Vector2(fallback_scale, fallback_scale)
 		return
-	var tex_size := float(maxi(tex.get_width(), 1))
-	var s := target_px / tex_size
+	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
+	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
 	sprite.scale = Vector2(s, s)

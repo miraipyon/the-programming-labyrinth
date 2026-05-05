@@ -73,28 +73,43 @@ func _ensure_layout() -> void:
 	if _goal_label != null and _rows_container != null:
 		return
 
-	var root_vbox := get_node_or_null("VBox")
+	var root_vbox := get_node_or_null("VBox") as VBoxContainer
 	if not (root_vbox is VBoxContainer):
 		root_vbox = VBoxContainer.new()
 		root_vbox.name = "VBox"
+		root_vbox.set_anchors_preset(Control.PRESET_FULL_RECT)
 		root_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		root_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		add_child(root_vbox)
+	var root: VBoxContainer = root_vbox
 
-	_goal_label = get_node_or_null("VBox/GoalLabel")
+	_goal_label = get_node_or_null("VBox/GoalLabel") as Label
 	if not (_goal_label is Label):
 		_goal_label = Label.new()
 		_goal_label.name = "GoalLabel"
 		_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_goal_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		root_vbox.add_child(_goal_label)
+		root.add_child(_goal_label)
+	if _goal_label != null:
+		_goal_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 
-	_rows_container = get_node_or_null("VBox/BlockRows")
-	if not (_rows_container is VBoxContainer):
+	var rows_slot := get_node_or_null("VBox/BlockRows")
+	if rows_slot is VBoxContainer:
+		_rows_container = rows_slot as VBoxContainer
+	elif rows_slot is ScrollContainer:
+		var rows_viewport := rows_slot.get_node_or_null("RowsVBox") as VBoxContainer
+		if rows_viewport == null:
+			rows_viewport = VBoxContainer.new()
+			rows_viewport.name = "RowsVBox"
+			rows_slot.add_child(rows_viewport)
+		_rows_container = rows_viewport
+	else:
 		_rows_container = VBoxContainer.new()
 		_rows_container.name = "BlockRows"
 		_rows_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		root_vbox.add_child(_rows_container)
+		root.add_child(_rows_container)
+	if _rows_container != null:
+		_rows_container.add_theme_constant_override("separation", 6)
 
 
 func _seed_order() -> void:
@@ -112,7 +127,12 @@ func _seed_order() -> void:
 
 func _render_blocks() -> void:
 	if _goal_label != null:
-		_goal_label.text = "Goal: %s" % str(_current_bug_data.get("goal", "Sắp xếp các block theo thứ tự đúng."))
+		var goal_text := _sanitize_goal_text(str(_current_bug_data.get("goal", "Sắp xếp các block theo thứ tự đúng.")).strip_edges())
+		var sections: Array[String] = [
+			"Yêu cầu: %s" % goal_text,
+			"Cách chơi: Dùng nút Up/Down để xếp block đúng thứ tự."
+		]
+		_goal_label.text = "\n".join(sections)
 
 	if _rows_container == null:
 		return
@@ -129,10 +149,12 @@ func _render_blocks() -> void:
 		var row := HBoxContainer.new()
 		row.name = "BlockRow_%d" % position
 		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_theme_constant_override("separation", 8)
 
 		var up_button := Button.new()
 		up_button.text = "Up"
 		up_button.disabled = position == 0
+		up_button.custom_minimum_size = Vector2(52, 0)
 		var captured_up := position
 		up_button.pressed.connect(func(): _move_block(captured_up, -1))
 		row.add_child(up_button)
@@ -140,13 +162,14 @@ func _render_blocks() -> void:
 		var down_button := Button.new()
 		down_button.text = "Down"
 		down_button.disabled = position == _current_order.size() - 1
+		down_button.custom_minimum_size = Vector2(62, 0)
 		var captured_down := position
 		down_button.pressed.connect(func(): _move_block(captured_down, 1))
 		row.add_child(down_button)
 
 		var label := Label.new()
 		label.text = "[%d] %s" % [block_index, text]
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.autowrap_mode = TextServer.AUTOWRAP_ARBITRARY
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(label)
 
@@ -200,3 +223,11 @@ func _parse_order_string(raw: String) -> Array:
 		result.append(int(value))
 
 	return result
+
+
+func _sanitize_goal_text(goal: String) -> String:
+	var marker := "Kết quả đúng:"
+	var idx := goal.find(marker)
+	if idx == -1:
+		return goal
+	return goal.substr(0, idx).strip_edges().trim_suffix(".")

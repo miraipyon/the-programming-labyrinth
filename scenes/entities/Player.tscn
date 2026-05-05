@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://gr5vi2newmdx" path="res://scenes/entities/Player.gd" id="1_player"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
-size = Vector2(24, 24)
+size = Vector2(18, 14)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2"]
 radius = 40.0
@@ -16,6 +16,7 @@ script = ExtResource("1_player")
 scale = Vector2(2, 2)
 
 [node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1300106541]
+position = Vector2(0, 9)
 shape = SubResource("RectangleShape2D_1")
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1287828827]

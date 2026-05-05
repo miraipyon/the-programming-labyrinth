@@ -179,7 +179,8 @@ func _process(delta: float) -> void:
 	var player: Node = maze_manager.get("player_node")
 	if player is Node2D:
 		var target_pos: Vector2 = player.global_position
-		camera.global_position = camera.global_position.lerp(target_pos, clampf(delta * 10.0, 0.0, 1.0))
+		var smoothed := camera.global_position.lerp(target_pos, clampf(delta * 10.0, 0.0, 1.0))
+		camera.global_position = Vector2(round(smoothed.x), round(smoothed.y))
 
 
 # --- Camera Setup ---
@@ -234,32 +235,37 @@ func _apply_camera_limits(p_stage_data: Dictionary) -> void:
 func _on_encounter_started(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 	if combat_console != null and combat_console.has_method("show_console"):
 		combat_console.call("show_console", enemy_data, bug_data)
-	if game_hud != null and game_hud.has_method("update_status"):
-		game_hud.call("update_status", "Combat: %s" % str(enemy_data.get("name", "Unknown")))
+	if turn_result_panel != null:
+		turn_result_panel.visible = false
+	if game_hud != null:
+		game_hud.visible = false
 
 
 func _on_encounter_completed(_success: bool) -> void:
 	if combat_console != null and combat_console.has_method("hide_console"):
 		combat_console.call("hide_console")
+	if turn_result_panel != null:
+		turn_result_panel.visible = false
+	if game_hud != null:
+		game_hud.visible = true
 	if game_hud != null and game_hud.has_method("update_status"):
 		game_hud.call("update_status", "Explore the labyrinth")
 
 
 func _on_turn_evaluated(result: Dictionary) -> void:
-	if turn_result_panel != null and turn_result_panel.has_method("display_result"):
+	var in_combat_screen := false
+	if combat_console != null and combat_console.visible:
+		in_combat_screen = true
+	if in_combat_screen and combat_console != null and combat_console.has_method("set_status_message"):
+		combat_console.call("set_status_message", str(result.get("details", "")))
+	elif turn_result_panel != null and turn_result_panel.has_method("display_result"):
 		turn_result_panel.call("display_result", result)
-	if game_hud != null and game_hud.has_method("update_status"):
-		game_hud.call("update_status", str(result.get("details", "")))
 
 
-func _on_player_turn_started(turn_number: int) -> void:
-	if combat_console == null:
+func _on_player_turn_started(_turn_number: int) -> void:
+	var turn_number := _turn_number
+	if turn_number < 0:
 		return
-
-	var turn_label: Node = combat_console.get_node_or_null("TurnLabel")
-	if turn_label is Label:
-		var label: Label = turn_label
-		label.text = "Turn %d" % turn_number
 
 
 # --- Game Over Conditions ---

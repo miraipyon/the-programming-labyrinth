@@ -8,10 +8,11 @@ signal chest_opened(loot_item_id: String)
 @export var chest_type: String = "normal"
 
 # --- Sprites ---
-const NORMAL_CHEST_CLOSED := "res://assets/sprites/chests/silver_chest/silver_chest_1.png"
-const NORMAL_CHEST_OPEN := "res://assets/sprites/chests/silver_chest/silver_chest_2.png"
-const RARE_CHEST_CLOSED := "res://assets/sprites/chests/gold_chest/gold_chest_1.png"
-const RARE_CHEST_OPEN := "res://assets/sprites/chests/gold_chest/gold_chest_2.png"
+const NORMAL_CHEST_CLOSED := "res://assets/chests/silver_chest/close.png"
+const NORMAL_CHEST_OPEN := "res://assets/chests/silver_chest/open.png"
+const RARE_CHEST_CLOSED := "res://assets/chests/gold_chest/close.png"
+const RARE_CHEST_OPEN := "res://assets/chests/gold_chest/open.png"
+const MIN_RENDER_SCALE: float = 0.05
 
 # --- State ---
 var is_opened: bool = false
@@ -68,10 +69,12 @@ func _update_appearance() -> void:
 func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
 	if sprite == null:
 		return
+	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var tex: Texture2D = sprite.texture
 	if tex == null:
-		sprite.scale = Vector2(target_px / 64.0, target_px / 64.0)
+		var fallback_scale := maxf(target_px / 64.0, MIN_RENDER_SCALE)
+		sprite.scale = Vector2(fallback_scale, fallback_scale)
 		return
-	var tex_size := float(maxi(tex.get_width(), 1))
-	var s := target_px / tex_size
+	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
+	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
 	sprite.scale = Vector2(s, s)

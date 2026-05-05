@@ -20,14 +20,35 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="CodeLabel" type="Label" parent="VBox"]
+[node name="RequirementLabel" type="Label" parent="VBox"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+autowrap_mode = 3
+
+[node name="CodeLabel" type="ScrollContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 128)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+horizontal_scroll_mode = 0
+
+[node name="SnippetText" type="Label" parent="VBox/CodeLabel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Code snippet"
 autowrap_mode = 3
 
-[node name="AnswerRows" type="VBoxContainer" parent="VBox"]
+[node name="AnswerRows" type="ScrollContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 154)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="RowsVBox" type="VBoxContainer" parent="VBox/AnswerRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
