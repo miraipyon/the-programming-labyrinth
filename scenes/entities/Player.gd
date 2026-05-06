@@ -14,7 +14,7 @@ const PLAYER_IDLE_FRAMES := [
 	"res://assets/MC/idle4.png"
 ]
 const PLAYER_TARGET_PX: float = 48.0
-const MIN_RENDER_SCALE: float = 0.04
+const MIN_RENDER_SCALE: float = 0.01
 @export var move_speed: float = 200.0
 
 # --- State ---

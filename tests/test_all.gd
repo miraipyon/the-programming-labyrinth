@@ -216,10 +216,10 @@ func _test_ui_components() -> void:
 	result_panel.add_child(msg_lbl)
 	root.add_child(result_panel)
 	await process_frame
-	result_panel.call("display_result", {"is_correct": true, "details": "ok", "fatal_error": false})
+	result_panel.call("display_result", {"is_correct": true, "details": "ok", "fatal_error": false, "fix_rate": 1.0})
 	_assert_true(result_panel.visible, "TurnResultPanel visible after display")
-	_assert_true(msg_lbl.text.find("thành công") != -1, "TurnResultPanel success message")
-	await create_timer(2.2).timeout
+	_assert_true(msg_lbl.text.find("✅") != -1 or msg_lbl.text.find("sửa") != -1, "TurnResultPanel success message")
+	await create_timer(3.2).timeout
 	_assert_true(not result_panel.visible, "TurnResultPanel auto hides")
 	result_panel.queue_free()
 
@@ -350,7 +350,9 @@ func _test_entities_and_combat() -> void:
 	combat_enemy.call("setup", "syntax_slime", "ch1_syntax_001", Vector2.ZERO)
 	encounter_manager.call("start_encounter", combat_enemy)
 	_assert_true(bool(encounter_manager.get("is_in_combat")), "EncounterManager start_encounter")
-	encounter_manager.call("submit_turn", {"line": 2, "fix": "print(\"Hello, \" + name)"})
+	encounter_manager.call("submit_turn", {"line": 1, "fix": "  'name': 'Hero',"})
+	await process_frame
+	encounter_manager.call("submit_turn", {"line": 2, "fix": "  'hp': 100"})
 	await process_frame
 	_assert_true(not bool(encounter_manager.get("is_in_combat")), "EncounterManager auto ends on success")
 	combat_enemy.queue_free()

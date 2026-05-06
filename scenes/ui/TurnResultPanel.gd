@@ -30,9 +30,9 @@ func display_result(result: Dictionary) -> void:
 		else:
 			modulate = Color(1.0, 0.75, 0.4)
 
-	# Ẩn panel sau 2 giây để tránh che UI quá lâu.
+	# Ẩn panel sau 3 giây để người chơi kịp đọc kết quả.
 	if _hide_timer != null:
-		_hide_timer.start(2.0)
+		_hide_timer.start(3.0)
 
 
 func _ready() -> void:
@@ -45,14 +45,41 @@ func _on_hide_timeout() -> void:
 
 
 func _build_message(result: Dictionary) -> String:
+	var hp_time := _get_hp_time_manager()
+	var current_hp := int(hp_time.get("current_hp")) if hp_time != null else -1
+
+	var fix_rate := float(result.get("fix_rate", 0.0))
+	var hp_loss_turn := int(result.get("monster_hp_loss", int(result.get("player_hp_loss", 0))))
+	var penalty_loss := int(result.get("wrong_line_penalty_loss", 0))
+	var wrong_count := int(result.get("wrong_line_count", 0))
+	var bugs_after := int(result.get("bugs_after", 0))
+	var blocks_missing := int(result.get("blocks_missing", 0))
+
 	if bool(result.get("is_correct", false)):
-		return "Bạn đã diệt bug thành công! HP loss: %d" % int(result.get("player_hp_loss", 0))
+		var lines: Array[String] = []
+		lines.append("✅ Đã sửa xong toàn bộ lỗi!")
+		lines.append("FIX_RATE: %.0f%%" % (fix_rate * 100.0))
+		if current_hp >= 0:
+			lines.append("HP còn lại: %d" % current_hp)
+		return "\n".join(lines)
 
-	var details := str(result.get("details", "Đáp án chưa đúng."))
-	if bool(result.get("fatal_error", false)):
-		return "Sai dòng: %s | HP loss: %d" % [details, int(result.get("player_hp_loss", 0))]
+	var lines: Array[String] = []
+	lines.append("❌ %s" % str(result.get("details", "Đáp án chưa đúng.")))
+	lines.append("FIX_RATE: %.0f%%" % (fix_rate * 100.0))
+	if blocks_missing > 0:
+		lines.append("BLOCKS_MISSING: %d" % blocks_missing)
+	elif bugs_after > 0:
+		lines.append("BUGS_AFTER: %d lỗi chưa sửa" % bugs_after)
+	lines.append("HP_LOSS_TURN: %d" % hp_loss_turn)
+	if wrong_count > 0:
+		lines.append("WRONG_LINE_PENALTY: %d (x%d sai dòng)" % [penalty_loss, wrong_count])
+	if current_hp >= 0:
+		lines.append("HP còn lại: %d" % current_hp)
+	return "\n".join(lines)
 
-	return "Chưa đúng: %s | HP loss: %d" % [details, int(result.get("player_hp_loss", 0))]
+
+func _get_hp_time_manager() -> Node:
+	return get_node_or_null("/root/HPTimeManager")
 
 
 func _ensure_layout() -> void:

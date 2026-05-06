@@ -29,6 +29,9 @@ var encounter_manager: Node = null
 var _root_control: Control = null
 var _enemy_label: Label = null
 var _turn_label: Label = null
+var _hp_row: HBoxContainer = null
+var _hp_label: Label = null
+var _hp_bar: ProgressBar = null
 var _status_label: Label = null
 var _quick_inventory: HBoxContainer = null
 var _submit_button: Button = null
@@ -63,11 +66,23 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 		_root_control.visible = true
 
 	if _enemy_label != null:
-		_enemy_label.text = ""
+		var enemy_name := str(enemy_data.get("name", str(enemy_data.get("id", "Enemy"))))
+		_enemy_label.text = "⚡ %s" % enemy_name
+		_enemy_label.visible = not enemy_name.is_empty()
 	if _status_label != null:
 		_status_label.text = ""
 	_reset_portrait_effect(_player_portrait)
 	_reset_portrait_effect(_enemy_portrait)
+	if _turn_label != null:
+		var em = get_node_or_null("../EncounterManager")
+		if em == null and get_parent() != null:
+			em = get_parent().find_child("EncounterManager", true, false)
+		var turn_n := 1
+		if em != null:
+			turn_n = int(em.get("turn_count"))
+		_turn_label.text = "Lượt: %d" % turn_n
+		_turn_label.visible = true
+	_update_player_hp()
 	_update_battle_view(enemy_data, current_bug_data)
 
 	var code_ui := _get_code_fix_ui()
@@ -96,7 +111,10 @@ func hide_console() -> void:
 		_root_control.visible = false
 
 
-func refresh_turn(_turn_number: int) -> void:
+func refresh_turn(turn_number: int) -> void:
+	if _turn_label != null:
+		_turn_label.text = "Lượt: %d" % turn_number
+		_turn_label.visible = true
 
 	if encounter_manager != null:
 		var bug_variant: Variant = encounter_manager.get("current_bug_data")
@@ -163,6 +181,9 @@ func use_hint_or_snap(item_id: String) -> Dictionary:
 
 
 func _on_completed(_success: bool) -> void:
+	if _turn_label != null:
+		_turn_label.text = ""
+		_turn_label.visible = false
 	hide_console()
 
 
@@ -233,6 +254,29 @@ func _ensure_layout() -> void:
 	_turn_label.text = ""
 	_turn_label.visible = false
 	vbox.add_child(_turn_label)
+
+	# HP bar của player trong combat
+	_hp_row = HBoxContainer.new()
+	_hp_row.name = "HPRow"
+	_hp_row.add_theme_constant_override("separation", 8)
+	vbox.add_child(_hp_row)
+
+	_hp_label = Label.new()
+	_hp_label.name = "CombatHPLabel"
+	_hp_label.text = "HP: --/--"
+	_hp_label.custom_minimum_size = Vector2(110, 0)
+	_hp_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
+	_hp_row.add_child(_hp_label)
+
+	_hp_bar = ProgressBar.new()
+	_hp_bar.name = "CombatHPBar"
+	_hp_bar.min_value = 0
+	_hp_bar.max_value = 100
+	_hp_bar.value = 100
+	_hp_bar.custom_minimum_size = Vector2(180, 16)
+	_hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hp_bar.show_percentage = false
+	_hp_row.add_child(_hp_bar)
 
 	var battle_view := VBoxContainer.new()
 	battle_view.name = "BattleView"
@@ -435,10 +479,29 @@ func set_status_message(message: String) -> void:
 func _on_turn_evaluated(result: Dictionary) -> void:
 	if not is_active:
 		return
+
+	# Update status/progress indicator
+	var status_parts: Array[String] = []
+	var bugs_after := int(result.get("bugs_after", 0))
+	var blocks_missing := int(result.get("blocks_missing", 0))
+	if bool(result.get("is_correct", false)):
+		status_parts.append("✅ Xong!")
+	elif current_mode == "block_assembly":
+		if blocks_missing > 0:
+			status_parts.append("BLOCKS_MISSING: %d" % blocks_missing)
+		var assembly_score := float(result.get("assembly_score", 0.0))
+		status_parts.append("%.0f%%" % (assembly_score * 100.0))
+	else:
+		if bugs_after > 0:
+			status_parts.append("BUGS_AFTER: %d" % bugs_after)
+	if not status_parts.is_empty() and _status_label != null:
+		_status_label.text = " | ".join(status_parts)
+
 	if int(result.get("player_hp_loss", 0)) > 0:
 		_play_damage_effect(_player_portrait)
 	if int(result.get("enemy_hp_loss", 0)) > 0:
 		_play_damage_effect(_enemy_portrait)
+	_update_player_hp()
 
 
 func _play_damage_effect(portrait: TextureRect) -> void:
@@ -490,12 +553,38 @@ func _reset_portrait_effect(portrait: TextureRect) -> void:
 	portrait.set_meta("_damage_tween", null)
 
 
+func _update_player_hp() -> void:
+	var htm: Node = get_node_or_null("/root/HPTimeManager")
+	if htm == null:
+		return
+	var current_hp := int(htm.get("current_hp"))
+	var max_hp := int(htm.get("max_hp"))
+	var safe_max := maxi(max_hp, 1)
+	var safe_hp := clampi(current_hp, 0, safe_max)
+	if _hp_label != null:
+		_hp_label.text = "HP: %d/%d" % [safe_hp, safe_max]
+		# Đổi màu khi HP thấp
+		var ratio := float(safe_hp) / float(safe_max)
+		if ratio <= 0.25:
+			_hp_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35))
+		elif ratio <= 0.5:
+			_hp_label.add_theme_color_override("font_color", Color(1.0, 0.7, 0.2))
+		else:
+			_hp_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
+	if _hp_bar != null:
+		_hp_bar.max_value = safe_max
+		_hp_bar.value = safe_hp
+
+
 func _build_objective_text(bug_data: Dictionary) -> String:
 	var mode := str(bug_data.get("type", "code_fix")).strip_edges()
-	if mode == "block_assembly":
-		var goal := _sanitize_goal_text(str(bug_data.get("goal", "Sắp xếp block theo thứ tự đúng.")).strip_edges())
-		return "Yêu cầu: %s" % goal
-
+	var goal := str(bug_data.get("goal", "")).strip_edges()
+	
+	if goal != "":
+		return "Yêu cầu: %s" % _sanitize_goal_text(goal)
+	elif mode == "block_assembly":
+		return "Yêu cầu: Sắp xếp block theo thứ tự đúng."
+	
 	return "Yêu cầu: Tìm và sửa tất cả lỗi trong đoạn code."
 
 

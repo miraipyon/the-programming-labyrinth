@@ -1,587 +1,674 @@
 [
-	{
-	  "id": "ch1_syntax_001",
-	  "chapter": 1,
-	  "language": "pseudocode",
-	  "topic": "syntax_basic",
-	  "difficulty": "easy",
-	  "snippet": [
-		"let score = 100",
-		"let name = \"Player\"",
-		"print(\"Hello, \" + name",
-		"print(\"Score: \" + score)"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Thiếu dấu đóng ngoặc ) ở cuối lệnh print",
-		  "wrong_code": "print(\"Hello, \" + name",
-		  "accepted_fixes": [
-			"print(\"Hello, \" + name)"
-		  ],
-		  "distractors": [
-			"print(\"Hello, \" + name;",
-			"print \"Hello, \" + name)",
-			"print(\"Hello, \" + name]"
-		  ]
-		}
-	  ],
-	  "explanation": "Mỗi lệnh gọi hàm cần đủ cặp ngoặc mở-đóng (). Dòng 2 mở ngoặc nhưng không đóng."
-	},
-	{
-	  "id": "ch1_syntax_002",
-	  "chapter": 1,
-	  "language": "pseudocode",
-	  "topic": "syntax_basic",
-	  "difficulty": "easy",
-	  "snippet": [
-		"let health = 100;",
-		"let damage = 25;",
-		"health = health - damge;",
-		"print(health);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Sai tên biến: 'damge' thay vì 'damage'",
-		  "wrong_code": "health = health - damge;",
-		  "accepted_fixes": [
-			"health = health - damage;"
-		  ],
-		  "distractors": [
-			"health = health - Damage;",
-			"health = health + damage;",
-			"health = damage - health;"
-		  ]
-		}
-	  ],
-	  "explanation": "Tên biến phân biệt chữ hoa/thường và phải khớp chính xác với khai báo. 'damge' ≠ 'damage'."
-	},
-	{
-	  "id": "ch1_syntax_003",
-	  "chapter": 1,
-	  "language": "pseudocode",
-	  "topic": "punctuation_brackets",
-	  "difficulty": "easy",
-	  "snippet": [
-		"let x = 10;",
-		"let y = 20;",
-		"if (x > y {",
-		"  print(\"x is bigger\");",
-		"}"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Thiếu dấu đóng ngoặc tròn ) sau điều kiện if",
-		  "wrong_code": "if (x > y {",
-		  "accepted_fixes": [
-			"if (x > y) {"
-		  ],
-		  "distractors": [
-			"if x > y) {",
-			"if (x > y) [",
-			"if (x > y]{"
-		  ]
-		}
-	  ],
-	  "explanation": "Câu lệnh if cần đủ cặp ngoặc tròn () bao quanh điều kiện rồi mới đến { mở block."
-	},
-	{
-	  "id": "ch1_syntax_004",
-	  "chapter": 1,
-	  "language": "pseudocode",
-	  "topic": "syntax_basic",
-	  "difficulty": "easy",
-	  "snippet": [
-		"let greeting = \"Hello World\";",
-		"Let count = 5;",
-		"print(greeting);",
-		"print(count);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 1,
-		  "description": "Từ khóa khai báo biến phải viết thường 'let', không phải 'Let'",
-		  "wrong_code": "Let count = 5;",
-		  "accepted_fixes": [
-			"let count = 5;"
-		  ],
-		  "distractors": [
-			"LET count = 5;",
-			"var count = 5;",
-			"Var count = 5;"
-		  ]
-		}
-	  ],
-	  "explanation": "Ngôn ngữ phân biệt chữ hoa/thường. Từ khóa 'Let' và 'LET' đều sai, phải dùng 'let'."
-	},
-	{
-	  "id": "ch1_syntax_005",
-	  "chapter": 1,
-	  "language": "pseudocode",
-	  "topic": "punctuation_brackets",
-	  "difficulty": "easy",
-	  "snippet": [
-		"let message = \"Hi;",
-		"print(message);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 0,
-		  "description": "Chuỗi ký tự thiếu dấu ngoặc kép đóng trước dấu chấm phẩy",
-		  "wrong_code": "let message = \"Hi;",
-		  "accepted_fixes": [
-			"let message = \"Hi\";"
-		  ],
-		  "distractors": [
-			"let message = Hi\";",
-			"let message = 'Hi';",
-			"let message = \"Hi"
-		  ]
-		}
-	  ],
-	  "explanation": "Chuỗi ký tự phải được bao bởi cặp dấu ngoặc kép mở-đóng. Dòng 0 mở \" nhưng không đóng trước dấu ;"
-	},
-	{
-	  "id": "ch2_logic_001",
-	  "chapter": 2,
-	  "language": "pseudocode",
-	  "topic": "wrong_branch",
-	  "difficulty": "medium",
-	  "snippet": [
-		"let hp = 50;",
-		"let max_hp = 100;",
-		"if (hp < 0) {",
-		"  print(\"Still alive!\");",
-		"} else {",
-		"  print(\"Game Over!\");",
-		"}"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Điều kiện sống/chết bị đảo ngược: hp < 0 không bao giờ đúng khi hp = 50",
-		  "wrong_code": "if (hp < 0) {",
-		  "accepted_fixes": [
-			"if (hp > 0) {"
-		  ],
-		  "distractors": [
-			"if (hp == 0) {",
-			"if (hp <= 0) {",
-			"if (hp >= 0) {"
-		  ]
-		}
-	  ],
-	  "explanation": "Người chơi còn sống khi HP > 0. Điều kiện hp < 0 sẽ luôn cho kết quả ngược khi hp = 50."
-	},
-	{
-	  "id": "ch2_logic_002",
-	  "chapter": 2,
-	  "language": "pseudocode",
-	  "topic": "wrong_branch",
-	  "difficulty": "medium",
-	  "snippet": [
-		"let score = 85;",
-		"let grade = \"\";",
-		"if (score >= 90) {",
-		"  grade = \"A\";",
-		"} else if (score = 80) {",
-		"  grade = \"B\";",
-		"} else {",
-		"  grade = \"C\";",
-		"}",
-		"print(grade);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 4,
-		  "description": "Dùng phép gán '=' thay vì so sánh '>=' hoặc '>=': score = 80 gán lại biến, không kiểm tra giá trị",
-		  "wrong_code": "} else if (score = 80) {",
-		  "accepted_fixes": [
-			"} else if (score >= 80) {"
-		  ],
-		  "distractors": [
-			"} else if (score == 80) {",
-			"} else if (score > 80) {",
-			"} else if (score <= 80) {"
-		  ]
-		}
-	  ],
-	  "explanation": "Trong câu lệnh điều kiện phải dùng toán tử so sánh (>=, ==, >, <). Dùng '=' là phép gán, không phải so sánh và gây lỗi logic nghiêm trọng."
-	},
-	{
-	  "id": "ch2_logic_003",
-	  "chapter": 2,
-	  "language": "pseudocode",
-	  "topic": "null_reference",
-	  "difficulty": "medium",
-	  "snippet": [
-		"let player = null;",
-		"let playerName = player.name;",
-		"print(playerName);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 1,
-		  "description": "Truy cập thuộc tính .name trên biến null gây lỗi NullPointerException",
-		  "wrong_code": "let playerName = player.name;",
-		  "accepted_fixes": [
-			"let playerName = player != null ? player.name : \"Unknown\";"
-		  ],
-		  "distractors": [
-			"let playerName = player.Name;",
-			"let playerName = null.name;",
-			"let playerName = player?.name;"
-		  ]
-		}
-	  ],
-	  "explanation": "Không thể truy cập thuộc tính trên biến null, phải kiểm tra null trước. Dùng toán tử ternary để xử lý trường hợp null an toàn."
-	},
-	{
-	  "id": "ch2_logic_004",
-	  "chapter": 2,
-	  "language": "pseudocode",
-	  "topic": "type_condition",
-	  "difficulty": "medium",
-	  "snippet": [
-		"let score = \"100\";",
-		"let bonus = 50;",
-		"let total = score + bonus;",
-		"print(total);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "score là chuỗi nên cộng với số cho kết quả nối chuỗi \"10050\" thay vì 150",
-		  "wrong_code": "let total = score + bonus;",
-		  "accepted_fixes": [
-			"let total = int(score) + bonus;",
-			"let total = toNumber(score) + bonus;"
-		  ],
-		  "distractors": [
-			"let total = score - bonus;",
-			"let total = score * bonus;",
-			"let total = str(score) + bonus;"
-		  ]
-		}
-	  ],
-	  "explanation": "Chuỗi + số = nối chuỗi. Phải chuyển đổi kiểu (type cast) score sang số nguyên trước khi cộng."
-	},
-	{
-	  "id": "ch2_logic_005",
-	  "chapter": 2,
-	  "language": "pseudocode",
-	  "topic": "wrong_branch",
-	  "difficulty": "hard",
-	  "snippet": [
-		"let temperature = 38;",
-		"let status = \"\";",
-		"if (temperature < 36) {",
-		"  status = \"Hạ thân nhiệt\";",
-		"} else if (temperature > 37.5) {",
-		"  status = \"Bình thường\";",
-		"} else {",
-		"  status = \"Sốt\";",
-		"}",
-		"print(status);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 5,
-		  "description": "Nhánh temperature > 37.5 gán 'Bình thường' nhưng phải là 'Sốt'",
-		  "wrong_code": "  status = \"Bình thường\";",
-		  "accepted_fixes": [
-			"  status = \"Sốt\";"
-		  ],
-		  "distractors": [
-			"  status = \"Hạ thân nhiệt\";",
-			"  status = \"Nguy hiểm\";",
-			"  status = \"Cảm cúm\";"
-		  ]
-		},
-		{
-		  "line": 7,
-		  "description": "Nhánh else còn lại (36 <= temp <= 37.5) gán 'Sốt' nhưng phải là 'Bình thường'",
-		  "wrong_code": "  status = \"Sốt\";",
-		  "accepted_fixes": [
-			"  status = \"Bình thường\";"
-		  ],
-		  "distractors": [
-			"  status = \"Hạ thân nhiệt\";",
-			"  status = \"Nguy hiểm\";",
-			"  status = \"Ổn định\";"
-		  ]
-		}
-	  ],
-	  "explanation": "Nhiệt độ > 37.5 là sốt, 36-37.5 là bình thường. Hai nhãn trạng thái bị hoán đổi cho nhau."
-	},
-	{
-	  "id": "ch3_runtime_001",
-	  "chapter": 3,
-	  "language": "pseudocode",
-	  "topic": "array_loop",
-	  "difficulty": "hard",
-	  "snippet": [
-		"let scores = [10, 20, 30, 40, 50];",
-		"let total = 0;",
-		"let i = 0;",
-		"while (i <= 5) {",
-		"  total = total + scores[i];",
-		"  i = i + 1;",
-		"}",
-		"print(total);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 3,
-		  "description": "Lỗi off-by-one: điều kiện i <= 5 truy cập index 5 nhưng mảng chỉ có index 0-4",
-		  "wrong_code": "while (i <= 5) {",
-		  "accepted_fixes": [
-			"while (i < 5) {",
-			"while (i <= 4) {"
-		  ],
-		  "distractors": [
-			"while (i < 4) {",
-			"while (i <= 6) {",
-			"while (i < scores.length + 1) {"
-		  ]
-		}
-	  ],
-	  "explanation": "Mảng 5 phần tử có index hợp lệ từ 0 đến 4. Điều kiện i <= 5 cho phép truy cập index 5 gây lỗi vượt biên."
-	},
-	{
-	  "id": "ch3_runtime_002",
-	  "chapter": 3,
-	  "language": "pseudocode",
-	  "topic": "array_loop",
-	  "difficulty": "hard",
-	  "snippet": [
-		"let items = [\"sword\", \"shield\", \"potion\"];",
-		"let i = 0;",
-		"while (i < items.length) {",
-		"  print(items[i]);",
-		"}",
-		"print(\"Done!\");"
-	  ],
-	  "bugs": [
-		{
-		  "line": 3,
-		  "description": "Thiếu lệnh tăng biến đếm i bên trong vòng lặp, gây vòng lặp vô tận",
-		  "wrong_code": "  print(items[i]);",
-		  "accepted_fixes": [
-			"  print(items[i]);\n  i = i + 1;"
-		  ],
-		  "distractors": [
-			"  print(items[i + 1]);",
-			"  print(items);",
-			"  i = i - 1;\n  print(items[i]);"
-		  ]
-		}
-	  ],
-	  "explanation": "Biến đếm i không bao giờ tăng nên điều kiện i < items.length luôn đúng, vòng lặp chạy mãi mãi."
-	},
-	{
-	  "id": "ch3_runtime_003",
-	  "chapter": 3,
-	  "language": "pseudocode",
-	  "topic": "off_by_one_index",
-	  "difficulty": "hard",
-	  "snippet": [
-		"let names = [\"An\", \"Bình\", \"Cường\"];",
-		"let last = names[names.length];",
-		"print(last);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 1,
-		  "description": "names.length = 3 nhưng index tối đa hợp lệ là 2 (length - 1); index 3 vượt biên",
-		  "wrong_code": "let last = names[names.length];",
-		  "accepted_fixes": [
-			"let last = names[names.length - 1];"
-		  ],
-		  "distractors": [
-			"let last = names[names.length + 1];",
-			"let last = names[0];",
-			"let last = names[names.length - 2];"
-		  ]
-		}
-	  ],
-	  "explanation": "Index cuối mảng = length - 1. names.length = 3 nên index hợp lệ là 0, 1, 2. Dùng names[3] sẽ vượt biên."
-	},
-	{
-	  "id": "ch3_runtime_004",
-	  "chapter": 3,
-	  "language": "pseudocode",
-	  "topic": "array_loop",
-	  "difficulty": "hard",
-	  "snippet": [
-		"let numbers = [5, 3, 8, 1, 9];",
-		"let max_val = numbers[0];",
-		"for (let i = 0; i < numbers.length; i++) {",
-		"  if (numbers[i] > max_val) {",
-		"    max_val = numbers[i];",
-		"  }",
-		"}",
-		"print(max_val);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Vòng lặp bắt đầu từ i=0 so sánh numbers[0] với chính max_val = numbers[0], không sai nhưng lãng phí; cần bắt đầu từ i=1 để hiệu quả và đúng pattern tìm max chuẩn",
-		  "wrong_code": "for (let i = 0; i < numbers.length; i++) {",
-		  "accepted_fixes": [
-			"for (let i = 1; i < numbers.length; i++) {"
-		  ],
-		  "distractors": [
-			"for (let i = 0; i <= numbers.length; i++) {",
-			"for (let i = 1; i <= numbers.length; i++) {",
-			"for (let i = 2; i < numbers.length; i++) {"
-		  ]
-		}
-	  ],
-	  "explanation": "Khi max_val đã khởi tạo bằng numbers[0], vòng lặp nên bắt đầu từ i=1 để bỏ qua phần tử đã dùng làm mốc, tránh so sánh thừa và đúng pattern tìm max chuẩn."
-	},
-	{
-	  "id": "ch3_runtime_005",
-	  "chapter": 3,
-	  "language": "pseudocode",
-	  "topic": "off_by_one_index",
-	  "difficulty": "very_hard",
-	  "snippet": [
-		"let arr = [10, 20, 30, 40, 50];",
-		"let reversed = [];",
-		"for (let i = arr.length; i >= 0; i--) {",
-		"  reversed.push(arr[i]);",
-		"}",
-		"print(reversed);"
-	  ],
-	  "bugs": [
-		{
-		  "line": 2,
-		  "description": "Vòng lặp bắt đầu từ arr.length (= 5) thay vì arr.length - 1 (= 4), index 5 vượt biên mảng",
-		  "wrong_code": "for (let i = arr.length; i >= 0; i--) {",
-		  "accepted_fixes": [
-			"for (let i = arr.length - 1; i >= 0; i--) {"
-		  ],
-		  "distractors": [
-			"for (let i = arr.length; i > 0; i--) {",
-			"for (let i = arr.length - 1; i > 0; i--) {",
-			"for (let i = arr.length + 1; i >= 0; i--) {"
-		  ]
-		}
-	  ],
-	  "explanation": "Duyệt ngược mảng phải bắt đầu từ index cuối = arr.length - 1. Bắt đầu từ arr.length truy cập index vượt biên ngay vòng đầu tiên."
-	},
-	{
-	  "id": "ch4_flow_001",
-	  "chapter": 4,
-	  "language": "pseudocode",
-	  "topic": "algorithm_flow",
-	  "difficulty": "hard",
-	  "type": "block_assembly",
-	  "goal": "Tính tổng các số chẵn trong mảng numbers = [1, 2, 3, 4, 5, 6]. Kết quả đúng: 12.",
-	  "blocks": [
-		"let numbers = [1, 2, 3, 4, 5, 6];",
-		"let sum = 0;",
-		"for (let i = 0; i < numbers.length; i++) {",
-		"  if (numbers[i] % 2 == 0) {",
-		"    sum = sum + numbers[i];",
-		"  }",
-		"}",
-		"print(sum);"
-	  ],
-	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Khai báo mảng và sum=0 trước, rồi vòng for duyệt từng phần tử, kiểm tra chẵn (% 2 == 0), cộng dồn vào sum, cuối cùng in kết quả."
-	},
-	{
-	  "id": "ch4_flow_002",
-	  "chapter": 4,
-	  "language": "pseudocode",
-	  "topic": "algorithm_flow",
-	  "difficulty": "hard",
-	  "type": "block_assembly",
-	  "goal": "Tìm giá trị lớn nhất trong mảng data = [7, 2, 9, 4, 1]. Kết quả đúng: 9.",
-	  "blocks": [
-		"let data = [7, 2, 9, 4, 1];",
-		"let max_val = data[0];",
-		"for (let i = 1; i < data.length; i++) {",
-		"  if (data[i] > max_val) {",
-		"    max_val = data[i];",
-		"  }",
-		"}",
-		"print(max_val);"
-	  ],
-	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Khởi tạo max_val = data[0], duyệt từ i=1 để bỏ qua phần tử đã dùng làm mốc, cập nhật max khi tìm được phần tử lớn hơn."
-	},
-	{
-	  "id": "ch4_flow_003",
-	  "chapter": 4,
-	  "language": "pseudocode",
-	  "topic": "algorithm_flow",
-	  "difficulty": "hard",
-	  "type": "block_assembly",
-	  "goal": "Đếm số lần ký tự 'a' xuất hiện trong chuỗi text = \"banana\". Kết quả đúng: 3.",
-	  "blocks": [
-		"let text = \"banana\";",
-		"let count = 0;",
-		"for (let i = 0; i < text.length; i++) {",
-		"  if (text[i] == 'a') {",
-		"    count = count + 1;",
-		"  }",
-		"}",
-		"print(count);"
-	  ],
-	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7],
-	  "explanation": "Duyệt từng ký tự trong chuỗi, so sánh với 'a', tăng biến đếm khi khớp. Thứ tự: khai báo → khởi tạo count → for loop → if → cộng → đóng ngoặc → print."
-	},
-	{
-	  "id": "ch4_flow_004",
-	  "chapter": 4,
-	  "language": "pseudocode",
-	  "topic": "algorithm_flow",
-	  "difficulty": "very_hard",
-	  "type": "block_assembly",
-	  "goal": "Kiểm tra số n = 17 có phải số nguyên tố không. Kết quả đúng: true.",
-	  "blocks": [
-		"let n = 17;",
-		"let is_prime = true;",
-		"if (n < 2) {",
-		"  is_prime = false;",
-		"}",
-		"for (let i = 2; i * i <= n; i++) {",
-		"  if (n % i == 0) {",
-		"    is_prime = false;",
-		"  }",
-		"}",
-		"print(is_prime);"
-	  ],
-	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-	  "explanation": "Kiểm tra n < 2 trước (không phải nguyên tố), rồi thử chia cho các số từ 2 đến căn bậc hai của n (i*i <= n). Nếu chia hết thì không phải nguyên tố."
-	},
-	{
-	  "id": "ch4_flow_005",
-	  "chapter": 4,
-	  "language": "pseudocode",
-	  "topic": "logic_flow_combined",
-	  "difficulty": "very_hard",
-	  "type": "block_assembly",
-	  "goal": "Sắp xếp mảng arr = [5, 3, 8, 1, 2] theo thứ tự tăng dần bằng Bubble Sort. Kết quả đúng: [1, 2, 3, 5, 8].",
-	  "blocks": [
-		"let arr = [5, 3, 8, 1, 2];",
-		"for (let i = 0; i < arr.length - 1; i++) {",
-		"  for (let j = 0; j < arr.length - 1 - i; j++) {",
-		"    if (arr[j] > arr[j + 1]) {",
-		"      let temp = arr[j];",
-		"      arr[j] = arr[j + 1];",
-		"      arr[j + 1] = temp;",
-		"    }",
-		"  }",
-		"}",
-		"print(arr);"
-	  ],
-	  "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-	  "explanation": "Bubble Sort: vòng ngoài i chạy length-1 lần, vòng trong j chạy length-1-i lần (vì phần tử cuối mỗi lượt đã đúng vị trí). Hoán đổi cặp arr[j] > arr[j+1] qua biến temp."
-	}
+  {
+    "id": "ch1_syntax_001",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "hard",
+    "goal": "Khởi tạo thông tin nhân vật và in ra màn hình.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Thiếu dấu phẩy ngăn cách các cặp key-value trong dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Gán giá trị trong dictionary phải dùng dấu hai chấm (:), không phải dấu bằng (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "Trong Python dictionary, các cặp key-value dùng dấu hai chấm (:) và được ngăn cách bởi dấu phẩy (,)."
+  },
+  {
+    "id": "ch1_syntax_002",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "hard",
+    "goal": "Kiểm tra điều kiện và in ra vật phẩm đầu tiên trong danh sách.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Giá trị boolean trong Python phải viết hoa chữ cái đầu (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Thiếu dấu phẩy ngăn cách các phần tử trong list.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python phân biệt chữ hoa chữ thường, boolean là `True` và `False`. Danh sách (list) cần dấu phẩy giữa các phần tử."
+  },
+  {
+    "id": "ch1_syntax_003",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "hard",
+    "goal": "Ghép chuỗi để hiển thị thông tin chức nghiệp và cấp độ.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Thiếu dấu nháy đơn đóng chuỗi tĩnh.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Thiếu dấu nháy đơn đóng phần chuỗi tĩnh trước khi nối chuỗi với biến.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "Trong Python, chuỗi (string) phải được bao bởi cặp dấu nháy tương ứng (' hoặc \") để ranh giới rõ ràng."
+  },
+  {
+    "id": "ch1_syntax_004",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "hard",
+    "goal": "Viết hàm tính sát thương (damage) dựa trên lực tấn công và phòng thủ.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Từ khóa định nghĩa hàm trong Python là 'def' thay vì 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Từ khóa 'return' phải viết thường toàn bộ.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python định nghĩa hàm bằng từ khóa `def`. Mọi từ khóa chuẩn (như `return`, `if`, `for`) đều viết chữ thường."
+  },
+  {
+    "id": "ch1_syntax_005",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "very_hard",
+    "goal": "Kiểm tra phần tử đầu tiên của danh sách lồng nhau (2D list) xem có dương không.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Thiếu ngoặc vuông đóng cho mảng con thứ nhất trước dấu phẩy.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Mệnh đề if (hoặc for, while, def) trong Python phải kết thúc bằng dấu hai chấm (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Cấu trúc danh sách lồng nhau cần mở/đóng đủ ngoặc `[]`. Biểu thức `if` phải kết thúc bằng dấu `:` để bắt đầu khối mã."
+  },
+  {
+    "id": "ch2_logic_001",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "hard",
+    "goal": "Đánh giá trạng thái máu (hp) của nhân vật.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'healthy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "Toán tử '=' là phép gán. Để so sánh bằng, phải dùng '=='.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic sai: hp phải < 50 mới bị coi là 'critical'. Dùng '>' là sai logic so với đề.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Toán tử so sánh bằng trong Python là `==`. Lỗi đảo ngược điều kiện logic (`>` thay vì `<`) là bẫy dễ chết nhất."
+  },
+  {
+    "id": "ch2_logic_002",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "hard",
+    "goal": "Cấp quyền truy cập nếu người dùng có chìa khóa, HOẶC (là tài khoản VIP VÀ cấp độ >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Dùng sai toán tử logic, yêu cầu là (VIP VÀ level >= 10), nếu dùng toán tử 'or' thì level < 10 vẫn vô được.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "Toán tử `and` (VÀ) yêu cầu cả 2 điều kiện đúng, đây chính xác là logic cần thiết để ép người chơi VIP phải thỏa mãn cấp độ."
+  },
+  {
+    "id": "ch2_logic_003",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "medium",
+    "goal": "Tính tổng sát thương vật lý bằng (Sát thương cơ bản + bonus * hệ số nhân).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg là dạng chuỗi (str), cộng trực tiếp với số nguyên sẽ báo lỗi TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "Trong Python, biến chuỗi (string) không tự động ép kiểu thành số nguyên. Dùng hàm `int()` để chuyển đổi chuỗi sang số hợp lệ."
+  },
+  {
+    "id": "ch2_logic_004",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "hard",
+    "goal": "Phân loại xếp hạng theo điểm (score): 90 trở lên là 'S', 70 trở lên là 'A', còn lại là 'B'.",
+    "snippet": [
+      "score = 85",
+      "rank = ''",
+      "if score >= 90:",
+      "    rank = 'S'",
+      "if score >= 70:",
+      "    rank = 'A'",
+      "else:",
+      "    rank = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Việc dùng `if` rời rạc khiến logic bị rò rỉ. Nếu điểm = 95, rank sẽ bị gán đè từ 'S' thành 'A'.",
+        "wrong_code": "if score >= 70:",
+        "accepted_fixes": [
+          "elif score >= 70:"
+        ],
+        "distractors": [
+          "elif score <= 70:",
+          "else if score >= 70:",
+          "if score > 70:"
+        ]
+      }
+    ],
+    "explanation": "Trong phân cấp logic loại trừ, `elif` (else if) sẽ ngăn các điều kiện dưới chạy đè lên nếu điều kiện trước đó đã đúng."
+  },
+  {
+    "id": "ch2_logic_005",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "hard",
+    "goal": "Xử lý máu: bị độc (poisoned) thì trừ 5 HP, ngược lại thì hồi 5 HP. Đảm bảo HP không bị âm.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "Toán tử 3 ngôi (inline if) bị đảo ngược logic so với đề: bị poison thì lại được cộng máu.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Cú pháp inline-if trong Python là: `Value_If_True if Condition else Value_If_False`. Nhầm thứ tự giá trị True/False sẽ đảo lộn toàn bộ tính năng."
+  },
+  {
+    "id": "ch3_runtime_001",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "hard",
+    "goal": "Sử dụng vòng lặp while để in ra từng vật phẩm trong hòm đồ (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Bắt đầu lặp từ index 1 sẽ vĩnh viễn bỏ qua phần tử đầu tiên (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Vòng lặp chạy tới <= len(items) sẽ sinh lỗi vượt biên mảng (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "List trong Python được đánh chỉ số từ 0. Do đó, phần tử đầu tiên là `[0]` và phần tử cuối cùng là `[len - 1]`. Việc lặp từ 1 tới `<=` len là lỗi Off-by-one chết người."
+  },
+  {
+    "id": "ch3_runtime_002",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "very_hard",
+    "goal": "Duyệt danh sách từ cuối lên đầu để đảm bảo thao tác xóa an toàn cho quái 'slime'.",
+    "snippet": [
+      "enemies = ['slime', 'slime', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'slime':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Duyệt xuôi khi pop() sẽ khiến list bị ngắn đi, ném ra lỗi IndexError (Out of range) ở cuối mảng.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Tuyệt đối không xóa phần tử mảng bằng index nếu đang duyệt xuôi (vòng lặp for i), vì kích thước mảng sẽ co lại. Giải pháp an toàn nhất là lặp ngược từ đuôi lên `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_runtime_003",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "hard",
+    "goal": "Mô phỏng nhân vật đi bộ tiêu hao năng lượng, in ra quãng đường khi hết sạch năng lượng.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Biến năng lượng (energy) thay vì bị tiêu hao thì lại tăng, khiến điều kiện `energy > 0` luôn đúng. Tạo ra Loop vô tận.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Cộng thêm vào biến năng lượng trong khi điều kiện dừng là cạn năng lượng sẽ tạo ra Infinite Loop, trực tiếp làm treo chương trình."
+  },
+  {
+    "id": "ch3_runtime_004",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "very_hard",
+    "goal": "Duyệt ma trận hình chữ nhật (không vuông) và tính tổng tất cả phần tử bên trong.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "Vòng lặp cột (j) gọi nhầm len(grid) tức là số lượng hàng (3), làm tràn biên số cột thực tế (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "Khi duyệt mảng 2D kích thước bất kỳ (M x N), vòng lặp của cột (vòng for con) phải sử dụng đúng chiều dài của hàng mà nó đang đứng: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_runtime_005",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "hard",
+    "goal": "Đảo ngược chuỗi mật khẩu bằng cách truy xuất ngược index qua vòng lặp.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "Khai báo range(len, 0, -1) lấy từ index=4 tới 1. Index 4 là sai vì max hợp lệ chỉ là 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "Trong Python, `range(start, stop, step)` lấy điểm `start` và DỪNG NGAY TRƯỚC `stop`. Để đi lùi đến hết `index = 0`, `stop` phải là `-1`. Và `start` luôn phải là `len - 1`."
+  },
+  {
+    "id": "ch4_flow_001",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Tìm kiếm nhị phân (Binary Search) giá trị `target` trong mảng đã sắp xếp `arr`. Trả về index hoặc -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "explanation": "Binary search tính vị trí giữa `mid` nguyên bằng `// 2`. Nếu nhỏ hơn target thì hẹp phạm vi từ trái (`left = mid + 1`), nếu lớn hơn thì thu hẹp bên phải (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_flow_002",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Kỹ thuật Two-Pointers: Trộn 2 danh sách số tăng dần `a` và `b` thành một danh sách duy nhất `result` cũng tăng dần.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "explanation": "So sánh phần tử con trỏ `a[i]` và `b[j]`. Nhỏ hơn thì vứt vào `result` và tăng con trỏ. Hai vòng while cuối để vét sạch tất cả các phần tử dư thừa do lệnh `and` kia chưa duyệt hết."
+  },
+  {
+    "id": "ch4_flow_003",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Kiểm tra xem chuỗi văn bản `s` có phải là chuỗi đối xứng (Palindrome) hay không.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+    "explanation": "Dùng 2 con trỏ, một duyệt từ phần tử đầu (0), một từ phần tử cuối (len-1) chạy ngược về trung tâm. Gặp bất kỳ 1 cặp ký tự lệch nhau, lập tức `break` vòng lặp."
+  },
+  {
+    "id": "ch4_flow_004",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Sắp xếp danh sách mảng số `nums` theo chiều tăng dần, dựa trên thuật toán Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6],
+    "explanation": "Selection Sort luôn tìm kiếm phần tử nhỏ nhất từ vùng danh sách chưa sắp xếp `[i+1, n]`. Mỗi khi quét hết một vòng, tiến hành hoán đổi trực tiếp `nums[i]` với phần tử min đó."
+  },
+  {
+    "id": "ch4_flow_005",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Giải thuật Quy hoạch động (Dynamic Programming): Trả về số Fibonacci tại vị trí n (với F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6],
+    "explanation": "Memoization hiệu quả bằng mảng DP: Khởi tạo mảng có sức chứa `n+1` số 0. Điền 2 trạng thái biên (base case) ban đầu là 0, 1. Tính toán tịnh tiến dựa trên việc lưu trạng thái trước để giảm thời gian gian tính vòng Fibonacci."
+  }
 ]

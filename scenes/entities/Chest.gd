@@ -12,7 +12,9 @@ const NORMAL_CHEST_CLOSED := "res://assets/chests/silver_chest/close.png"
 const NORMAL_CHEST_OPEN := "res://assets/chests/silver_chest/open.png"
 const RARE_CHEST_CLOSED := "res://assets/chests/gold_chest/close.png"
 const RARE_CHEST_OPEN := "res://assets/chests/gold_chest/open.png"
-const MIN_RENDER_SCALE: float = 0.05
+const MIN_RENDER_SCALE: float = 0.01
+# Chest nhỏ hơn enemy (40px) và player (48px).
+const CHEST_TARGET_PX: float = 28.0
 
 # --- State ---
 var is_opened: bool = false
@@ -62,7 +64,7 @@ func _update_appearance() -> void:
 		else:
 			$Sprite.modulate = Color.WHITE
 
-	_apply_target_scale($Sprite, 44.0)
+	_apply_target_scale($Sprite, CHEST_TARGET_PX)
 
 
 # --- Visual Scale ---

@@ -50,10 +50,10 @@ func test_bug_evaluator_code_fix():
 		]
 	}
 
-	# Case 1: Wrong Line (Fatal Error)
+	# Case 1: Wrong Line (gây phạt HP theo GDD §3.2, không phải fatal_error)
 	var ans_wrong_line = {"line": 1, "fix": "print(\"Hello, \" + name)"}
 	var res1 = eval.evaluate_answer(bug_data, ans_wrong_line)
-	assert_true(res1.fatal_error == true, "Evaluator throws fatal_error on wrong line")
+	assert_true(res1.wrong_line_count > 0, "Evaluator counts wrong line selection")
 	assert_true(res1.is_correct == false, "Evaluator marks as false on wrong line")
 
 	# Case 2: Right Line, Wrong Syntax

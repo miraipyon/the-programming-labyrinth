@@ -21,11 +21,10 @@ const SPRITE_MAP := {
 	"logic_bomb_boss": "res://assets/logic_bomb_boss/idle.png",
 }
 
-# Target visual sizes per tier (pixels in world-space before camera zoom)
-const TARGET_PX_NORMAL: float = 52.0
-const TARGET_PX_STRONG: float = 64.0
-const TARGET_PX_BOSS: float = 84.0
-const MIN_RENDER_SCALE: float = 0.055
+# Tất cả quái cùng kích cỡ để nhìn đồng đều trên map.
+# Player = 48px → quái = 40px (nhỏ hơn một chút để player nổi bật).
+const TARGET_PX_ALL: float = 40.0
+const MIN_RENDER_SCALE: float = 0.01
 
 # --- State ---
 var enemy_data: Dictionary = {}
@@ -92,13 +91,8 @@ func _update_appearance() -> void:
 		$Sprite.texture = load(sprite_path)
 		$Sprite.modulate = Color.WHITE
 
-	var tier: String = enemy_data.get("tier", "normal")
-	var target_px: float = TARGET_PX_NORMAL
-	if tier == "boss":
-		target_px = TARGET_PX_BOSS
-	elif tier == "strong":
-		target_px = TARGET_PX_STRONG
-	_apply_target_scale($Sprite, target_px)
+	# Tất cả quái dùng cùng target_px để đồng bộ khích cỡ trên map.
+	_apply_target_scale($Sprite, TARGET_PX_ALL)
 
 
 # --- Visual Scale ---

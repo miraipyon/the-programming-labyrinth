@@ -93,7 +93,9 @@ func _evaluate_code_fix(bug_data: Dictionary, answer: Dictionary) -> Dictionary:
 
 	result.remaining_count = maxi(result.bugs_before - result.fixed_count, 0)
 	result.bugs_after = result.remaining_count
-	result.fatal_error = result.wrong_line_count > 0
+	# wrong_line chỉ gây phạt HP (WRONG_LINE_PENALTY), không phải fatal error.
+	# fatal_error chỉ dùng khi có lỗi dữ liệu nghiêm trọng.
+	result.fatal_error = false
 	result.fix_rate = float(result.fixed_count) / maxf(1.0, float(result.bugs_before))
 	result.is_correct = result.remaining_count == 0
 
