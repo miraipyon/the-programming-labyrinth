@@ -35,7 +35,7 @@ var is_defeated: bool = false
 func _ready() -> void:
 	add_to_group("enemy")
 	if not enemy_id.is_empty():
-		enemy_data = DataManager.get_enemy_data(enemy_id)
+		enemy_data = DataManager.get_enemy_data(enemy_id).duplicate(true)
 		_update_appearance()
 
 
@@ -46,7 +46,7 @@ func setup(p_enemy_id: String, p_bug_id: String, pos: Vector2) -> void:
 	position = pos
 
 	if DataManager:
-		enemy_data = DataManager.get_enemy_data(enemy_id)
+		enemy_data = DataManager.get_enemy_data(enemy_id).duplicate(true)
 
 	_update_appearance()
 

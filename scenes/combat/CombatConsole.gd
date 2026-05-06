@@ -353,6 +353,9 @@ func _bind_existing_layout() -> bool:
 	_status_label = _find_label(["CombatRoot/Panel/VBox/StatusLabel", "StatusLabel", "VBox/StatusLabel"])
 	if _status_label != null:
 		_status_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var vbox_node := get_node_or_null("CombatRoot/Panel/VBox")
+	if vbox_node is VBoxContainer:
+		_bind_or_create_hp_widgets(vbox_node)
 	var player_portrait_node := get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait")
 	if player_portrait_node is TextureRect:
 		_player_portrait = player_portrait_node
@@ -380,7 +383,7 @@ func _bind_existing_layout() -> bool:
 		if not _submit_button.pressed.is_connected(_on_submit_pressed):
 			_submit_button.pressed.connect(_on_submit_pressed)
 
-	return _quick_inventory != null and _submit_button != null
+	return _quick_inventory != null and _submit_button != null and _hp_label != null and _hp_bar != null
 
 
 func _take_or_create_ui(node_name: String, script: Script) -> Control:
@@ -401,6 +404,45 @@ func _take_or_create_ui(node_name: String, script: Script) -> Control:
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	control.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	return control
+
+
+func _bind_or_create_hp_widgets(vbox: VBoxContainer) -> void:
+	_hp_row = get_node_or_null("CombatRoot/Panel/VBox/HPRow") as HBoxContainer
+	_hp_label = get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPLabel") as Label
+	_hp_bar = get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPBar") as ProgressBar
+	if _hp_row != null and _hp_label != null and _hp_bar != null:
+		return
+
+	var turn_label := _turn_label
+	if _hp_row == null:
+		_hp_row = HBoxContainer.new()
+		_hp_row.name = "HPRow"
+		_hp_row.add_theme_constant_override("separation", 8)
+		if turn_label != null:
+			var turn_index := turn_label.get_index()
+			vbox.add_child(_hp_row)
+			vbox.move_child(_hp_row, turn_index + 1)
+		else:
+			vbox.add_child(_hp_row)
+
+	if _hp_label == null:
+		_hp_label = Label.new()
+		_hp_label.name = "CombatHPLabel"
+		_hp_label.text = "HP: --/--"
+		_hp_label.custom_minimum_size = Vector2(110, 0)
+		_hp_label.add_theme_color_override("font_color", Color(0.95, 0.85, 0.55))
+		_hp_row.add_child(_hp_label)
+
+	if _hp_bar == null:
+		_hp_bar = ProgressBar.new()
+		_hp_bar.name = "CombatHPBar"
+		_hp_bar.min_value = 0
+		_hp_bar.max_value = 100
+		_hp_bar.value = 100
+		_hp_bar.custom_minimum_size = Vector2(180, 16)
+		_hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_hp_bar.show_percentage = false
+		_hp_row.add_child(_hp_bar)
 
 
 func _refresh_quick_inventory() -> void:

@@ -108,7 +108,7 @@ func test_encounter_combat_flow():
 	var DummyEnemy = CharacterBody2D.new()
 	DummyEnemy.set_script(load("res://scenes/entities/Enemy.gd"))
 	DummyEnemy.set("enemy_id", "test_boss")
-	DummyEnemy.set("enemy_data", {"hit_base": 10})
+	DummyEnemy.set("enemy_data", {"id": "syntax_slime", "hit_base": 10})
 
 	em.start_encounter(DummyEnemy)
 	assert_true(em.is_in_combat == true, "Encounter flag set to true")
@@ -139,6 +139,9 @@ func test_encounter_combat_flow():
 
 	em.end_encounter(true)
 	assert_true(em.is_in_combat == false, "Encounter correctly closed.")
+	var post_enemy_data: Dictionary = DummyEnemy.get("enemy_data")
+	assert_true(post_enemy_data.has("id"), "Encounter does not clear source enemy_data")
+	assert_true(post_enemy_data.has("hit_base"), "Encounter keeps enemy hit_base after completion")
 
 	DummyEnemy.free()
 	em.free()

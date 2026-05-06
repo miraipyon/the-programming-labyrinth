@@ -19,6 +19,7 @@ const CARDINAL_DIRS: Array[Vector2i] = [
 	Vector2i(0, 1),
 	Vector2i(0, -1),
 ]
+const MAX_MAZE_GENERATION_ATTEMPTS: int = 6
 
 # --- State ---
 var stage_data: Dictionary = {}
@@ -330,17 +331,53 @@ func _prepare_perfect_maze_layout() -> void:
 	var enemy_variant: Variant = stage_data.get("enemy_spawns", [])
 	if typeof(enemy_variant) == TYPE_ARRAY:
 		source_enemy_spawns = Array(enemy_variant).duplicate(true)
+	var normalized_enemy_spawns := source_enemy_spawns.duplicate(true)
+
+	var campaign_bug_id := _select_campaign_bug_for_stage()
+	if not campaign_bug_id.is_empty():
+		normalized_enemy_spawns = _normalize_campaign_enemy_spawns(source_enemy_spawns, campaign_bug_id)
+		stage_data["encounters"] = [campaign_bug_id]
 
 	var source_chest_spawns: Array = []
 	var chest_variant: Variant = stage_data.get("chest_spawns", [])
 	if typeof(chest_variant) == TYPE_ARRAY:
 		source_chest_spawns = Array(chest_variant).duplicate(true)
 
-	var rng := RandomNumberGenerator.new()
-	var seed_text := "%s|%d|%d" % [str(stage_data.get("id", "stage")), grid_width, grid_height]
-	rng.seed = int(seed_text.hash())
+	var generated_enemy_spawns: Array = []
+	var generated_chest_spawns: Array = []
+	var generated_ok := false
+	var seed_text := "%s|ch=%d|w=%d|h=%d|t=%d" % [
+		str(stage_data.get("id", "stage")),
+		int(stage_data.get("chapter", 0)),
+		grid_width,
+		grid_height,
+		int(stage_data.get("time_limit_seconds", 0))
+	]
+	for attempt in range(MAX_MAZE_GENERATION_ATTEMPTS):
+		var rng := RandomNumberGenerator.new()
+		rng.seed = int(("%s|attempt=%d" % [seed_text, attempt]).hash())
+		var maze_data := _generate_perfect_maze(grid_width, grid_height, rng)
+		_apply_generated_maze_data(maze_data)
 
-	var maze_data := _generate_perfect_maze(grid_width, grid_height, rng)
+		generated_enemy_spawns = _build_enemy_spawns_for_maze(normalized_enemy_spawns, rng)
+		generated_chest_spawns = _build_chest_spawns_for_maze(source_chest_spawns, rng)
+		generated_ok = debug_has_unique_route() and not generated_enemy_spawns.is_empty() and not generated_chest_spawns.is_empty()
+		if generated_ok:
+			break
+
+	if not generated_ok:
+		push_warning("[MazeManager] Failed strict maze validation for stage %s, using latest generated attempt." % str(stage_data.get("id", "stage")))
+
+	var player_pos := _room_to_world(_maze_start_room)
+	var portal_pos := _room_to_world(_maze_exit_room)
+	stage_data["player_spawn"] = {"x": player_pos.x, "y": player_pos.y}
+	stage_data["portal_position"] = {"x": portal_pos.x, "y": portal_pos.y}
+	stage_data["enemy_spawns"] = generated_enemy_spawns
+	stage_data["chest_spawns"] = generated_chest_spawns
+	stage_data["obstacle_spawns"] = []
+
+
+func _apply_generated_maze_data(maze_data: Dictionary) -> void:
 	_maze_passable = maze_data.get("passable", [])
 	_maze_grid_width = int(maze_data.get("grid_width", 0))
 	_maze_grid_height = int(maze_data.get("grid_height", 0))
@@ -350,13 +387,80 @@ func _prepare_perfect_maze_layout() -> void:
 	_maze_exit_room = maze_data.get("exit_room", Vector2i.ZERO)
 	_maze_main_path = maze_data.get("path_rooms", [])
 
-	var player_pos := _room_to_world(_maze_start_room)
-	var portal_pos := _room_to_world(_maze_exit_room)
-	stage_data["player_spawn"] = {"x": player_pos.x, "y": player_pos.y}
-	stage_data["portal_position"] = {"x": portal_pos.x, "y": portal_pos.y}
-	stage_data["enemy_spawns"] = _build_enemy_spawns_for_maze(source_enemy_spawns, rng)
-	stage_data["chest_spawns"] = _build_chest_spawns_for_maze(source_chest_spawns, rng)
-	stage_data["obstacle_spawns"] = []
+
+func _select_campaign_bug_for_stage() -> String:
+	var stage_id := str(stage_data.get("id", "")).strip_edges()
+	if not stage_id.begins_with("ch") or stage_id.find("_stage") == -1:
+		return ""
+
+	var parts := stage_id.split("_stage")
+	if parts.size() != 2:
+		return ""
+	var chapter_text := parts[0].trim_prefix("ch")
+	var stage_text := parts[1]
+	if not chapter_text.is_valid_int() or not stage_text.is_valid_int():
+		return ""
+
+	var chapter := int(chapter_text)
+	var stage_index := int(stage_text)
+	if chapter < 1 or chapter > 4 or stage_index < 1 or stage_index > 5:
+		return ""
+
+	var chapter_prefix := ""
+	match chapter:
+		1:
+			chapter_prefix = "ch1_syntax_"
+		2:
+			chapter_prefix = "ch2_logic_"
+		3:
+			chapter_prefix = "ch3_runtime_"
+		4:
+			chapter_prefix = "ch4_flow_"
+		_:
+			return ""
+
+	var bug_id := "%s%03d" % [chapter_prefix, stage_index]
+	if not _bug_id_exists(bug_id):
+		return ""
+	return bug_id
+
+
+func _bug_id_exists(bug_id: String) -> bool:
+	if bug_id.is_empty():
+		return false
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if data_manager == null or not data_manager.has_method("get_bug_by_id"):
+		return false
+	var bug_variant: Variant = data_manager.call("get_bug_by_id", bug_id)
+	return typeof(bug_variant) == TYPE_DICTIONARY and not Dictionary(bug_variant).is_empty()
+
+
+func _normalize_campaign_enemy_spawns(source_enemy_spawns: Array, bug_id: String) -> Array:
+	var fallback_enemy := "syntax_slime"
+	var chapter := int(stage_data.get("chapter", 1))
+	match chapter:
+		1:
+			fallback_enemy = "syntax_slime"
+		2:
+			fallback_enemy = "null_shadow"
+		3:
+			fallback_enemy = "infinite_golem"
+		4:
+			fallback_enemy = "flow_architect"
+		_:
+			fallback_enemy = "syntax_slime"
+
+	var template := {
+		"enemy_id": fallback_enemy,
+		"bug_id": bug_id
+	}
+	if not source_enemy_spawns.is_empty() and typeof(source_enemy_spawns[0]) == TYPE_DICTIONARY:
+		template = Dictionary(source_enemy_spawns[0]).duplicate(true)
+		var source_enemy_id := str(template.get("enemy_id", "")).strip_edges()
+		template["enemy_id"] = source_enemy_id if not source_enemy_id.is_empty() else fallback_enemy
+	template["bug_id"] = bug_id
+
+	return [template]
 
 
 func _generate_perfect_maze(grid_width: int, grid_height: int, rng: RandomNumberGenerator) -> Dictionary:

@@ -5,7 +5,7 @@ extends Node
 
 # Chapter 1 - Syntax
 # ch1_syntax_001
-# line 1:   'name': 'Hero', |   'name': 'Hero',
+# line 1:   'name': 'Hero' |   'name': 'Hero',
 # line 2:   'hp': 100 |   'hp': 100,
 #
 # ch1_syntax_002

@@ -60,6 +60,22 @@ visible = false
 layout_mode = 2
 text = ""
 
+[node name="HPRow" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CombatHPLabel" type="Label" parent="CombatRoot/Panel/VBox/HPRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(110, 0)
+text = "HP: --/--"
+theme_override_colors/font_color = Color(0.95, 0.85, 0.55, 1)
+
+[node name="CombatHPBar" type="ProgressBar" parent="CombatRoot/Panel/VBox/HPRow"]
+custom_minimum_size = Vector2(180, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+show_percentage = false
+
 [node name="BattleView" type="VBoxContainer" parent="CombatRoot/Panel/VBox"]
 custom_minimum_size = Vector2(0, 250)
 layout_mode = 2

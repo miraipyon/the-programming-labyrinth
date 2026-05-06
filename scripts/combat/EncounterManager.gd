@@ -35,15 +35,17 @@ func start_encounter(enemy_node: Node2D) -> void:
 
 	is_in_combat = true
 	current_enemy_node = enemy_node
+	current_enemy_data.clear()
+	current_bug_data.clear()
 
 	if enemy_node.has_method("get_bug_data"):
 		var bug_data_variant: Variant = enemy_node.call("get_bug_data")
 		if typeof(bug_data_variant) == TYPE_DICTIONARY:
-			current_bug_data = bug_data_variant
+			current_bug_data = Dictionary(bug_data_variant).duplicate(true)
 
 	var enemy_data_variant: Variant = enemy_node.get("enemy_data")
 	if typeof(enemy_data_variant) == TYPE_DICTIONARY:
-		current_enemy_data = enemy_data_variant
+		current_enemy_data = Dictionary(enemy_data_variant).duplicate(true)
 
 	turn_count = 1
 	encounter_started_at_msec = Time.get_ticks_msec()
@@ -121,7 +123,7 @@ func submit_turn(player_answer: Variant) -> void:
 		end_encounter(true)
 		return
 
-	_update_remaining_bugs_after_turn(result)
+	_update_remaining_bugs_after_turn(result, player_answer)
 
 	if hptm != null and int(hptm.get("current_hp")) <= 0:
 		end_encounter(false)
@@ -162,7 +164,7 @@ func end_encounter(success: bool) -> void:
 	encounter_completed.emit(success)
 
 
-func _update_remaining_bugs_after_turn(result: Dictionary) -> void:
+func _update_remaining_bugs_after_turn(result: Dictionary, player_answer: Variant) -> void:
 	if str(current_bug_data.get("type", "code_fix")) != "code_fix":
 		return
 
@@ -183,4 +185,58 @@ func _update_remaining_bugs_after_turn(result: Dictionary) -> void:
 		if remaining_lines.has(int(bug.get("line", -1))):
 			filtered_bugs.append(bug)
 
+	_apply_fixed_snippet_lines(result, player_answer)
 	current_bug_data["bugs"] = filtered_bugs
+
+
+func _apply_fixed_snippet_lines(result: Dictionary, player_answer: Variant) -> void:
+	var snippet_variant: Variant = current_bug_data.get("snippet", [])
+	if typeof(snippet_variant) != TYPE_ARRAY:
+		return
+
+	var fixed_lines_variant: Variant = result.get("fixed_lines", [])
+	if typeof(fixed_lines_variant) != TYPE_ARRAY:
+		return
+
+	var fix_by_line := _extract_fix_text_by_line(player_answer)
+	if fix_by_line.is_empty():
+		return
+
+	var snippet: Array = Array(snippet_variant).duplicate(true)
+	for line_variant in Array(fixed_lines_variant):
+		var line := int(line_variant)
+		if line < 0 or line >= snippet.size():
+			continue
+		if not fix_by_line.has(line):
+			continue
+		var fixed_text := str(fix_by_line[line]).strip_edges()
+		if fixed_text.is_empty():
+			continue
+		snippet[line] = fixed_text
+
+	current_bug_data["snippet"] = snippet
+
+
+func _extract_fix_text_by_line(player_answer: Variant) -> Dictionary:
+	var result := {}
+	if typeof(player_answer) != TYPE_DICTIONARY:
+		return result
+
+	var answer: Dictionary = player_answer
+	var fixes_variant: Variant = answer.get("fixes", [])
+	if typeof(fixes_variant) == TYPE_ARRAY:
+		for fix_variant in Array(fixes_variant):
+			if typeof(fix_variant) != TYPE_DICTIONARY:
+				continue
+			var fix_entry: Dictionary = fix_variant
+			var line := int(fix_entry.get("line", -1))
+			if line < 0:
+				continue
+			result[line] = str(fix_entry.get("fix", "")).strip_edges()
+
+	if result.is_empty():
+		var line := int(answer.get("line", -1))
+		if line >= 0:
+			result[line] = str(answer.get("fix", "")).strip_edges()
+
+	return result

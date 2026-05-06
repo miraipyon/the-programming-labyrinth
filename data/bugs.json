@@ -4,7 +4,7 @@
     "chapter": 1,
     "language": "python",
     "topic": "syntax_basic",
-    "difficulty": "hard",
+    "difficulty": "easy",
     "goal": "Khởi tạo thông tin nhân vật và in ra màn hình.",
     "snippet": [
       "player = {",
@@ -50,7 +50,7 @@
     "chapter": 1,
     "language": "python",
     "topic": "syntax_basic",
-    "difficulty": "hard",
+    "difficulty": "medium",
     "goal": "Kiểm tra điều kiện và in ra vật phẩm đầu tiên trong danh sách.",
     "snippet": [
       "is_ready = true",
@@ -135,7 +135,7 @@
     "chapter": 1,
     "language": "python",
     "topic": "syntax_function",
-    "difficulty": "hard",
+    "difficulty": "very_hard",
     "goal": "Viết hàm tính sát thương (damage) dựa trên lực tấn công và phòng thủ.",
     "snippet": [
       "function calc_damage(atk, defense):",
@@ -177,7 +177,7 @@
     "chapter": 1,
     "language": "python",
     "topic": "syntax_brackets",
-    "difficulty": "very_hard",
+    "difficulty": "boss",
     "goal": "Kiểm tra phần tử đầu tiên của danh sách lồng nhau (2D list) xem có dương không.",
     "snippet": [
       "matrix = [[1, 2, [3, 4]]",
@@ -219,7 +219,7 @@
     "chapter": 2,
     "language": "python",
     "topic": "wrong_branch",
-    "difficulty": "hard",
+    "difficulty": "easy",
     "goal": "Đánh giá trạng thái máu (hp) của nhân vật.",
     "snippet": [
       "hp = 40",
@@ -267,7 +267,7 @@
     "chapter": 2,
     "language": "python",
     "topic": "boolean_logic",
-    "difficulty": "hard",
+    "difficulty": "medium",
     "goal": "Cấp quyền truy cập nếu người dùng có chìa khóa, HOẶC (là tài khoản VIP VÀ cấp độ >= 10).",
     "snippet": [
       "has_key = False",
@@ -300,7 +300,7 @@
     "chapter": 2,
     "language": "python",
     "topic": "type_mismatch",
-    "difficulty": "medium",
+    "difficulty": "hard",
     "goal": "Tính tổng sát thương vật lý bằng (Sát thương cơ bản + bonus * hệ số nhân).",
     "snippet": [
       "base_dmg = '50'",
@@ -332,7 +332,7 @@
     "chapter": 2,
     "language": "python",
     "topic": "branching_logic",
-    "difficulty": "hard",
+    "difficulty": "very_hard",
     "goal": "Phân loại xếp hạng theo điểm (score): 90 trở lên là 'S', 70 trở lên là 'A', còn lại là 'B'.",
     "snippet": [
       "score = 85",
@@ -366,7 +366,7 @@
     "chapter": 2,
     "language": "python",
     "topic": "ternary_logic",
-    "difficulty": "hard",
+    "difficulty": "boss",
     "goal": "Xử lý máu: bị độc (poisoned) thì trừ 5 HP, ngược lại thì hồi 5 HP. Đảm bảo HP không bị âm.",
     "snippet": [
       "state = 'poisoned'",
@@ -397,7 +397,7 @@
     "chapter": 3,
     "language": "python",
     "topic": "off_by_one",
-    "difficulty": "hard",
+    "difficulty": "easy",
     "goal": "Sử dụng vòng lặp while để in ra từng vật phẩm trong hòm đồ (items).",
     "snippet": [
       "items = ['map', 'compass', 'key']",
@@ -441,7 +441,7 @@
     "chapter": 3,
     "language": "python",
     "topic": "array_mutation",
-    "difficulty": "very_hard",
+    "difficulty": "medium",
     "goal": "Duyệt danh sách từ cuối lên đầu để đảm bảo thao tác xóa an toàn cho quái 'slime'.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
@@ -535,7 +535,7 @@
     "chapter": 3,
     "language": "python",
     "topic": "loop_logic",
-    "difficulty": "hard",
+    "difficulty": "boss",
     "goal": "Đảo ngược chuỗi mật khẩu bằng cách truy xuất ngược index qua vòng lặp.",
     "snippet": [
       "password = ''",
@@ -566,7 +566,7 @@
     "chapter": 4,
     "language": "python",
     "topic": "algorithm_flow",
-    "difficulty": "very_hard",
+    "difficulty": "easy",
     "type": "block_assembly",
     "goal": "Tìm kiếm nhị phân (Binary Search) giá trị `target` trong mảng đã sắp xếp `arr`. Trả về index hoặc -1.",
     "blocks": [
@@ -590,7 +590,7 @@
     "chapter": 4,
     "language": "python",
     "topic": "algorithm_flow",
-    "difficulty": "very_hard",
+    "difficulty": "medium",
     "type": "block_assembly",
     "goal": "Kỹ thuật Two-Pointers: Trộn 2 danh sách số tăng dần `a` và `b` thành một danh sách duy nhất `result` cũng tăng dần.",
     "blocks": [
@@ -606,7 +606,7 @@
       "while j < len(b):",
       "    result.append(b[j]); j += 1"
     ],
-    "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+    "correct_order": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     "explanation": "So sánh phần tử con trỏ `a[i]` và `b[j]`. Nhỏ hơn thì vứt vào `result` và tăng con trỏ. Hai vòng while cuối để vét sạch tất cả các phần tử dư thừa do lệnh `and` kia chưa duyệt hết."
   },
   {
@@ -614,7 +614,7 @@
     "chapter": 4,
     "language": "python",
     "topic": "algorithm_flow",
-    "difficulty": "very_hard",
+    "difficulty": "hard",
     "type": "block_assembly",
     "goal": "Kiểm tra xem chuỗi văn bản `s` có phải là chuỗi đối xứng (Palindrome) hay không.",
     "blocks": [
@@ -656,7 +656,7 @@
     "chapter": 4,
     "language": "python",
     "topic": "algorithm_flow",
-    "difficulty": "very_hard",
+    "difficulty": "boss",
     "type": "block_assembly",
     "goal": "Giải thuật Quy hoạch động (Dynamic Programming): Trả về số Fibonacci tại vị trí n (với F(0)=0, F(1)=1).",
     "blocks": [

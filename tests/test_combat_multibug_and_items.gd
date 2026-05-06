@@ -24,6 +24,7 @@ func _run_suite() -> void:
 	await get_tree().process_frame
 	_capture_state()
 	_test_multibug_code_fix_evaluator()
+	_test_partial_fix_updates_snippet_and_remaining_bugs()
 	_test_wrong_line_penalty_damage()
 	await _test_block_snap_ui()
 	await _test_combat_console_quick_inventory()
@@ -79,6 +80,49 @@ func _test_wrong_line_penalty_damage() -> void:
 	_assert_eq(int(result.get("penalty_damage", -1)), 10, "Wrong-line penalty stacks per wrong line")
 	_assert_eq(int(result.get("total_damage", -1)), 20, "Total turn damage combines monster and penalty damage")
 	_assert_eq(int(hp_time.get("current_hp")), 80, "Combined turn damage reduces HP")
+
+
+func _test_partial_fix_updates_snippet_and_remaining_bugs() -> void:
+	var wrapper := Node.new()
+	wrapper.name = "EncounterSnippetUpdateWrapper"
+	get_tree().root.add_child(wrapper)
+
+	var encounter: Node = load("res://scripts/combat/EncounterManager.gd").new()
+	encounter.name = "EncounterManager"
+	wrapper.add_child(encounter)
+
+	var dummy_enemy := CharacterBody2D.new()
+	dummy_enemy.set_script(load("res://scenes/entities/Enemy.gd"))
+	dummy_enemy.set("enemy_data", {"id": "syntax_slime", "hit_base": 10})
+	wrapper.add_child(dummy_enemy)
+	encounter.call("start_encounter", dummy_enemy)
+
+	var bug_data := {
+		"type": "code_fix",
+		"snippet": ["if ready", "print(name)", "return user"],
+		"bugs": [
+			{"line": 0, "accepted_fixes": ["if ready:"]},
+			{"line": 2, "accepted_fixes": ["return user.name"]}
+		]
+	}
+	encounter.set("current_bug_data", bug_data.duplicate(true))
+
+	encounter.call("submit_turn", {"fixes": [
+		{"line": 0, "fix": "if ready:"},
+		{"line": 2, "fix": "return user"}
+	]})
+
+	var updated_bug_data: Dictionary = encounter.get("current_bug_data")
+	var updated_snippet: Array = updated_bug_data.get("snippet", [])
+	var updated_bugs: Array = updated_bug_data.get("bugs", [])
+	_assert_true(updated_snippet.size() >= 1, "Updated snippet remains available after partial fix")
+	if updated_snippet.size() >= 1:
+		_assert_eq(str(updated_snippet[0]), "if ready:", "Partial fix replaces fixed snippet line")
+	_assert_eq(updated_bugs.size(), 1, "Partial fix keeps only unresolved bugs")
+	if updated_bugs.size() == 1:
+		_assert_eq(int(Dictionary(updated_bugs[0]).get("line", -1)), 2, "Remaining bug line stays unresolved")
+
+	wrapper.queue_free()
 
 
 func _test_block_snap_ui() -> void:
@@ -146,6 +190,13 @@ func _test_combat_console_quick_inventory() -> void:
 		"bugs": [{"line": 0, "accepted_fixes": ["print(name)"]}]
 	}
 	console.call("show_console", {"name": "Syntax Slime"}, code_bug)
+	var hp_label := console.get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPLabel") as Label
+	var hp_bar := console.get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPBar") as ProgressBar
+	_assert_true(hp_label != null and hp_bar != null, "Combat UI shows HP widgets")
+	if hp_label != null:
+		_assert_true(hp_label.text.find("70/100") != -1, "Combat UI updates player HP text")
+	if hp_bar != null:
+		_assert_eq(int(hp_bar.value), 70, "Combat UI updates player HP bar value")
 	var hint_result: Dictionary = console.call("use_hint_or_snap", "hint_chip")
 	_assert_true(bool(hint_result.get("success", false)), "Quick inventory uses Hint Chip in code-fix combat")
 	var permanent: Dictionary = inventory.get("permanent_inventory")
