@@ -24,8 +24,16 @@ jobs:
       - name: Verify Godot
         run: godot --version
 
-      - name: Smoke boot
-        run: godot --headless --path . --quit-after 3
+      - name: Cache Godot resources
+        uses: actions/cache@v4
+        with:
+          path: .godot/
+          key: godot-cache-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            godot-cache-${{ runner.os }}-
+
+      - name: Import Resources
+        run: godot --headless --path . --import
 
       - name: Test all
         run: godot --headless --path . --script tests/test_all.gd
