@@ -127,10 +127,10 @@ func _seed_order() -> void:
 
 func _render_blocks() -> void:
 	if _goal_label != null:
-		var goal_text := _sanitize_goal_text(str(_current_bug_data.get("goal", "Sắp xếp các block theo thứ tự đúng.")).strip_edges())
+		var goal_text := _sanitize_goal_text(str(_current_bug_data.get("goal", "Arrange the blocks in the correct order.")).strip_edges())
 		var sections: Array[String] = [
-			"Yêu cầu: %s" % goal_text,
-			"Cách chơi: Dùng nút Up/Down để xếp block đúng thứ tự."
+			"Objective: %s" % goal_text,
+			"How to play: Use Up/Down buttons to arrange blocks in the correct order."
 		]
 		_goal_label.text = "\n".join(sections)
 
@@ -226,7 +226,7 @@ func _parse_order_string(raw: String) -> Array:
 
 
 func _sanitize_goal_text(goal: String) -> String:
-	var marker := "Kết quả đúng:"
+	var marker := "Correct output:"
 	var idx := goal.find(marker)
 	if idx == -1:
 		return goal

@@ -71,11 +71,8 @@ func defeat() -> void:
 	if has_node("Sprite"):
 		var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
 		if not sprite_path.is_empty():
-			var die_path := sprite_path.replace("idle.png", "die.png")
 			var dead_path := sprite_path.replace("idle.png", "dead.png")
-			if ResourceLoader.exists(die_path):
-				$Sprite.texture = load(die_path)
-			elif ResourceLoader.exists(dead_path):
+			if ResourceLoader.exists(dead_path):
 				$Sprite.texture = load(dead_path)
 			else:
 				$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.5)

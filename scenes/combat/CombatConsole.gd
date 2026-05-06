@@ -35,9 +35,11 @@ var _hp_bar: ProgressBar = null
 var _status_label: Label = null
 var _quick_inventory: HBoxContainer = null
 var _submit_button: Button = null
+var _skip_button: Button = null
 var _player_portrait: TextureRect = null
 var _enemy_portrait: TextureRect = null
 var _battle_line_label: Label = null
+var _resolved_code_lines: Dictionary = {}
 
 
 func _ready() -> void:
@@ -61,6 +63,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 	current_enemy_data = enemy_data
 	current_bug_data = bug_data.duplicate(true)
 	current_mode = current_bug_data.get("type", "code_fix")
+	_resolved_code_lines.clear()
 	visible = true
 	if _root_control != null:
 		_root_control.visible = true
@@ -80,7 +83,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 		var turn_n := 1
 		if em != null:
 			turn_n = int(em.get("turn_count"))
-		_turn_label.text = "Lượt: %d" % turn_n
+		_turn_label.text = "Turn: %d" % turn_n
 		_turn_label.visible = true
 	_update_player_hp()
 	_update_battle_view(enemy_data, current_bug_data)
@@ -92,12 +95,17 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 			code_ui.show()
 			block_ui.hide()
 			code_ui.call("populate_code", current_bug_data)
+			if code_ui.has_method("clear_correct_lines"):
+				code_ui.call("clear_correct_lines")
 		else:
 			code_ui.hide()
 			block_ui.show()
 			block_ui.call("populate_blocks", current_bug_data)
 	if _submit_button != null:
 		_submit_button.text = "Submit"
+	if _skip_button != null:
+		_skip_button.text = "Skip (Dev)"
+		_skip_button.visible = true
 
 	_refresh_quick_inventory()
 
@@ -113,7 +121,7 @@ func hide_console() -> void:
 
 func refresh_turn(turn_number: int) -> void:
 	if _turn_label != null:
-		_turn_label.text = "Lượt: %d" % turn_number
+		_turn_label.text = "Turn: %d" % turn_number
 		_turn_label.visible = true
 
 	if encounter_manager != null:
@@ -124,6 +132,8 @@ func refresh_turn(turn_number: int) -> void:
 				var code_ui := _get_code_fix_ui()
 				if code_ui != null:
 					code_ui.call("populate_code", current_bug_data)
+					if code_ui.has_method("mark_correct_lines") and not _resolved_code_lines.is_empty():
+						code_ui.call("mark_correct_lines", _get_resolved_code_lines_sorted())
 			elif current_mode == "block_assembly":
 				var block_ui := _get_block_assembly_ui()
 				if block_ui != null:
@@ -136,7 +146,7 @@ func refresh_turn(turn_number: int) -> void:
 func use_hint_or_snap(item_id: String) -> Dictionary:
 	var inventory_manager: Node = get_node_or_null("/root/InventoryManager")
 	if inventory_manager == null or not inventory_manager.has_method("use_item"):
-		return _status_result(false, "InventoryManager chưa sẵn sàng.")
+		return _status_result(false, "InventoryManager is not ready.")
 
 	var item_data: Dictionary = {}
 	var data_manager: Node = get_node_or_null("/root/DataManager")
@@ -147,14 +157,14 @@ func use_hint_or_snap(item_id: String) -> Dictionary:
 
 	var effect := str(item_data.get("effect", ""))
 	if effect == "hint" and current_mode != "code_fix":
-		return _status_result(false, "Hint Chip chỉ dùng trong Code Fix.")
+		return _status_result(false, "Hint Chip can only be used in Code Fix mode.")
 	if effect == "auto_snap" and current_mode != "block_assembly":
-		return _status_result(false, "Block Snap Chip chỉ dùng trong Chapter 4.")
+		return _status_result(false, "Block Snap Chip can only be used in Chapter 4.")
 
 	var use_result_variant: Variant = inventory_manager.call("use_item", item_id)
 	var use_result: Dictionary = use_result_variant if typeof(use_result_variant) == TYPE_DICTIONARY else {}
 	if not bool(use_result.get("success", false)):
-		return _status_result(false, str(use_result.get("message", "Không dùng được item.")))
+		return _status_result(false, str(use_result.get("message", "Cannot use item.")))
 
 	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
 	match str(use_result.get("effect", "")):
@@ -174,10 +184,15 @@ func use_hint_or_snap(item_id: String) -> Dictionary:
 				block_ui.call("snap_next_correct")
 		"revive", "damage_reduction", "skip_hit":
 			if hp_time_manager != null and hp_time_manager.has_method("activate_artifact"):
-				hp_time_manager.call("activate_artifact", item_id)
+				var activate_result_variant: Variant = hp_time_manager.call("activate_artifact", item_id)
+				if typeof(activate_result_variant) == TYPE_DICTIONARY:
+					var activate_result: Dictionary = activate_result_variant
+					if not bool(activate_result.get("success", false)):
+						_refresh_quick_inventory()
+						return _status_result(false, str(activate_result.get("message", "Cannot activate artifact.")))
 
 	_refresh_quick_inventory()
-	return _status_result(true, str(use_result.get("message", "Đã dùng item.")))
+	return _status_result(true, str(use_result.get("message", "Item used.")))
 
 
 func _on_completed(_success: bool) -> void:
@@ -198,7 +213,7 @@ func _on_submit_pressed() -> void:
 		var code_ui := _get_code_fix_ui()
 		if code_ui != null:
 			if code_ui.has_method("has_line_selection") and not bool(code_ui.call("has_line_selection")):
-				_status_result(false, "Hãy chọn ít nhất 1 dòng cần sửa trước khi Submit.")
+				_status_result(false, "Select at least 1 line to fix before submitting.")
 				return
 			answer = code_ui.call("get_user_answer")
 	elif current_mode == "block_assembly":
@@ -208,6 +223,29 @@ func _on_submit_pressed() -> void:
 
 	if answer != null:
 		encounter_manager.call("submit_turn", answer)
+
+
+func _on_skip_pressed() -> void:
+	if not encounter_manager:
+		encounter_manager = _find_encounter_manager()
+	if encounter_manager == null:
+		_status_result(false, "EncounterManager is not ready.")
+		return
+
+	if encounter_manager.has_method("dev_skip_current_encounter"):
+		var skip_result_variant: Variant = encounter_manager.call("dev_skip_current_encounter")
+		if typeof(skip_result_variant) == TYPE_DICTIONARY:
+			var skip_result: Dictionary = skip_result_variant
+			_status_result(bool(skip_result.get("success", false)), str(skip_result.get("message", "Dev skip executed.")))
+		else:
+			_status_result(true, "Dev skip executed.")
+		return
+
+	if encounter_manager.has_method("end_encounter"):
+		encounter_manager.call("end_encounter", true)
+		_status_result(true, "Dev skip executed.")
+	else:
+		_status_result(false, "Skip combat API not found.")
 
 
 func _ensure_layout() -> void:
@@ -331,6 +369,14 @@ func _ensure_layout() -> void:
 		_submit_button.pressed.connect(_on_submit_pressed)
 	vbox.add_child(_submit_button)
 
+	_skip_button = Button.new()
+	_skip_button.name = "SkipButton"
+	_skip_button.text = "Skip (Dev)"
+	_skip_button.tooltip_text = "Dev shortcut: end combat instantly."
+	if not _skip_button.pressed.is_connected(_on_skip_pressed):
+		_skip_button.pressed.connect(_on_skip_pressed)
+	vbox.add_child(_skip_button)
+
 
 func _bind_existing_layout() -> bool:
 	var existing_root := get_node_or_null("CombatRoot")
@@ -356,6 +402,7 @@ func _bind_existing_layout() -> bool:
 	var vbox_node := get_node_or_null("CombatRoot/Panel/VBox")
 	if vbox_node is VBoxContainer:
 		_bind_or_create_hp_widgets(vbox_node)
+		_bind_or_create_skip_button(vbox_node)
 	var player_portrait_node := get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait")
 	if player_portrait_node is TextureRect:
 		_player_portrait = player_portrait_node
@@ -373,7 +420,7 @@ func _bind_existing_layout() -> bool:
 		_battle_line_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_battle_line_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_battle_line_label.visible = true
-		_battle_line_label.text = "Yêu cầu sẽ hiển thị ở đây."
+		_battle_line_label.text = "Objective will appear here."
 	var inventory_node := get_node_or_null("CombatRoot/Panel/VBox/QuickInventory")
 	if inventory_node is HBoxContainer:
 		_quick_inventory = inventory_node
@@ -382,8 +429,13 @@ func _bind_existing_layout() -> bool:
 		_submit_button = submit_node
 		if not _submit_button.pressed.is_connected(_on_submit_pressed):
 			_submit_button.pressed.connect(_on_submit_pressed)
+	var skip_node := get_node_or_null("CombatRoot/Panel/VBox/SkipButton")
+	if skip_node is Button:
+		_skip_button = skip_node
+		if not _skip_button.pressed.is_connected(_on_skip_pressed):
+			_skip_button.pressed.connect(_on_skip_pressed)
 
-	return _quick_inventory != null and _submit_button != null and _hp_label != null and _hp_bar != null
+	return _quick_inventory != null and _submit_button != null and _skip_button != null and _hp_label != null and _hp_bar != null
 
 
 func _take_or_create_ui(node_name: String, script: Script) -> Control:
@@ -443,6 +495,23 @@ func _bind_or_create_hp_widgets(vbox: VBoxContainer) -> void:
 		_hp_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_hp_bar.show_percentage = false
 		_hp_row.add_child(_hp_bar)
+
+
+func _bind_or_create_skip_button(vbox: VBoxContainer) -> void:
+	_skip_button = get_node_or_null("CombatRoot/Panel/VBox/SkipButton") as Button
+	if _skip_button == null:
+		_skip_button = Button.new()
+		_skip_button.name = "SkipButton"
+		_skip_button.text = "Skip (Dev)"
+		_skip_button.tooltip_text = "Dev shortcut: end combat instantly."
+		if _submit_button != null and _submit_button.get_parent() == vbox:
+			var submit_index := _submit_button.get_index()
+			vbox.add_child(_skip_button)
+			vbox.move_child(_skip_button, submit_index + 1)
+		else:
+			vbox.add_child(_skip_button)
+	if not _skip_button.pressed.is_connected(_on_skip_pressed):
+		_skip_button.pressed.connect(_on_skip_pressed)
 
 
 func _refresh_quick_inventory() -> void:
@@ -522,24 +591,50 @@ func _on_turn_evaluated(result: Dictionary) -> void:
 	if not is_active:
 		return
 
-	# Update status/progress indicator
+	if current_mode == "code_fix":
+		var fixed_lines_variant: Variant = result.get("fixed_lines", [])
+		if typeof(fixed_lines_variant) == TYPE_ARRAY:
+			for line_variant in Array(fixed_lines_variant):
+				_resolved_code_lines[int(line_variant)] = true
+		var code_ui := _get_code_fix_ui()
+		if code_ui != null and code_ui.has_method("mark_correct_lines") and not _resolved_code_lines.is_empty():
+			code_ui.call("mark_correct_lines", _get_resolved_code_lines_sorted())
+
+	# Update status/progress indicator theo GDD: FIX_RATE_TURN, HP_LOSS_TURN,
+	# WRONG_LINE_PENALTY (nếu có), BUGS_AFTER/BLOCKS_MISSING và HP còn lại.
 	var status_parts: Array[String] = []
 	var bugs_after := int(result.get("bugs_after", 0))
 	var blocks_missing := int(result.get("blocks_missing", 0))
+	var fix_rate := clampf(float(result.get("fix_rate", 0.0)), 0.0, 1.0)
+	var player_hp_loss := int(result.get("player_hp_loss", 0))
+	var wrong_line_penalty_loss := int(result.get("wrong_line_penalty_loss", 0))
+	status_parts.append("FIX_RATE_TURN: %.0f%%" % (fix_rate * 100.0))
+	status_parts.append("HP_LOSS_TURN: %d" % player_hp_loss)
+	if current_mode == "code_fix" and wrong_line_penalty_loss > 0:
+		status_parts.append("WRONG_LINE_PENALTY: -%d HP" % wrong_line_penalty_loss)
+
 	if bool(result.get("is_correct", false)):
 		status_parts.append("✅ Xong!")
 	elif current_mode == "block_assembly":
 		if blocks_missing > 0:
 			status_parts.append("BLOCKS_MISSING: %d" % blocks_missing)
-		var assembly_score := float(result.get("assembly_score", 0.0))
-		status_parts.append("%.0f%%" % (assembly_score * 100.0))
+		var assembly_score := clampf(float(result.get("assembly_score", 0.0)), 0.0, 1.0)
+		status_parts.append("ASSEMBLY_SCORE: %.0f%%" % (assembly_score * 100.0))
 	else:
 		if bugs_after > 0:
 			status_parts.append("BUGS_AFTER: %d" % bugs_after)
+		else:
+			status_parts.append("BUGS_AFTER: 0")
+
+	var htm: Node = get_node_or_null("/root/HPTimeManager")
+	if htm != null:
+		var current_hp := int(htm.get("current_hp"))
+		var max_hp := maxi(int(htm.get("max_hp")), 1)
+		status_parts.append("HP: %d/%d" % [clampi(current_hp, 0, max_hp), max_hp])
 	if not status_parts.is_empty() and _status_label != null:
 		_status_label.text = " | ".join(status_parts)
 
-	if int(result.get("player_hp_loss", 0)) > 0:
+	if player_hp_loss > 0:
 		_play_damage_effect(_player_portrait)
 	if int(result.get("enemy_hp_loss", 0)) > 0:
 		_play_damage_effect(_enemy_portrait)
@@ -623,15 +718,15 @@ func _build_objective_text(bug_data: Dictionary) -> String:
 	var goal := str(bug_data.get("goal", "")).strip_edges()
 	
 	if goal != "":
-		return "Yêu cầu: %s" % _sanitize_goal_text(goal)
+		return "Objective: %s" % _sanitize_goal_text(goal)
 	elif mode == "block_assembly":
-		return "Yêu cầu: Sắp xếp block theo thứ tự đúng."
+		return "Objective: Arrange blocks in the correct order."
 	
-	return "Yêu cầu: Tìm và sửa tất cả lỗi trong đoạn code."
+	return "Objective: Find and fix all errors in the code snippet."
 
 
 func _sanitize_goal_text(goal: String) -> String:
-	var marker := "Kết quả đúng:"
+	var marker := "Correct output:"
 	var idx := goal.find(marker)
 	if idx == -1:
 		return goal
@@ -692,3 +787,12 @@ func _configure_portrait(portrait: TextureRect, _enemy_side: bool) -> void:
 	portrait.scale = Vector2.ONE
 	portrait.rotation_degrees = 0.0
 	portrait.modulate = Color.WHITE
+
+
+func _get_resolved_code_lines_sorted() -> Array[int]:
+	var result: Array[int] = []
+	var keys: Array = _resolved_code_lines.keys()
+	keys.sort()
+	for key in keys:
+		result.append(int(key))
+	return result

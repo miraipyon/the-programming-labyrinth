@@ -56,7 +56,7 @@ func _on_inventory_loot_added(item_id: String) -> void:
 			item_data = item_variant
 
 	var item_name := str(item_data.get("name", item_id))
-	var item_desc := str(item_data.get("description", "Vật phẩm mới đã được thêm vào túi đồ."))
+	var item_desc := str(item_data.get("description", "A new item was added to your inventory."))
 	show_loot(item_name, item_desc)
 
 

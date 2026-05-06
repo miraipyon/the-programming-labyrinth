@@ -2,7 +2,7 @@
 extends Control
 
 func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_connect_button("RetryButton", _on_retry_pressed)
 	_connect_button("QuitButton", _on_quit_pressed)
 
@@ -10,7 +10,7 @@ func _ready() -> void:
 func set_reason(reason: String) -> void:
 	var reason_text := reason.strip_edges()
 	if reason_text.is_empty():
-		reason_text = "Bạn đã gục ngã trong mê cung."
+		reason_text = "You have fallen in the labyrinth."
 
 	var reason_node: Node = _find_reason_node()
 	if reason_node is Label:

@@ -167,7 +167,7 @@ func _test_combat_console_quick_inventory() -> void:
 		return
 
 	inventory.call("init_for_stage")
-	inventory.set("permanent_inventory", {"green_tea": 1, "hint_chip": 1, "block_snap_chip": 1})
+	inventory.set("permanent_inventory", {"green_tea": 1, "hint_chip": 1, "block_snap_chip": 1, "runtime_patch": 1})
 	hp_time.call("init_for_stage", 1)
 	hp_time.call("take_damage", 30)
 
@@ -205,6 +205,10 @@ func _test_combat_console_quick_inventory() -> void:
 	var tea_result: Dictionary = console.call("use_hint_or_snap", "green_tea")
 	_assert_true(bool(tea_result.get("success", false)), "Quick inventory uses Green Tea")
 	_assert_eq(int(hp_time.get("current_hp")), 95, "Green Tea heals through quick inventory")
+	var patch_result: Dictionary = console.call("use_hint_or_snap", "runtime_patch")
+	_assert_true(bool(patch_result.get("success", false)), "Quick inventory activates Runtime Patch")
+	var patch_reactivate_result: Dictionary = console.call("use_hint_or_snap", "runtime_patch")
+	_assert_true(not bool(patch_reactivate_result.get("success", true)), "Quick inventory cannot reactivate Runtime Patch in same stage")
 
 	var block_bug := {
 		"type": "block_assembly",

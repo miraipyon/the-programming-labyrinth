@@ -57,24 +57,24 @@ func _build_message(result: Dictionary) -> String:
 
 	if bool(result.get("is_correct", false)):
 		var lines: Array[String] = []
-		lines.append("✅ Đã sửa xong toàn bộ lỗi!")
+		lines.append("✅ All issues fixed!")
 		lines.append("FIX_RATE: %.0f%%" % (fix_rate * 100.0))
 		if current_hp >= 0:
-			lines.append("HP còn lại: %d" % current_hp)
+			lines.append("HP remaining: %d" % current_hp)
 		return "\n".join(lines)
 
 	var lines: Array[String] = []
-	lines.append("❌ %s" % str(result.get("details", "Đáp án chưa đúng.")))
+	lines.append("❌ %s" % str(result.get("details", "Answer is not correct yet.")))
 	lines.append("FIX_RATE: %.0f%%" % (fix_rate * 100.0))
 	if blocks_missing > 0:
 		lines.append("BLOCKS_MISSING: %d" % blocks_missing)
 	elif bugs_after > 0:
-		lines.append("BUGS_AFTER: %d lỗi chưa sửa" % bugs_after)
+		lines.append("BUGS_AFTER: %d unresolved issue(s)" % bugs_after)
 	lines.append("HP_LOSS_TURN: %d" % hp_loss_turn)
 	if wrong_count > 0:
-		lines.append("WRONG_LINE_PENALTY: %d (x%d sai dòng)" % [penalty_loss, wrong_count])
+		lines.append("WRONG_LINE_PENALTY: %d (x%d wrong line pick(s))" % [penalty_loss, wrong_count])
 	if current_hp >= 0:
-		lines.append("HP còn lại: %d" % current_hp)
+		lines.append("HP remaining: %d" % current_hp)
 	return "\n".join(lines)
 
 

@@ -270,11 +270,11 @@ func _on_player_turn_started(_turn_number: int) -> void:
 
 # --- Game Over Conditions ---
 func _on_player_died() -> void:
-	_handle_game_over("Hết máu")
+	_handle_game_over("Out of HP")
 
 
 func _on_time_expired() -> void:
-	_handle_game_over("Hết thời gian")
+	_handle_game_over("Time is up")
 
 
 func _handle_game_over(reason: String) -> void:
@@ -315,7 +315,7 @@ func show_loot_alert(loot_id: String) -> void:
 
 	var data_manager: Node = get_node_or_null("/root/DataManager")
 	var item_name := loot_id
-	var description := "Nhặt được vật phẩm mới"
+	var description := "New item collected"
 	if data_manager != null and data_manager.has_method("get_item_data"):
 		var item_variant: Variant = data_manager.call("get_item_data", loot_id)
 		if typeof(item_variant) == TYPE_DICTIONARY:
@@ -347,7 +347,7 @@ func show_victory_screen() -> void:
 
 	var screen := VICTORY_SCREEN_SCENE.instantiate() as Control
 	screen.name = "VictoryScreen"
-	_prepare_overlay_screen(screen)
+	_prepare_overlay_screen(screen, false)
 	if screen.get_node_or_null("VBox/ContinueButton") == null:
 		_add_basic_victory_layout(screen)
 	
@@ -366,7 +366,7 @@ func show_game_over_screen(reason: String) -> void:
 
 	var screen := GAME_OVER_SCREEN_SCENE.instantiate() as Control
 	screen.name = "GameOverScreen"
-	_prepare_overlay_screen(screen)
+	_prepare_overlay_screen(screen, false)
 	if screen.get_node_or_null("VBox/RetryButton") == null:
 		_add_basic_game_over_layout(screen)
 		
@@ -415,8 +415,13 @@ func _add_basic_victory_layout(screen: Control) -> void:
 
 	var button := Button.new()
 	button.name = "ContinueButton"
-	button.text = "Continue"
+	button.text = "Continue to Next Stage"
 	vbox.add_child(button)
+
+	var menu_button := Button.new()
+	menu_button.name = "MainMenuButton"
+	menu_button.text = "Back to Main Menu"
+	vbox.add_child(menu_button)
 
 
 func _add_basic_game_over_layout(screen: Control) -> void:
@@ -466,7 +471,7 @@ func show_pause_screen() -> void:
 		return
 	var screen := PAUSE_MENU_SCENE.instantiate() as Control
 	screen.name = "PauseMenu"
-	_prepare_overlay_screen(screen)
+	_prepare_overlay_screen(screen, true)
 	if screen.get_node_or_null("VBox/ResumeButton") == null:
 		_add_basic_pause_layout(screen)
 		
@@ -507,6 +512,6 @@ func _add_basic_pause_layout(screen: Control) -> void:
 		vbox.add_child(button)
 
 
-func _prepare_overlay_screen(screen: Control) -> void:
-	screen.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+func _prepare_overlay_screen(screen: Control, process_while_paused: bool) -> void:
+	screen.process_mode = Node.PROCESS_MODE_WHEN_PAUSED if process_while_paused else Node.PROCESS_MODE_ALWAYS
 	screen.set_anchors_preset(Control.PRESET_FULL_RECT)

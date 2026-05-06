@@ -20,6 +20,8 @@ const CARDINAL_DIRS: Array[Vector2i] = [
 	Vector2i(0, -1),
 ]
 const MAX_MAZE_GENERATION_ATTEMPTS: int = 6
+const CAMPAIGN_ENEMIES_PER_STAGE: int = 4
+const CAMPAIGN_CHESTS_PER_STAGE: int = 3
 
 # --- State ---
 var stage_data: Dictionary = {}
@@ -234,7 +236,7 @@ func _on_chest_interacted(chest_node: Node2D) -> void:
 
 func _on_portal_reached() -> void:
 	if _has_live_enemies():
-		print("[MazeManager] Chưa hạ hết quái, portal chưa kích hoạt.")
+		print("[MazeManager] Enemies remain, portal is still locked.")
 		_update_portal_state()
 		return
 
@@ -333,19 +335,30 @@ func _prepare_perfect_maze_layout() -> void:
 		source_enemy_spawns = Array(enemy_variant).duplicate(true)
 	var normalized_enemy_spawns := source_enemy_spawns.duplicate(true)
 
-	var campaign_bug_id := _select_campaign_bug_for_stage()
-	if not campaign_bug_id.is_empty():
-		normalized_enemy_spawns = _normalize_campaign_enemy_spawns(source_enemy_spawns, campaign_bug_id)
-		stage_data["encounters"] = [campaign_bug_id]
-
 	var source_chest_spawns: Array = []
 	var chest_variant: Variant = stage_data.get("chest_spawns", [])
 	if typeof(chest_variant) == TYPE_ARRAY:
 		source_chest_spawns = Array(chest_variant).duplicate(true)
 
+	var stage_info := _get_campaign_stage_info()
+	var is_campaign_stage := bool(stage_info.get("valid", false))
+	if is_campaign_stage:
+		var campaign_bug_ids := _build_stage_encounters_for_campaign(stage_info)
+		if not campaign_bug_ids.is_empty():
+			normalized_enemy_spawns = _normalize_campaign_enemy_spawns(
+				source_enemy_spawns,
+				campaign_bug_ids,
+				int(stage_info.get("chapter", 1)),
+				int(stage_info.get("stage_index", 1))
+			)
+			stage_data["encounters"] = campaign_bug_ids
+		source_chest_spawns = _normalize_campaign_chest_spawns(source_chest_spawns)
+
 	var generated_enemy_spawns: Array = []
 	var generated_chest_spawns: Array = []
 	var generated_ok := false
+	var target_enemy_count := normalized_enemy_spawns.size()
+	var target_chest_count := source_chest_spawns.size()
 	var seed_text := "%s|ch=%d|w=%d|h=%d|t=%d" % [
 		str(stage_data.get("id", "stage")),
 		int(stage_data.get("chapter", 0)),
@@ -361,7 +374,7 @@ func _prepare_perfect_maze_layout() -> void:
 
 		generated_enemy_spawns = _build_enemy_spawns_for_maze(normalized_enemy_spawns, rng)
 		generated_chest_spawns = _build_chest_spawns_for_maze(source_chest_spawns, rng)
-		generated_ok = debug_has_unique_route() and not generated_enemy_spawns.is_empty() and not generated_chest_spawns.is_empty()
+		generated_ok = debug_has_unique_route() and generated_enemy_spawns.size() == target_enemy_count and generated_chest_spawns.size() == target_chest_count
 		if generated_ok:
 			break
 
@@ -388,41 +401,29 @@ func _apply_generated_maze_data(maze_data: Dictionary) -> void:
 	_maze_main_path = maze_data.get("path_rooms", [])
 
 
-func _select_campaign_bug_for_stage() -> String:
+func _get_campaign_stage_info() -> Dictionary:
 	var stage_id := str(stage_data.get("id", "")).strip_edges()
 	if not stage_id.begins_with("ch") or stage_id.find("_stage") == -1:
-		return ""
+		return {"valid": false}
 
 	var parts := stage_id.split("_stage")
 	if parts.size() != 2:
-		return ""
+		return {"valid": false}
 	var chapter_text := parts[0].trim_prefix("ch")
 	var stage_text := parts[1]
 	if not chapter_text.is_valid_int() or not stage_text.is_valid_int():
-		return ""
+		return {"valid": false}
 
 	var chapter := int(chapter_text)
 	var stage_index := int(stage_text)
 	if chapter < 1 or chapter > 4 or stage_index < 1 or stage_index > 5:
-		return ""
+		return {"valid": false}
 
-	var chapter_prefix := ""
-	match chapter:
-		1:
-			chapter_prefix = "ch1_syntax_"
-		2:
-			chapter_prefix = "ch2_logic_"
-		3:
-			chapter_prefix = "ch3_runtime_"
-		4:
-			chapter_prefix = "ch4_flow_"
-		_:
-			return ""
-
-	var bug_id := "%s%03d" % [chapter_prefix, stage_index]
-	if not _bug_id_exists(bug_id):
-		return ""
-	return bug_id
+	return {
+		"valid": true,
+		"chapter": chapter,
+		"stage_index": stage_index
+	}
 
 
 func _bug_id_exists(bug_id: String) -> bool:
@@ -435,32 +436,157 @@ func _bug_id_exists(bug_id: String) -> bool:
 	return typeof(bug_variant) == TYPE_DICTIONARY and not Dictionary(bug_variant).is_empty()
 
 
-func _normalize_campaign_enemy_spawns(source_enemy_spawns: Array, bug_id: String) -> Array:
-	var fallback_enemy := "syntax_slime"
-	var chapter := int(stage_data.get("chapter", 1))
+func _build_stage_encounters_for_campaign(stage_info: Dictionary) -> Array:
+	var chapter := int(stage_info.get("chapter", 1))
+	var stage_index := clampi(int(stage_info.get("stage_index", 1)), 1, 5)
+
+	var staged_bug_ids: Array = []
+	for i in range(1, CAMPAIGN_ENEMIES_PER_STAGE + 1):
+		var bug_id := "ch%d_stage%d_q%02d" % [chapter, stage_index, i]
+		if _bug_id_exists(bug_id):
+			staged_bug_ids.append(bug_id)
+	if staged_bug_ids.size() == CAMPAIGN_ENEMIES_PER_STAGE:
+		return staged_bug_ids
+
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if data_manager == null or not data_manager.has_method("get_bugs_by_chapter"):
+		return _fallback_encounters_from_stage_data()
+
+	var chapter_bugs_variant: Variant = data_manager.call("get_bugs_by_chapter", chapter)
+	if typeof(chapter_bugs_variant) != TYPE_ARRAY:
+		return _fallback_encounters_from_stage_data()
+
+	var chapter_bugs: Array = chapter_bugs_variant
+	var normalized: Array = []
+	for bug_variant in chapter_bugs:
+		if typeof(bug_variant) != TYPE_DICTIONARY:
+			continue
+		var bug_data: Dictionary = bug_variant
+		var bug_id := str(bug_data.get("id", "")).strip_edges()
+		if bug_id.is_empty():
+			continue
+		normalized.append({
+			"id": bug_id,
+			"difficulty_rank": _difficulty_rank(str(bug_data.get("difficulty", "")))
+		})
+
+	if normalized.size() < CAMPAIGN_ENEMIES_PER_STAGE:
+		return _fallback_encounters_from_stage_data()
+
+	normalized.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		var a_rank := int(a.get("difficulty_rank", 0))
+		var b_rank := int(b.get("difficulty_rank", 0))
+		if a_rank == b_rank:
+			return str(a.get("id", "")) < str(b.get("id", ""))
+		return a_rank < b_rank
+	)
+
+	var ids: Array = []
+	for entry_variant in normalized:
+		if typeof(entry_variant) != TYPE_DICTIONARY:
+			continue
+		ids.append(str(Dictionary(entry_variant).get("id", "")))
+
+	if ids.size() >= 5:
+		var exclude_index := clampi(5 - stage_index, 0, 4)
+		var picked: Array = []
+		for i in range(5):
+			if i == exclude_index:
+				continue
+			picked.append(ids[i])
+		return picked
+
+	var fallback: Array = []
+	for i in range(mini(CAMPAIGN_ENEMIES_PER_STAGE, ids.size())):
+		fallback.append(ids[i])
+	return fallback
+
+
+func _fallback_encounters_from_stage_data() -> Array:
+	var encounters_variant: Variant = stage_data.get("encounters", [])
+	if typeof(encounters_variant) != TYPE_ARRAY:
+		return []
+	var encounters: Array = encounters_variant
+	var picked: Array = []
+	var seen := {}
+	for bug_variant in encounters:
+		var bug_id := str(bug_variant).strip_edges()
+		if bug_id.is_empty() or seen.has(bug_id):
+			continue
+		if not _bug_id_exists(bug_id):
+			continue
+		seen[bug_id] = true
+		picked.append(bug_id)
+		if picked.size() >= CAMPAIGN_ENEMIES_PER_STAGE:
+			break
+	return picked
+
+
+func _difficulty_rank(difficulty: String) -> int:
+	match difficulty.strip_edges().to_lower():
+		"easy":
+			return 1
+		"medium":
+			return 2
+		"hard":
+			return 3
+		"very_hard":
+			return 4
+		"boss":
+			return 5
+		_:
+			return 0
+
+
+func _enemy_pool_for_chapter(chapter: int) -> Array:
 	match chapter:
 		1:
-			fallback_enemy = "syntax_slime"
+			return ["syntax_slime", "semicolon_wisp"]
 		2:
-			fallback_enemy = "null_shadow"
+			return ["null_shadow", "branch_phantom", "type_mismatch_medusa"]
 		3:
-			fallback_enemy = "infinite_golem"
+			return ["infinite_golem", "boundary_hydra"]
 		4:
-			fallback_enemy = "flow_architect"
+			return ["flow_architect", "logic_bomb_boss"]
 		_:
-			fallback_enemy = "syntax_slime"
+			return ["syntax_slime"]
 
-	var template := {
-		"enemy_id": fallback_enemy,
-		"bug_id": bug_id
-	}
-	if not source_enemy_spawns.is_empty() and typeof(source_enemy_spawns[0]) == TYPE_DICTIONARY:
-		template = Dictionary(source_enemy_spawns[0]).duplicate(true)
-		var source_enemy_id := str(template.get("enemy_id", "")).strip_edges()
-		template["enemy_id"] = source_enemy_id if not source_enemy_id.is_empty() else fallback_enemy
-	template["bug_id"] = bug_id
 
-	return [template]
+func _normalize_campaign_enemy_spawns(source_enemy_spawns: Array, bug_ids: Array, chapter: int, stage_index: int) -> Array:
+	var rebuilt: Array = []
+	var enemy_pool: Array = _enemy_pool_for_chapter(chapter)
+	for i in range(mini(CAMPAIGN_ENEMIES_PER_STAGE, bug_ids.size())):
+		var template: Dictionary = {}
+		if i < source_enemy_spawns.size() and typeof(source_enemy_spawns[i]) == TYPE_DICTIONARY:
+			template = Dictionary(source_enemy_spawns[i]).duplicate(true)
+		elif not source_enemy_spawns.is_empty() and typeof(source_enemy_spawns[0]) == TYPE_DICTIONARY:
+			template = Dictionary(source_enemy_spawns[0]).duplicate(true)
+
+		var enemy_id := str(template.get("enemy_id", "")).strip_edges()
+		if not enemy_pool.is_empty():
+			var pool_index := (stage_index - 1 + i) % enemy_pool.size()
+			enemy_id = str(enemy_pool[pool_index]).strip_edges()
+		if enemy_id.is_empty():
+			enemy_id = "syntax_slime"
+
+		template["enemy_id"] = enemy_id
+		template["bug_id"] = str(bug_ids[i]).strip_edges()
+		rebuilt.append(template)
+	return rebuilt
+
+
+func _normalize_campaign_chest_spawns(source_chest_spawns: Array) -> Array:
+	var required_types: Array = ["rare", "normal", "normal"]
+	var rebuilt: Array = []
+	for i in range(CAMPAIGN_CHESTS_PER_STAGE):
+		var template: Dictionary = {}
+		if i < source_chest_spawns.size() and typeof(source_chest_spawns[i]) == TYPE_DICTIONARY:
+			template = Dictionary(source_chest_spawns[i]).duplicate(true)
+		elif not source_chest_spawns.is_empty() and typeof(source_chest_spawns[0]) == TYPE_DICTIONARY:
+			template = Dictionary(source_chest_spawns[0]).duplicate(true)
+		template["type"] = required_types[i]
+		rebuilt.append(template)
+	return rebuilt
 
 
 func _generate_perfect_maze(grid_width: int, grid_height: int, rng: RandomNumberGenerator) -> Dictionary:

@@ -25,6 +25,7 @@ func _run_suite() -> void:
 	_capture_state()
 	_test_inventory_use_item_rules()
 	await _test_inventory_panel_applies_consumables()
+	await _test_maze_hud_applies_items_immediately()
 	_test_artifact_damage_flow()
 	_restore_state()
 
@@ -63,7 +64,7 @@ func _test_inventory_panel_applies_consumables() -> void:
 		return
 
 	inventory.call("init_for_stage")
-	inventory.set("permanent_inventory", {"green_tea": 1, "focus_pill": 1})
+	inventory.set("permanent_inventory", {"green_tea": 1, "focus_pill": 1, "hint_chip": 1})
 	hp_time.call("init_for_stage", 1)
 	hp_time.call("take_damage", 40)
 	hp_time.set("time_remaining", 100.0)
@@ -78,10 +79,12 @@ func _test_inventory_panel_applies_consumables() -> void:
 
 	panel.call("_on_item_use_pressed", "focus_pill")
 	_assert_eq(int(round(float(hp_time.get("time_remaining")))), 130, "Focus Pill restores time through InventoryPanel")
+	panel.call("_on_item_use_pressed", "hint_chip")
 
 	var permanent: Dictionary = inventory.get("permanent_inventory")
 	_assert_true(not permanent.has("green_tea"), "Green Tea removed after use")
 	_assert_true(not permanent.has("focus_pill"), "Focus Pill removed after use")
+	_assert_eq(int(permanent.get("hint_chip", 0)), 1, "Hint Chip is not consumed outside combat in InventoryPanel")
 
 	panel.queue_free()
 	await get_tree().process_frame
@@ -97,6 +100,10 @@ func _test_artifact_damage_flow() -> void:
 	hp_time.call("activate_artifact", "github_cape")
 	hp_time.call("take_damage", 150)
 	_assert_eq(int(hp_time.get("current_hp")), 50, "GitHub Cape revives at half HP")
+	hp_time.call("take_damage", 200)
+	_assert_eq(int(hp_time.get("current_hp")), 0, "GitHub Cape revive triggers only once per stage")
+	var cape_reactivate: Dictionary = hp_time.call("activate_artifact", "github_cape")
+	_assert_true(not bool(cape_reactivate.get("success", true)), "GitHub Cape cannot be reactivated in the same stage")
 
 	hp_time.call("init_for_stage", 1)
 	hp_time.call("activate_artifact", "ide_armor")
@@ -112,6 +119,54 @@ func _test_artifact_damage_flow() -> void:
 	var second_hit: Dictionary = hp_time.call("apply_turn_damage", 0.0, 10, 0)
 	_assert_eq(int(second_hit.get("total_damage", -1)), 10, "Runtime Patch only skips one hit")
 	_assert_eq(int(hp_time.get("current_hp")), 90, "Second monster hit damages HP")
+	var patch_reactivate: Dictionary = hp_time.call("activate_artifact", "runtime_patch")
+	_assert_true(not bool(patch_reactivate.get("success", true)), "Runtime Patch cannot be reactivated in the same stage")
+	var third_hit: Dictionary = hp_time.call("apply_turn_damage", 0.0, 10, 0)
+	_assert_eq(int(third_hit.get("total_damage", -1)), 10, "Runtime Patch does not refresh after activation lock")
+	_assert_eq(int(hp_time.get("current_hp")), 80, "Third monster hit still damages HP")
+
+
+func _test_maze_hud_applies_items_immediately() -> void:
+	var inventory := _inventory_manager()
+	var hp_time := _hp_time_manager()
+	_assert_true(inventory != null and hp_time != null, "Managers exist for in-maze HUD item logic")
+	if inventory == null or hp_time == null:
+		return
+
+	inventory.call("init_for_stage")
+	inventory.set("permanent_inventory", {
+		"green_tea": 1,
+		"focus_pill": 1,
+		"hint_chip": 1,
+		"runtime_patch": 1
+	})
+	hp_time.call("init_for_stage", 1)
+	hp_time.call("take_damage", 40)
+	hp_time.set("time_remaining", 100.0)
+
+	var hud_scene: PackedScene = load("res://scenes/ui/GameHUD.tscn")
+	var hud := hud_scene.instantiate()
+	get_tree().root.add_child(hud)
+	await get_tree().process_frame
+
+	hud.call("_on_maze_use_item", "green_tea", "consumable", "heal", 25, inventory, hp_time, null)
+	_assert_eq(int(hp_time.get("current_hp")), 85, "Green Tea from in-maze HUD heals immediately")
+	hud.call("_on_maze_use_item", "focus_pill", "consumable", "restore_time", 30, inventory, hp_time, null)
+	_assert_eq(int(round(float(hp_time.get("time_remaining")))), 130, "Focus Pill from in-maze HUD restores time immediately")
+
+	hud.call("_on_maze_use_item", "hint_chip", "consumable", "hint", 1, inventory, hp_time, null)
+	var permanent: Dictionary = inventory.get("permanent_inventory")
+	_assert_eq(int(permanent.get("hint_chip", 0)), 1, "Hint Chip is not consumed outside combat")
+
+	hud.call("_on_maze_use_item", "runtime_patch", "artifact", "skip_hit", 1, inventory, hp_time, null)
+	var active_artifacts: Dictionary = hp_time.get("active_artifacts")
+	_assert_true(active_artifacts.has("runtime_patch"), "Runtime Patch activates from in-maze HUD")
+	hud.call("_on_maze_use_item", "runtime_patch", "artifact", "skip_hit", 1, inventory, hp_time, null)
+	var patch_state: Dictionary = hp_time.get("active_artifacts").get("runtime_patch", {})
+	_assert_eq(int(patch_state.get("skips_left", -1)), 1, "Runtime Patch cannot be stacked by reactivating in same stage")
+
+	hud.queue_free()
+	await get_tree().process_frame
 
 
 func _capture_state() -> void:

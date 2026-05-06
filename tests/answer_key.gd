@@ -64,3 +64,15 @@ extends Node
 # ch4_flow_003: correct_order = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 # ch4_flow_004: correct_order = [0, 1, 2, 3, 4, 5, 6]
 # ch4_flow_005: correct_order = [0, 1, 2, 3, 4, 5, 6]
+
+# Campaign stage encounter layout (4 câu đố / màn, 20 màn tổng cộng = 80 câu):
+# ID theo dạng: ch{chapter}_stage{stage}_q{01..04}
+# Ví dụ:
+# - Chapter 1, stage 1: ch1_stage1_q01 .. ch1_stage1_q04
+# - Chapter 2, stage 4: ch2_stage4_q01 .. ch2_stage4_q04
+#
+# Mỗi qXX kế thừa đáp án từ bộ legacy cùng chapter:
+# - Chapter 1 kế thừa từ ch1_syntax_001..005
+# - Chapter 2 kế thừa từ ch2_logic_001..005
+# - Chapter 3 kế thừa từ ch3_runtime_001..005
+# - Chapter 4 kế thừa từ ch4_flow_001..005

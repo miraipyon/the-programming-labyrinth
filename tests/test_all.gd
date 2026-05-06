@@ -6,6 +6,7 @@ var failed: int = 0
 
 func _initialize() -> void:
 	await create_timer(0.05).timeout
+	var save_snapshot := _take_save_snapshot()
 	print("=== TEST ALL START ===")
 
 	await _test_all_scripts_loadable()
@@ -19,6 +20,7 @@ func _initialize() -> void:
 	await _run_embedded_suite("res://tests/test_inventory_artifacts.gd")
 	await _run_embedded_suite("res://tests/test_combat_multibug_and_items.gd")
 
+	_restore_save_snapshot(save_snapshot)
 	print("=== TEST ALL SUMMARY ===")
 	print("Passed: ", passed)
 	print("Failed: ", failed)
@@ -218,7 +220,7 @@ func _test_ui_components() -> void:
 	await process_frame
 	result_panel.call("display_result", {"is_correct": true, "details": "ok", "fatal_error": false, "fix_rate": 1.0})
 	_assert_true(result_panel.visible, "TurnResultPanel visible after display")
-	_assert_true(msg_lbl.text.find("✅") != -1 or msg_lbl.text.find("sửa") != -1, "TurnResultPanel success message")
+	_assert_true(msg_lbl.text.find("✅") != -1 or msg_lbl.text.find("fixed") != -1, "TurnResultPanel success message")
 	await create_timer(3.2).timeout
 	_assert_true(not result_panel.visible, "TurnResultPanel auto hides")
 	result_panel.queue_free()
@@ -252,6 +254,11 @@ func _test_ui_components() -> void:
 	wrapper.queue_free()
 
 	# InventoryPanel
+	var inv_manager_for_panel: Node = root.get_node_or_null("InventoryManager")
+	var inv_perm_snapshot: Variant = {}
+	if inv_manager_for_panel != null:
+		inv_perm_snapshot = inv_manager_for_panel.get("permanent_inventory")
+		inv_manager_for_panel.set("permanent_inventory", {"green_tea": 1, "github_cape": 1})
 	var inv := CanvasLayer.new()
 	inv.set_script(load("res://scenes/ui/InventoryPanel.gd"))
 	var panel := Panel.new()
@@ -273,7 +280,31 @@ func _test_ui_components() -> void:
 	await process_frame
 	inv.call("toggle")
 	_assert_true(inv.visible, "InventoryPanel toggles visible")
+	var has_icon := false
+	var has_item_badge := false
+	var has_artifact_badge := false
+	var has_tooltip := false
+	for child in item_list.get_children():
+		if child is HBoxContainer:
+			var row: HBoxContainer = child
+			if row.tooltip_text.find("Description") != -1:
+				has_tooltip = true
+			for row_child in row.get_children():
+				if row_child is TextureRect and (row_child as TextureRect).texture != null:
+					has_icon = true
+				if row_child is Label:
+					var label_child: Label = row_child
+					if label_child.text == "[ITEM]":
+						has_item_badge = true
+					if label_child.text == "[ARTIFACT]":
+						has_artifact_badge = true
+	_assert_true(has_icon, "InventoryPanel shows item/artifact icons")
+	_assert_true(has_item_badge, "InventoryPanel marks regular items")
+	_assert_true(has_artifact_badge, "InventoryPanel marks artifacts")
+	_assert_true(has_tooltip, "InventoryPanel exposes usage tooltip")
 	inv.queue_free()
+	if inv_manager_for_panel != null:
+		inv_manager_for_panel.set("permanent_inventory", inv_perm_snapshot)
 
 
 func _test_entities_and_combat() -> void:
@@ -425,6 +456,7 @@ func _test_menu_and_stage_flow() -> void:
 		"stage": str(game_manager.get("current_stage_id")),
 		"state": int(game_manager.get("current_state")),
 		"unlocked": game_manager.get("chapters_unlocked"),
+		"campaign_complete": bool(game_manager.get("campaign_complete")),
 		"perm": inventory_manager.get("permanent_inventory"),
 		"temp": inventory_manager.get("temporary_inventory")
 	}
@@ -435,6 +467,18 @@ func _test_menu_and_stage_flow() -> void:
 	root.add_child(menu)
 	await process_frame
 	_assert_true(menu.get_node_or_null("VBox/NewGameButton") != null, "MainMenu has NewGameButton")
+	_assert_true(menu.get_node_or_null("VBox/LoreButton") != null, "MainMenu has lore button")
+	_assert_true(menu.get_node_or_null("VBox/GuideButton") != null, "MainMenu has guide button")
+	if menu.has_method("_on_lore_pressed"):
+		menu.call("_on_lore_pressed")
+		await process_frame
+		var lore_body: Node = menu.get_node_or_null("InfoOverlay/InfoPanel/VBox/ScrollContainer/BodyText")
+		_assert_true(lore_body is RichTextLabel and (lore_body as RichTextLabel).text.find("Core Kernel") != -1, "MainMenu lore modal explains game context")
+	if menu.has_method("_on_guide_pressed"):
+		menu.call("_on_guide_pressed")
+		await process_frame
+		var guide_body: Node = menu.get_node_or_null("InfoOverlay/InfoPanel/VBox/ScrollContainer/BodyText")
+		_assert_true(guide_body is RichTextLabel and (guide_body as RichTextLabel).text.find("MAIN OBJECTIVE") != -1, "MainMenu guide modal explains gameplay")
 	# Chapter picker must always have exactly 4 entries (MVP: all chapters visible)
 	var ch_opt: Node = menu.get_node_or_null("VBox/ChapterSelect/ChapterOptionButton")
 	if ch_opt is OptionButton:
@@ -494,13 +538,27 @@ func _test_menu_and_stage_flow() -> void:
 		gov.add_child(b2)
 	root.add_child(go)
 	await process_frame
+	_assert_eq(go.process_mode, Node.PROCESS_MODE_ALWAYS, "GameOverScreen accepts input while game is not paused")
+	var retry_button_node: Node = go.get_node_or_null("VBox/RetryButton")
+	if retry_button_node is Button:
+		var retry_button: Button = retry_button_node
+		_assert_true(retry_button.pressed.is_connected(Callable(go, "_on_retry_pressed")), "GameOverScreen retry button is connected")
+	else:
+		_fail("GameOverScreen missing RetryButton in fixture")
 	go.call("set_reason", "Test Reason")
 	_assert_eq(reason.text, "Test Reason", "GameOverScreen set_reason")
-	go.call("_on_retry_pressed")
+	if retry_button_node is Button:
+		(retry_button_node as Button).pressed.emit()
+	else:
+		go.call("_on_retry_pressed")
 	await process_frame
 	_assert_eq(int(game_manager.get("current_state")), 1, "GameOverScreen retry enters PLAYING")
 
 	# VictoryScreen
+	game_manager.set("current_chapter", 1)
+	game_manager.set("current_stage_id", "ch1_stage1")
+	game_manager.set("chapters_unlocked", [1])
+	game_manager.set("campaign_complete", false)
 	inventory_manager.set("temporary_inventory", {"green_tea": 1})
 	var victory := Control.new()
 	victory.set_script(load("res://scenes/menus/VictoryScreen.gd"))
@@ -516,19 +574,37 @@ func _test_menu_and_stage_flow() -> void:
 	var cont := Button.new()
 	cont.name = "ContinueButton"
 	vv.add_child(cont)
+	var main_menu_button := Button.new()
+	main_menu_button.name = "MainMenuButton"
+	vv.add_child(main_menu_button)
 	root.add_child(victory)
 	await process_frame
+	_assert_eq(victory.process_mode, Node.PROCESS_MODE_ALWAYS, "VictoryScreen accepts input while game is not paused")
+	_assert_true(cont.pressed.is_connected(Callable(victory, "_on_continue_pressed")), "VictoryScreen continue button is connected")
+	_assert_true(main_menu_button.pressed.is_connected(Callable(victory, "_on_main_menu_pressed")), "VictoryScreen main menu button is connected")
 	_assert_true(loot.text.find("Green Tea") != -1, "VictoryScreen lists temporary loot with display name")
-	victory.call("_on_continue_pressed")
+	cont.pressed.emit()
 	await process_frame
 	var permanent_variant: Variant = inventory_manager.get("permanent_inventory")
 	var permanent: Dictionary = permanent_variant if typeof(permanent_variant) == TYPE_DICTIONARY else {}
 	_assert_true(int(permanent.get("green_tea", 0)) > 0, "VictoryScreen continue confirms loot")
+	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage2", "VictoryScreen continue advances to next stage")
+	_assert_true(not bool(game_manager.get("campaign_complete")), "VictoryScreen continue does not mark campaign complete before final stage")
+
+	game_manager.set("current_chapter", 4)
+	game_manager.set("current_stage_id", "ch4_stage5")
+	game_manager.set("campaign_complete", false)
+	var final_result_variant: Variant = game_manager.call("save_on_stage_clear")
+	var final_result: Dictionary = final_result_variant if typeof(final_result_variant) == TYPE_DICTIONARY else {}
+	_assert_true(bool(final_result.get("campaign_complete", false)), "Final stage clear marks campaign complete")
+	_assert_true(not bool(final_result.get("has_next_stage", true)), "Final stage clear has no next stage")
+	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch4_stage5", "Final stage clear does not loop to ch4_stage1")
 
 	# Restore state
 	game_manager.set("current_chapter", int(snapshot["chapter"]))
 	game_manager.set("current_stage_id", str(snapshot["stage"]))
 	game_manager.set("chapters_unlocked", snapshot["unlocked"])
+	game_manager.set("campaign_complete", bool(snapshot["campaign_complete"]))
 	if game_manager.has_method("set_state"):
 		game_manager.call("set_state", int(snapshot["state"]))
 	inventory_manager.set("permanent_inventory", snapshot["perm"])
@@ -574,3 +650,29 @@ func _run_embedded_suite(script_path: String) -> void:
 
 	suite.queue_free()
 	await process_frame
+
+
+func _take_save_snapshot() -> Dictionary:
+	var save_path := "user://savegame.json"
+	var snapshot := {
+		"path": save_path,
+		"exists": FileAccess.file_exists(save_path),
+		"text": ""
+	}
+	if bool(snapshot["exists"]):
+		var file := FileAccess.open(save_path, FileAccess.READ)
+		if file != null:
+			snapshot["text"] = file.get_as_text()
+			file.close()
+	return snapshot
+
+
+func _restore_save_snapshot(snapshot: Dictionary) -> void:
+	var save_path := str(snapshot.get("path", "user://savegame.json"))
+	if bool(snapshot.get("exists", false)):
+		var file := FileAccess.open(save_path, FileAccess.WRITE)
+		if file != null:
+			file.store_string(str(snapshot.get("text", "")))
+			file.close()
+	elif FileAccess.file_exists(save_path):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path))

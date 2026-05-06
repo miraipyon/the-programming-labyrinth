@@ -27,6 +27,7 @@ var current_state: GameState = GameState.MENU
 var current_chapter: int = 1
 var current_stage_id: String = ""
 var chapters_unlocked: Array[int] = [1]  # Chapter 1 mở mặc định
+var campaign_complete: bool = false
 
 # --- Lifecycle ---
 func _ready() -> void:
@@ -75,6 +76,7 @@ func start_stage(chapter: int, stage_id: String) -> void:
 	current_stage_id = stage_id.strip_edges()
 	if current_stage_id.is_empty():
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+	campaign_complete = false
 
 	var scene_path := "res://scenes/maze/MazeLevel.tscn"
 	if not FileAccess.file_exists(scene_path):
@@ -106,7 +108,7 @@ func unlock_chapter(chapter: int) -> void:
 		chapters_unlocked.sort()
 		chapter_unlocked.emit(chapter_safe)
 		_save_game()
-		print("[GameManager] Đã mở khóa Chapter: ", chapter_safe)
+		print("[GameManager] Chapter unlocked: ", chapter_safe)
 
 func is_chapter_unlocked(chapter: int) -> bool:
 	return chapters_unlocked.has(chapter)
@@ -116,7 +118,8 @@ func _save_game() -> void:
 	var save_data = {
 		"chapters_unlocked": chapters_unlocked,
 		"current_chapter": current_chapter,
-		"current_stage_id": current_stage_id
+		"current_stage_id": current_stage_id,
+		"campaign_complete": campaign_complete
 	}
 
 	var json_string = JSON.stringify(save_data, "\t")
@@ -138,6 +141,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		campaign_complete = false
 		return
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
@@ -146,6 +150,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		campaign_complete = false
 		return
 
 	var json_text = file.get_as_text()
@@ -159,6 +164,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		campaign_complete = false
 		return
 
 	var data = json.data
@@ -184,16 +190,20 @@ func _load_save() -> void:
 			chapters_unlocked.append(current_chapter)
 
 		chapters_unlocked.sort()
+		campaign_complete = bool(data.get("campaign_complete", false))
 
 		print("[GameManager] Saved data loaded successfully!")
 	else:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		campaign_complete = false
 
-func save_on_stage_clear() -> void:
+func save_on_stage_clear() -> Dictionary:
 	var next_chapter := current_chapter
-	var next_stage_id := ""
+	var next_stage_id := current_stage_id.strip_edges()
+	var has_next_stage := false
+	var completed_campaign := false
 	var data_manager: Node = get_node_or_null("/root/DataManager")
 
 	if data_manager != null and data_manager.has_method("get_stages_by_chapter"):
@@ -202,10 +212,14 @@ func save_on_stage_clear() -> void:
 
 		if current_index >= 0 and current_index < chapter_stages.size() - 1:
 			next_stage_id = _stage_id_from_entry(chapter_stages[current_index + 1])
+			has_next_stage = true
 		elif current_index == -1 and chapter_stages.size() > 0:
 			next_stage_id = _stage_id_from_entry(chapter_stages[0])
+			has_next_stage = true
+		elif current_chapter >= TOTAL_CHAPTERS:
+			completed_campaign = true
 		else:
-			next_chapter = mini(current_chapter + 1, TOTAL_CHAPTERS)
+			next_chapter = current_chapter + 1
 			if not chapters_unlocked.has(next_chapter):
 				chapters_unlocked.append(next_chapter)
 				chapters_unlocked.sort()
@@ -214,14 +228,33 @@ func save_on_stage_clear() -> void:
 			var next_chapter_stages := _sorted_stage_list(data_manager.call("get_stages_by_chapter", next_chapter))
 			if next_chapter_stages.size() > 0:
 				next_stage_id = _stage_id_from_entry(next_chapter_stages[0])
-
-	if next_stage_id.is_empty():
+				has_next_stage = true
+	elif current_chapter >= TOTAL_CHAPTERS:
+		completed_campaign = true
+	else:
+		next_chapter = current_chapter + 1
 		next_stage_id = _default_stage_for_chapter(next_chapter)
+		has_next_stage = true
 
-	current_chapter = clampi(next_chapter, 1, TOTAL_CHAPTERS)
+	if has_next_stage and next_stage_id.is_empty():
+		next_stage_id = _default_stage_for_chapter(next_chapter)
+	elif completed_campaign and next_stage_id.is_empty():
+		next_stage_id = _default_stage_for_chapter(current_chapter)
+
+	current_chapter = clampi(next_chapter if has_next_stage else current_chapter, 1, TOTAL_CHAPTERS)
 	current_stage_id = next_stage_id
+	campaign_complete = completed_campaign
 	_save_game()
-	print("[GameManager] Stage Clear! Next: %s (Chapter %d)" % [current_stage_id, current_chapter])
+	if campaign_complete:
+		print("[GameManager] Stage Clear! Campaign complete at: %s (Chapter %d)" % [current_stage_id, current_chapter])
+	else:
+		print("[GameManager] Stage Clear! Next: %s (Chapter %d)" % [current_stage_id, current_chapter])
+	return {
+		"chapter": current_chapter,
+		"stage_id": current_stage_id,
+		"has_next_stage": has_next_stage,
+		"campaign_complete": campaign_complete
+	}
 
 # --- Internal ---
 func _change_scene(scene_path: String) -> void:
@@ -242,7 +275,7 @@ func _change_scene(scene_path: String) -> void:
 
 	scene_transition_finished.emit()
 
-	print("[GameManager] Đã nạp xong: ", scene_path)
+	print("[GameManager] Scene loaded: ", scene_path)
 
 
 func _default_stage_for_chapter(chapter: int) -> String:

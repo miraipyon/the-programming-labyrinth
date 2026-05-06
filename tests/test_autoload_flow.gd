@@ -38,6 +38,7 @@ func _initialize() -> void:
 		game_manager.set("current_chapter", 1)
 		game_manager.set("current_stage_id", "ch1_stage1")
 		game_manager.set("chapters_unlocked", [1])
+		game_manager.set("campaign_complete", false)
 		var unlocked_reset_variant: Variant = game_manager.get("chapters_unlocked")
 		if typeof(unlocked_reset_variant) == TYPE_ARRAY:
 			var unlocked_reset: Array = unlocked_reset_variant
@@ -48,12 +49,19 @@ func _initialize() -> void:
 			game_manager.call("_save_game")
 
 		# Progress and save again
+		var first_clear: Dictionary = {}
 		if game_manager.has_method("save_on_stage_clear"):
-			game_manager.call("save_on_stage_clear")
+			var first_clear_variant: Variant = game_manager.call("save_on_stage_clear")
+			if typeof(first_clear_variant) == TYPE_DICTIONARY:
+				first_clear = first_clear_variant
 		if str(game_manager.get("current_stage_id")) != "ch1_stage2":
 			failures.append("save_on_stage_clear did not advance to ch1_stage2")
 		if int(game_manager.get("current_chapter")) != 1:
 			failures.append("save_on_stage_clear unexpectedly changed chapter before stage 5")
+		if not bool(first_clear.get("has_next_stage", false)):
+			failures.append("save_on_stage_clear result did not report next stage for ch1_stage1")
+		if bool(first_clear.get("campaign_complete", false)):
+			failures.append("save_on_stage_clear marked campaign complete on ch1_stage1")
 		var chapters_unlocked_variant: Variant = game_manager.get("chapters_unlocked")
 		var chapters_unlocked: Array = chapters_unlocked_variant if typeof(chapters_unlocked_variant) == TYPE_ARRAY else []
 		if chapters_unlocked.has(2):
@@ -72,13 +80,32 @@ func _initialize() -> void:
 		if not chapters_unlocked.has(2):
 			failures.append("chapter 2 was not unlocked after chapter 1 completion")
 
+		game_manager.set("current_chapter", 4)
+		game_manager.set("current_stage_id", "ch4_stage5")
+		game_manager.set("campaign_complete", false)
+		var final_clear: Dictionary = {}
+		if game_manager.has_method("save_on_stage_clear"):
+			var final_clear_variant: Variant = game_manager.call("save_on_stage_clear")
+			if typeof(final_clear_variant) == TYPE_DICTIONARY:
+				final_clear = final_clear_variant
+		if str(game_manager.get("current_stage_id")) != "ch4_stage5":
+			failures.append("Final stage clear looped away from ch4_stage5")
+		if not bool(game_manager.get("campaign_complete")):
+			failures.append("Final stage clear did not persist campaign_complete")
+		if bool(final_clear.get("has_next_stage", true)):
+			failures.append("Final stage clear result reported a next stage")
+		if not bool(final_clear.get("campaign_complete", false)):
+			failures.append("Final stage clear result did not report campaign_complete")
+
 		# Reload from disk
 		if game_manager.has_method("_load_save"):
 			game_manager.call("_load_save")
-		if int(game_manager.get("current_chapter")) != 2:
-			failures.append("_load_save did not restore progressed chapter")
-		if str(game_manager.get("current_stage_id")) != "ch2_stage1":
-			failures.append("_load_save did not restore progressed stage")
+		if int(game_manager.get("current_chapter")) != 4:
+			failures.append("_load_save did not restore final chapter")
+		if str(game_manager.get("current_stage_id")) != "ch4_stage5":
+			failures.append("_load_save did not restore final stage")
+		if not bool(game_manager.get("campaign_complete")):
+			failures.append("_load_save did not restore campaign_complete")
 
 		# Data query
 		var stage_variant: Variant = data_manager.call("get_stage_data", "ch1_stage1") if data_manager.has_method("get_stage_data") else {}

@@ -117,11 +117,11 @@ func use_item(item_id: String) -> Dictionary:
 	}
 
 	if key.is_empty():
-		result.message = "Item không hợp lệ."
+		result.message = "Invalid item."
 		return result
 
 	if not has_permanent_item(key):
-		result.message = "Item này chưa có trong inventory đã chốt."
+		result.message = "This item is not in permanent inventory."
 		return result
 
 	var item_data: Dictionary = {}
@@ -132,14 +132,14 @@ func use_item(item_id: String) -> Dictionary:
 			item_data = item_variant
 
 	if item_data.is_empty():
-		result.message = "Không tìm thấy dữ liệu item."
+		result.message = "Item data not found."
 		return result
 
 	result.success = true
 	result.type = str(item_data.get("type", ""))
 	result.effect = str(item_data.get("effect", ""))
 	result.value = item_data.get("value", 0)
-	result.message = "Đã dùng %s." % str(item_data.get("name", key))
+	result.message = "Used %s." % str(item_data.get("name", key))
 
 	if result.type == "consumable":
 		permanent_inventory[key] = maxi(int(permanent_inventory.get(key, 0)) - 1, 0)

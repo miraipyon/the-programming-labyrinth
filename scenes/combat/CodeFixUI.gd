@@ -10,9 +10,18 @@ var _snippet_label: Label = null
 var _rows_container: VBoxContainer = null
 var _selected_line: int = -1
 var _selected_lines: Dictionary = {}
+var _resolved_lines: Dictionary = {}
+var _active_bug_id: String = ""
 
 
 func populate_code(bug_data: Dictionary) -> void:
+	var bug_id := str(bug_data.get("id", "")).strip_edges()
+	if bug_id.is_empty():
+		_resolved_lines.clear()
+	elif bug_id != _active_bug_id:
+		_resolved_lines.clear()
+	_active_bug_id = bug_id
+
 	_current_bug_data = bug_data.duplicate(true)
 	_ensure_layout()
 	_render_requirement()
@@ -184,7 +193,7 @@ func _render_snippet() -> void:
 	for i in range(snippet_lines.size()):
 		numbered_lines.append("%02d: %s" % [i, str(snippet_lines[i])])
 	if numbered_lines.is_empty():
-		numbered_lines.append("Không có đoạn code để hiển thị.")
+		numbered_lines.append("No code snippet available.")
 
 	if _snippet_label != null:
 		_snippet_label.text = "\n".join(numbered_lines)
@@ -222,6 +231,16 @@ func _render_answer_rows() -> void:
 		checkbox.button_pressed = false
 		row.add_child(checkbox)
 
+		var tick_label := Label.new()
+		tick_label.name = "SolvedTick_%d" % i
+		tick_label.custom_minimum_size = Vector2(28, 0)
+		tick_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tick_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		tick_label.add_theme_font_size_override("font_size", 22)
+		tick_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.45))
+		tick_label.text = ""
+		row.add_child(tick_label)
+
 		var option := OptionButton.new()
 		option.name = "FixOption_%d" % i
 		option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -240,8 +259,10 @@ func _render_answer_rows() -> void:
 		_line_rows[i] = {
 			"row": row,
 			"checkbox": checkbox,
+			"tick": tick_label,
 			"option": option
 		}
+		_update_line_tick(i)
 
 
 func _seed_default_answer() -> void:
@@ -516,6 +537,22 @@ func has_line_selection() -> bool:
 	return not _selected_lines.is_empty()
 
 
+func mark_correct_lines(lines: Array) -> void:
+	for line_variant in lines:
+		var line := int(line_variant)
+		if line >= 0:
+			_resolved_lines[line] = true
+
+	for key in _line_rows.keys():
+		_update_line_tick(int(key))
+
+
+func clear_correct_lines() -> void:
+	_resolved_lines.clear()
+	for key in _line_rows.keys():
+		_update_line_tick(int(key))
+
+
 func _on_line_toggled(line: int, is_pressed: bool) -> void:
 	_mark_line_selected(line, is_pressed)
 
@@ -550,6 +587,24 @@ func _get_selected_lines_sorted() -> Array[int]:
 	for key in keys:
 		result.append(int(key))
 	return result
+
+
+func _update_line_tick(line: int) -> void:
+	if not _line_rows.has(line):
+		return
+	var row_data: Dictionary = _line_rows[line]
+	var tick: Label = row_data.get("tick", null)
+	var checkbox: CheckBox = row_data.get("checkbox", null)
+	var solved := _resolved_lines.has(line)
+	if tick != null:
+		tick.text = "✔" if solved else ""
+		tick.visible = solved
+	if checkbox != null:
+		checkbox.text = "Line %02d%s" % [line, " (OK)" if solved else ""]
+		if solved:
+			checkbox.add_theme_color_override("font_color", Color(0.6, 1.0, 0.68))
+		else:
+			checkbox.remove_theme_color_override("font_color")
 
 
 func _find_fix_input() -> Node:

@@ -128,3 +128,9 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Submit"
+
+[node name="SkipButton" type="Button" parent="CombatRoot/Panel/VBox"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+tooltip_text = "Dev shortcut: end combat instantly."
+text = "Skip (Dev)"

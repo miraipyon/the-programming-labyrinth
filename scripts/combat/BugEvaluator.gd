@@ -21,7 +21,7 @@ func evaluate_answer(bug_data: Dictionary, player_answer: Variant) -> Dictionary
 	}
 
 	if bug_data.is_empty():
-		result.details = "Lỗi dữ liệu câu đố."
+		result.details = "Puzzle data error."
 		return result
 
 	var type: String = bug_data.get("type", "code_fix")
@@ -31,7 +31,7 @@ func evaluate_answer(bug_data: Dictionary, player_answer: Variant) -> Dictionary
 	elif type == "block_assembly" and typeof(player_answer) == TYPE_ARRAY:
 		return _evaluate_block_assembly(bug_data, player_answer)
 
-	result.details = "Đáp án không đúng định dạng (%s)." % type
+	result.details = "Answer format is invalid for mode (%s)." % type
 	return result
 
 
@@ -53,7 +53,7 @@ func _evaluate_code_fix(bug_data: Dictionary, answer: Dictionary) -> Dictionary:
 	}
 
 	if not bug_data.has("bugs") or bug_data["bugs"].size() == 0:
-		result.details = "Không có bug nào để sửa."
+		result.details = "No bugs available to fix."
 		return result
 
 	var bugs: Array = bug_data.get("bugs", [])
@@ -100,11 +100,11 @@ func _evaluate_code_fix(bug_data: Dictionary, answer: Dictionary) -> Dictionary:
 	result.is_correct = result.remaining_count == 0
 
 	if result.is_correct:
-		result.details = "Tuyệt vời! Đã sửa %d/%d lỗi." % [result.fixed_count, result.bugs_before]
+		result.details = "Great job! Fixed %d/%d issues." % [result.fixed_count, result.bugs_before]
 	elif result.fatal_error:
-		result.details = "Sửa sai dòng %d lần. Đã sửa đúng %d/%d lỗi." % [result.wrong_line_count, result.fixed_count, result.bugs_before]
+		result.details = "Wrong line picked %d time(s). Fixed %d/%d issues." % [result.wrong_line_count, result.fixed_count, result.bugs_before]
 	else:
-		result.details = "Đã sửa đúng %d/%d lỗi. Còn %d lỗi cần xử lý." % [result.fixed_count, result.bugs_before, result.remaining_count]
+		result.details = "Fixed %d/%d issues. %d issue(s) remaining." % [result.fixed_count, result.bugs_before, result.remaining_count]
 
 	return result
 
@@ -128,11 +128,11 @@ func _evaluate_block_assembly(bug_data: Dictionary, answer: Array) -> Dictionary
 
 	var correct_order: Array = bug_data.get("correct_order", [])
 	if correct_order.size() == 0:
-		result.details = "Lỗi dữ liệu vòng lặp Block."
+		result.details = "Block assembly data error."
 		return result
 
 	if answer.size() != correct_order.size():
-		result.details = "Số lượng khối lệnh không khớp."
+		result.details = "Block count does not match."
 		return result
 
 	var total_blocks := correct_order.size()
@@ -152,10 +152,10 @@ func _evaluate_block_assembly(bug_data: Dictionary, answer: Array) -> Dictionary
 
 	if correct_positions == total_blocks:
 		result.is_correct = true
-		result.details = "Chính xác! Lắp ráp thuật toán hoàn hảo."
+		result.details = "Correct! Algorithm assembled perfectly."
 	else:
 		result.is_correct = false
-		result.details = "Sai trình tự! Đúng được %d/%d khối lệnh." % [correct_positions, total_blocks]
+		result.details = "Wrong order! Correct positions: %d/%d block(s)." % [correct_positions, total_blocks]
 
 	return result
 

@@ -19,53 +19,60 @@
 	"green_tea": {
 	  "name": "Green Tea",
 	  "type": "consumable",
-	  "description": "Hồi máu cho bản thân",
+	  "description": "Restore your HP",
 	  "effect": "heal",
-	  "value": 25
+	  "value": 25,
+	  "icon": "res://assets/items/green_tea.png"
 	},
 	"focus_pill": {
 	  "name": "Focus Pill",
 	  "type": "consumable",
-	  "description": "Phục hồi 1 ít thời gian đã mất",
+	  "description": "Recover some lost time",
 	  "effect": "restore_time",
-	  "value": 30
+	  "value": 30,
+	  "icon": "res://assets/items/focus_pill.png"
 	},
 	"hint_chip": {
 	  "name": "Hint Chip",
 	  "type": "consumable",
-	  "description": "Highlight 1 dòng lỗi",
+	  "description": "Highlight 1 bug line",
 	  "effect": "hint",
-	  "value": 1
+	  "value": 1,
+	  "icon": "res://assets/items/hint_chip.png"
 	},
 	"block_snap_chip": {
 	  "name": "Block Snap Chip",
 	  "type": "consumable",
-	  "description": "Tự động xếp 1 khối lệnh vào đúng vị trí (Chapter 4 only)",
+	  "description": "Automatically place 1 block in the correct position (Chapter 4 only)",
 	  "effect": "auto_snap",
-	  "value": 1
+	  "value": 1,
+	  "icon": "res://assets/items/blocksnap_chip.png"
 	}
   },
   "artifacts": {
 	"github_cape": {
 	  "name": "GitHub Cape",
 	  "type": "artifact",
-	  "description": "Hồi sinh 1 lần khi HP = 0",
+	  "description": "Revive once when HP reaches 0",
 	  "effect": "revive",
-	  "value": 1
+	  "value": 1,
+	  "icon": "res://assets/artifacts/github_cape.png"
 	},
 	"ide_armor": {
 	  "name": "IDE Armor",
 	  "type": "artifact",
-	  "description": "Giảm 20% HP_LOSS_TURN mỗi lượt bị hit",
+	  "description": "Reduce HP_LOSS_TURN by 20% each hit",
 	  "effect": "damage_reduction",
-	  "value": 0.2
+	  "value": 0.2,
+	  "icon": "res://assets/artifacts/ide_armor.png"
 	},
 	"runtime_patch": {
 	  "name": "Runtime Patch",
 	  "type": "artifact",
-	  "description": "Bỏ qua 1 hit của quái trong màn hiện tại",
+	  "description": "Ignore 1 enemy hit in the current stage",
 	  "effect": "skip_hit",
-	  "value": 1
+	  "value": 1,
+	  "icon": "res://assets/artifacts/runtime_patch.png"
 	}
   }
 }

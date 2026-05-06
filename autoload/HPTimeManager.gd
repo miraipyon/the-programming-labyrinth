@@ -15,9 +15,6 @@ var current_hp: int = 100
 var time_remaining: float = 0.0
 var timer_active: bool = false
 var active_artifacts: Dictionary = {}
-# Consumables used in the maze (outside combat) are buffered here
-# and applied at the start of the next encounter.
-var pending_consumables: Array[Dictionary] = []
 
 # --- Constants (từ GDD) ---
 # WRONG_LINE_PENALTY = 5 HP (mất máu khi chọn sai dòng)
@@ -54,7 +51,6 @@ func init_for_stage(chapter: int) -> void:
 
 	timer_active = false # Đảm bảo timer chưa chạy ngay khi vừa init
 	active_artifacts.clear()
-	pending_consumables.clear()
 
 	# Emit signal để cập nhật UI ngay lập tức
 	hp_changed.emit(current_hp, max_hp)
@@ -113,28 +109,8 @@ func apply_wrong_line_penalty() -> void:
 	take_damage(5)
 
 
-## Queue a consumable effect to be applied at the start of the next encounter.
-## Called when the player uses a consumable from the in-maze inventory UI.
-func queue_consumable_effect(effect: String, value: Variant) -> void:
-	pending_consumables.append({"effect": effect, "value": value})
-
-
-## Apply all queued consumable effects at the start of the next encounter.
-## Called by EncounterManager.start_encounter().
-func apply_pending_consumables() -> void:
-	for entry_variant in pending_consumables:
-		if typeof(entry_variant) != TYPE_DICTIONARY:
-			continue
-		var entry: Dictionary = entry_variant
-		match str(entry.get("effect", "")):
-			"heal":
-				heal(int(entry.get("value", 0)))
-			"restore_time":
-				restore_time(float(entry.get("value", 0.0)))
-			# hint and auto_snap are in-combat effects — ignore when buffered outside combat
-	pending_consumables.clear()
-
-
+## Activate a stage artifact.
+## Artifacts can only be activated once per stage.
 func activate_artifact(item_id: String) -> Dictionary:
 	var key := item_id.strip_edges()
 	var result := {
@@ -143,21 +119,33 @@ func activate_artifact(item_id: String) -> Dictionary:
 		"message": ""
 	}
 
+	if active_artifacts.has(key):
+		result.message = "Artifact already activated for this stage."
+		if key == "github_cape":
+			var cape_state: Dictionary = active_artifacts[key]
+			if int(cape_state.get("revives_left", 0)) <= 0:
+				result.message = "GitHub Cape revive already used for this stage."
+		elif key == "runtime_patch":
+			var patch_state: Dictionary = active_artifacts[key]
+			if int(patch_state.get("skips_left", 0)) <= 0:
+				result.message = "Runtime Patch already used for this stage."
+		return result
+
 	match key:
 		"github_cape":
 			active_artifacts[key] = {"revives_left": 1}
 			result.success = true
-			result.message = "GitHub Cape đã sẵn sàng hồi sinh."
+			result.message = "GitHub Cape revive is ready."
 		"ide_armor":
 			active_artifacts[key] = {"damage_reduction": 0.2}
 			result.success = true
-			result.message = "IDE Armor đang giảm sát thương."
+			result.message = "IDE Armor is reducing damage."
 		"runtime_patch":
 			active_artifacts[key] = {"skips_left": 1}
 			result.success = true
-			result.message = "Runtime Patch sẽ chặn hit kế tiếp."
+			result.message = "Runtime Patch will block the next hit."
 		_:
-			result.message = "Artifact không hợp lệ."
+			result.message = "Invalid artifact."
 
 	if bool(result.success):
 		artifact_changed.emit(active_artifacts.duplicate(true))

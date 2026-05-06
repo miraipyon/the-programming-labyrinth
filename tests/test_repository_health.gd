@@ -23,6 +23,7 @@ func _run_suite() -> void:
 	_test_required_files()
 	_test_hygiene_files()
 	_test_stage_catalog()
+	_test_item_icon_assets()
 	await _test_generated_maze_quality()
 	await _test_scene_contracts()
 
@@ -81,11 +82,53 @@ func _test_stage_catalog() -> void:
 			_assert_true(typeof(stage.get("chest_spawns", [])) == TYPE_ARRAY, "Stage has chest_spawns array")
 			_assert_true(typeof(stage.get("player_spawn", {})) == TYPE_DICTIONARY, "Stage has player_spawn")
 			_assert_true(typeof(stage.get("portal_position", {})) == TYPE_DICTIONARY, "Stage has portal_position")
+			var enemy_spawns: Array = stage.get("enemy_spawns", [])
+			var chest_spawns: Array = stage.get("chest_spawns", [])
+			_assert_eq(enemy_spawns.size(), 4, "Stage has exactly 4 enemies")
+			_assert_eq(chest_spawns.size(), 3, "Stage has exactly 3 chests")
+			_assert_eq(_count_chests_of_type(chest_spawns, "rare"), 1, "Stage has exactly 1 gold/rare chest")
+			_assert_eq(_count_chests_of_type(chest_spawns, "normal"), 2, "Stage has exactly 2 silver/normal chests")
 
 	_assert_eq(total_stages, 20, "Total stage count is 20")
+	var stage_specific_bug_count := 0
+	for chapter in [1, 2, 3, 4]:
+		for stage_number in [1, 2, 3, 4, 5]:
+			for question_number in [1, 2, 3, 4]:
+				var bug_id := "ch%d_stage%d_q%02d" % [chapter, stage_number, question_number]
+				var bug_variant: Variant = data_manager.call("get_bug_by_id", bug_id)
+				var exists := typeof(bug_variant) == TYPE_DICTIONARY and not Dictionary(bug_variant).is_empty()
+				_assert_true(exists, "Stage-specific bug exists: %s" % bug_id)
+				if exists:
+					stage_specific_bug_count += 1
+	_assert_eq(stage_specific_bug_count, 80, "Stage-specific bug count is 80")
+
+
+func _test_item_icon_assets() -> void:
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	_assert_true(data_manager != null, "DataManager exists for item icon validation")
+	if data_manager == null:
+		return
+
+	for item_id in ["green_tea", "focus_pill", "hint_chip", "block_snap_chip", "github_cape", "ide_armor", "runtime_patch"]:
+		var item_variant: Variant = data_manager.call("get_item_data", item_id)
+		_assert_true(typeof(item_variant) == TYPE_DICTIONARY, "Item data exists for icon validation: %s" % item_id)
+		if typeof(item_variant) != TYPE_DICTIONARY:
+			continue
+		var item_data: Dictionary = item_variant
+		var icon_path := str(item_data.get("icon", "")).strip_edges()
+		_assert_true(not icon_path.is_empty(), "Item has icon path: %s" % item_id)
+		_assert_true(ResourceLoader.exists(icon_path), "Item icon asset exists: %s" % item_id)
 
 
 func _test_scene_contracts() -> void:
+	await _assert_scene_contract("res://scenes/menus/MainMenu.tscn", "", [
+		"VBox/NewGameButton",
+		"VBox/ContinueButton",
+		"VBox/LoreButton",
+		"VBox/GuideButton",
+		"VBox/ChapterSelect",
+		"VBox/QuitButton"
+	])
 	await _assert_scene_contract("res://scenes/maze/MazeLevel.tscn", "MazeLevel", [
 		"MazeManager",
 		"EncounterManager",
@@ -146,7 +189,8 @@ func _test_scene_contracts() -> void:
 	await _assert_scene_contract("res://scenes/menus/VictoryScreen.tscn", "VictoryScreen", [
 		"VBox/TitleLabel",
 		"VBox/LootLabel",
-		"VBox/ContinueButton"
+		"VBox/ContinueButton",
+		"VBox/MainMenuButton"
 	])
 
 
@@ -201,8 +245,10 @@ func _test_generated_maze_quality() -> void:
 		var generated_enemy_spawns: Array = generated_stage.get("enemy_spawns", [])
 		var generated_chest_spawns: Array = generated_stage.get("chest_spawns", [])
 		var generated_encounters: Array = generated_stage.get("encounters", [])
-		_assert_true(generated_enemy_spawns.size() > 0, "Stage %s has enemy spawns in generated maze" % stage_id)
-		_assert_true(generated_chest_spawns.size() > 0, "Stage %s has chest spawns in generated maze" % stage_id)
+		_assert_eq(generated_enemy_spawns.size(), 4, "Stage %s has exactly 4 enemy spawns in generated maze" % stage_id)
+		_assert_eq(generated_chest_spawns.size(), 3, "Stage %s has exactly 3 chest spawns in generated maze" % stage_id)
+		_assert_eq(_count_chests_of_type(generated_chest_spawns, "rare"), 1, "Stage %s has exactly 1 gold/rare chest in generated maze" % stage_id)
+		_assert_eq(_count_chests_of_type(generated_chest_spawns, "normal"), 2, "Stage %s has exactly 2 silver/normal chests in generated maze" % stage_id)
 		_assert_eq(generated_enemy_spawns.size(), generated_encounters.size(), "Stage %s enemy count matches question count" % stage_id)
 
 		var used_bug_ids := {}
@@ -257,6 +303,17 @@ func _test_generated_maze_quality() -> void:
 			continue
 		for i in range(1, chapter_scores.size()):
 			_assert_true(int(chapter_scores[i]) > int(chapter_scores[i - 1]), "Chapter %d stage %d is harder than stage %d" % [chapter, i + 1, i])
+
+
+func _count_chests_of_type(chest_spawns: Array, chest_type: String) -> int:
+	var count := 0
+	for spawn_variant in chest_spawns:
+		if typeof(spawn_variant) != TYPE_DICTIONARY:
+			continue
+		var spawn: Dictionary = spawn_variant
+		if str(spawn.get("type", "")).strip_edges() == chest_type:
+			count += 1
+	return count
 
 
 func _build_layout_signature(maze_manager: Node2D) -> String:
@@ -386,7 +443,8 @@ func _assert_scene_contract(scene_path: String, root_name: String, required_path
 	var instance := scene.instantiate()
 	get_tree().root.add_child(instance)
 	await get_tree().process_frame
-	_assert_eq(instance.name, root_name, "Scene root name: %s" % scene_path)
+	if not root_name.is_empty():
+		_assert_eq(instance.name, root_name, "Scene root name: %s" % scene_path)
 	for node_path in required_paths:
 		_assert_true(instance.get_node_or_null(str(node_path)) != null, "%s has %s" % [scene_path, str(node_path)])
 	instance.queue_free()

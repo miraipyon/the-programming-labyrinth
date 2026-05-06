@@ -50,11 +50,6 @@ func start_encounter(enemy_node: Node2D) -> void:
 	turn_count = 1
 	encounter_started_at_msec = Time.get_ticks_msec()
 
-	# Apply any consumables used in the maze before this encounter
-	var hptm_pre: Node = get_node_or_null("/root/HPTimeManager")
-	if hptm_pre != null and hptm_pre.has_method("apply_pending_consumables"):
-		hptm_pre.call("apply_pending_consumables")
-
 	var game_manager: Node = get_node_or_null("/root/GameManager")
 	if game_manager != null and game_manager.has_method("enter_combat"):
 		game_manager.call("enter_combat")
@@ -130,6 +125,32 @@ func submit_turn(player_answer: Variant) -> void:
 		return
 
 	return_turn()
+
+
+func dev_skip_current_encounter() -> Dictionary:
+	if not is_in_combat:
+		return {"success": false, "message": "No active combat is running."}
+
+	var hit_base := 10
+	if current_enemy_node != null and current_enemy_node.has_method("get_hit_base"):
+		hit_base = int(current_enemy_node.call("get_hit_base"))
+
+	var result := {
+		"is_correct": true,
+		"fix_rate": 1.0,
+		"details": "DEV SKIP: Enemy defeated instantly.",
+		"fatal_error": false,
+		"enemy_hp_loss": hit_base * 5,
+		"player_hp_loss": 0,
+		"turn_number": turn_count,
+		"fixed_lines": [],
+		"wrong_line_penalty_loss": 0,
+		"bugs_after": 0,
+		"blocks_missing": 0
+	}
+	turn_evaluated.emit(result)
+	end_encounter(true)
+	return {"success": true, "message": "Combat skipped."}
 
 
 func return_turn() -> void:

@@ -74,6 +74,20 @@ def get_dead_ends(maze):
                     dead_ends.append((r, c))
     return dead_ends
 
+def parse_stage_index(stage_id):
+    if not isinstance(stage_id, str):
+        return 1
+    if "_stage" not in stage_id:
+        return 1
+    try:
+        return max(1, int(stage_id.split("_stage")[1]))
+    except Exception:
+        return 1
+
+def build_stage_encounters(chapter, stage_index):
+    stage_index = max(1, min(5, int(stage_index)))
+    return [f"ch{chapter}_stage{stage_index}_q{i:02d}" for i in range(1, 5)]
+
 def main():
     random.seed(888) # New seed for new layouts
     TS = 64
@@ -90,6 +104,9 @@ def main():
     
     for stage in stages:
         ch = stage.get("chapter", 1)
+        stage_index = parse_stage_index(stage.get("id", ""))
+        encounters = build_stage_encounters(ch, stage_index)
+        stage["encounters"] = encounters
         
         if ch == 1: wt, ht = 19, 19
         elif ch == 2: wt, ht = 25, 25
@@ -149,11 +166,12 @@ def main():
         dead_ends.sort(key=lambda t: distances.get(t, 0), reverse=True)
         
         chest_spawns = []
-        num_chests = random.randint(3, 5)
+        num_chests = 3
         placed_chests = set()
+        chest_types = ["rare", "normal", "normal"]
         for i in range(min(num_chests, len(dead_ends))):
             t = dead_ends[i]
-            ctype = "rare" if random.random() < 0.35 else "normal"
+            ctype = chest_types[i]
             chest_spawns.append({"type": ctype, "position": {"x": t[1] * TS + TS//2, "y": t[0] * TS + TS//2}})
             placed_chests.add(t)
             
@@ -166,7 +184,6 @@ def main():
         ]
         
         enemy_tiles = []
-        encounters = stage.get("encounters", [])
         num_enemies = len(encounters)
         
         if len(available_for_enemies) >= num_enemies:
@@ -190,7 +207,8 @@ def main():
         enemy_spawns = []
         for i, enc in enumerate(encounters):
             t = enemy_tiles[i]
-            enemy_id = random.choice(enemies_by_ch.get(ch, ["syntax_slime"]))
+            chapter_pool = enemies_by_ch.get(ch, ["syntax_slime"])
+            enemy_id = chapter_pool[(stage_index - 1 + i) % len(chapter_pool)]
             enemy_spawns.append({
                 "enemy_id": enemy_id,
                 "bug_id": enc,

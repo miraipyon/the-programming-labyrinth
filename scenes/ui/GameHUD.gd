@@ -17,6 +17,16 @@ var _artifact_bar: Label = null
 # Pending consumable indicator
 var _pending_label: Label = null
 
+const ITEM_ICON_PATHS := {
+	"green_tea": "res://assets/items/green_tea.png",
+	"focus_pill": "res://assets/items/focus_pill.png",
+	"hint_chip": "res://assets/items/hint_chip.png",
+	"block_snap_chip": "res://assets/items/blocksnap_chip.png",
+	"github_cape": "res://assets/artifacts/github_cape.png",
+	"ide_armor": "res://assets/artifacts/ide_armor.png",
+	"runtime_patch": "res://assets/artifacts/runtime_patch.png"
+}
+
 
 func _ready() -> void:
 	_ensure_layout()
@@ -147,12 +157,12 @@ func _build_inv_panel() -> void:
 
 	var header := Label.new()
 	header.name = "Header"
-	header.text = "📦 Inventory (trước khi vào đánh)"
+	header.text = "Inventory"
 	root_vbox.add_child(header)
 
 	var note := Label.new()
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.text = "Consumable → hiệu lực lần đánh tiếp theo\nArtifact → hiệu lực cả màn"
+	note.text = "[ITEM] one-time use. Green Tea and Focus Pill apply immediately. Hint Chip and Block Snap Chip are combat-only. [ARTIFACT] can stay active for the current stage."
 	note.modulate = Color(0.8, 0.8, 0.6)
 	note.add_theme_font_size_override("font_size", 11)
 	root_vbox.add_child(note)
@@ -176,7 +186,7 @@ func _build_inv_panel() -> void:
 	root_vbox.add_child(_pending_label)
 
 	var close_btn := Button.new()
-	close_btn.text = "Đóng ✕"
+	close_btn.text = "Close ✕"
 	close_btn.pressed.connect(func(): toggle_inventory())
 	root_vbox.add_child(close_btn)
 
@@ -201,7 +211,7 @@ func _refresh_inv_panel() -> void:
 
 	if items.is_empty():
 		var empty := Label.new()
-		empty.text = "Inventory trống"
+		empty.text = "Inventory is empty"
 		empty.modulate = Color(0.6, 0.6, 0.6)
 		_inv_list.add_child(empty)
 		return
@@ -223,22 +233,36 @@ func _refresh_inv_panel() -> void:
 		var display_name := str(item_data.get("name", item_id))
 		var item_type := str(item_data.get("type", ""))
 		var effect := str(item_data.get("effect", ""))
-		var description := str(item_data.get("description", ""))
+		var tooltip := _build_inventory_tooltip(item_id, item_data)
 
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 6)
+		row.tooltip_text = tooltip
 		_inv_list.add_child(row)
 
+		var icon := _make_inventory_icon(item_id, item_data)
+		icon.tooltip_text = tooltip
+		row.add_child(icon)
+
+		var type_lbl := Label.new()
+		type_lbl.text = _type_badge(item_type)
+		type_lbl.custom_minimum_size = Vector2(70, 0)
+		type_lbl.add_theme_font_size_override("font_size", 10)
+		type_lbl.modulate = Color(0.55, 0.9, 1.0) if item_type == "artifact" else Color(0.7, 1.0, 0.55)
+		type_lbl.tooltip_text = tooltip
+		row.add_child(type_lbl)
+
 		var name_lbl := Label.new()
-		var tag := " [C]" if item_type == "consumable" else " [A]"
-		name_lbl.text = "%s%s x%d" % [display_name, tag, count]
+		name_lbl.text = "%s x%d" % [display_name, count]
 		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		name_lbl.add_theme_font_size_override("font_size", 12)
+		name_lbl.tooltip_text = tooltip
 		row.add_child(name_lbl)
 
 		var use_btn := Button.new()
-		use_btn.text = "Dùng"
+		use_btn.text = "Use"
 		use_btn.custom_minimum_size = Vector2(54, 0)
+		use_btn.tooltip_text = tooltip
 		var captured_id := item_id
 		var captured_type := item_type
 		var captured_effect := effect
@@ -247,13 +271,6 @@ func _refresh_inv_panel() -> void:
 			_on_maze_use_item(captured_id, captured_type, captured_effect, captured_value,
 				inv_manager, hp_time_manager, data_manager))
 		row.add_child(use_btn)
-
-		var desc_lbl := Label.new()
-		desc_lbl.text = description
-		desc_lbl.modulate = Color(0.7, 0.7, 0.7)
-		desc_lbl.add_theme_font_size_override("font_size", 10)
-		desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_inv_list.add_child(desc_lbl)
 
 
 func _on_maze_use_item(
@@ -268,22 +285,40 @@ func _on_maze_use_item(
 	if inv_manager == null or not inv_manager.has_method("use_item"):
 		return
 
+	if item_type == "consumable" and (effect == "hint" or effect == "auto_snap"):
+		_update_pending_label("Cannot use %s outside combat." % item_id)
+		return
+
 	var use_result_variant: Variant = inv_manager.call("use_item", item_id)
 	var use_result: Dictionary = use_result_variant if typeof(use_result_variant) == TYPE_DICTIONARY else {}
 	if not bool(use_result.get("success", false)):
-		_update_pending_label("Không dùng được: %s" % str(use_result.get("message", "")))
+		_update_pending_label("Cannot use item: %s" % str(use_result.get("message", "")))
 		return
 
 	if item_type == "consumable":
-		# Buffer the effect — apply at next encounter start
-		if hp_time_manager != null and hp_time_manager.has_method("queue_consumable_effect"):
-			hp_time_manager.call("queue_consumable_effect", effect, value)
-		_update_pending_label("✓ %s đã được queue → sẽ áp dụng lúc đánh quái tiếp theo." % item_id)
+		match effect:
+			"heal":
+				if hp_time_manager != null and hp_time_manager.has_method("heal"):
+					hp_time_manager.call("heal", int(value))
+				_update_pending_label("✓ %s used: HP restored immediately." % item_id)
+			"restore_time":
+				if hp_time_manager != null and hp_time_manager.has_method("restore_time"):
+					hp_time_manager.call("restore_time", float(value))
+				_update_pending_label("✓ %s used: time restored immediately." % item_id)
+			_:
+				_update_pending_label("Cannot use %s in the maze." % item_id)
 	elif item_type == "artifact":
 		# Activate immediately — lasts whole stage
 		if hp_time_manager != null and hp_time_manager.has_method("activate_artifact"):
-			hp_time_manager.call("activate_artifact", item_id)
-		_update_pending_label("✓ %s đã kích hoạt → hiệu lực cả màn." % item_id)
+			var activate_result_variant: Variant = hp_time_manager.call("activate_artifact", item_id)
+			if typeof(activate_result_variant) == TYPE_DICTIONARY:
+				var activate_result: Dictionary = activate_result_variant
+				if bool(activate_result.get("success", false)):
+					_update_pending_label("✓ %s activated -> active for this stage." % item_id)
+				else:
+					_update_pending_label(str(activate_result.get("message", "Cannot activate artifact.")))
+			else:
+				_update_pending_label("✓ %s activated -> active for this stage." % item_id)
 
 	_refresh_inv_panel()
 
@@ -291,6 +326,71 @@ func _on_maze_use_item(
 func _update_pending_label(msg: String) -> void:
 	if _pending_label != null:
 		_pending_label.text = msg
+
+
+func _make_inventory_icon(item_id: String, item_data: Dictionary = {}) -> TextureRect:
+	var rect := TextureRect.new()
+	rect.custom_minimum_size = Vector2(28, 28)
+	rect.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+	var icon_path := str(item_data.get("icon", ITEM_ICON_PATHS.get(item_id, "")))
+	if not icon_path.is_empty() and ResourceLoader.exists(icon_path):
+		rect.texture = load(icon_path)
+	return rect
+
+
+func _type_badge(item_type: String) -> String:
+	return "[ARTIFACT]" if item_type == "artifact" else "[ITEM]"
+
+
+func _build_inventory_tooltip(item_id: String, item_data: Dictionary) -> String:
+	var display_name := str(item_data.get("name", item_id))
+	var item_type := str(item_data.get("type", "consumable"))
+	var description := str(item_data.get("description", "No description available."))
+	var effect := str(item_data.get("effect", ""))
+	var value: Variant = item_data.get("value", 0)
+	var type_text := "Artifact - stage-long effect" if item_type == "artifact" else "Item - one-time use"
+	return "%s\nType: %s\nDescription: %s\nEffect: %s\nUsage: %s" % [
+		display_name,
+		type_text,
+		description,
+		_effect_summary(effect, value),
+		_usage_text(item_type, effect)
+	]
+
+
+func _usage_text(item_type: String, effect: String) -> String:
+	if item_type == "artifact":
+		return "Use in the maze to activate it for the current stage."
+	match effect:
+		"heal", "restore_time":
+			return "Use in the maze to apply this effect immediately."
+		"hint", "auto_snap":
+			return "Use during combat only."
+		_:
+			return "Use in the correct context to apply its effect."
+
+
+func _effect_summary(effect: String, value: Variant) -> String:
+	match effect:
+		"heal":
+			return "Restore %d HP." % int(value)
+		"restore_time":
+			return "Restore %d seconds of time." % int(value)
+		"hint":
+			return "Reveal %d bug line(s) in code-fix combat." % int(value)
+		"auto_snap":
+			return "Auto-place %d correct block(s) in block assembly." % int(value)
+		"revive":
+			return "Revive %d time(s) when HP reaches 0." % int(value)
+		"damage_reduction":
+			return "Reduce damage taken per turn by %d%%." % int(round(float(value) * 100.0))
+		"skip_hit":
+			return "Block %d enemy hit(s) in the current stage." % int(value)
+		_:
+			return "Special effect."
 
 
 # --- Layout ---

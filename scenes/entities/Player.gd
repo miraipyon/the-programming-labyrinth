@@ -27,6 +27,8 @@ var _facing: String = "down"
 # --- Lifecycle ---
 func _ready() -> void:
 	add_to_group("player")
+	# Giữ player luôn render phía trên enemy khi chồng vị trí.
+	z_index = 10
 
 	if has_node("Sprite"):
 		_load_idle_textures()
