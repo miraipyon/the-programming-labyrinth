@@ -22,7 +22,7 @@ const CARDINAL_DIRS: Array[Vector2i] = [
 const MAX_MAZE_GENERATION_ATTEMPTS: int = 6
 const CAMPAIGN_ENEMIES_PER_STAGE: int = 4
 const CAMPAIGN_CHESTS_PER_STAGE: int = 3
-const FLOOR_TEXTURE_PATH := "res://assets_3/groundEarth_checkered.png"
+const FLOOR_TEXTURE_PATH := "res://assets_3/wallBreakable.png"
 const WALL_TEXTURE_PATH := "res://assets_3/wallStone.png"
 
 # --- State ---
