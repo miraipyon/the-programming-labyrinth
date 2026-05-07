@@ -22,6 +22,8 @@ const CARDINAL_DIRS: Array[Vector2i] = [
 const MAX_MAZE_GENERATION_ATTEMPTS: int = 6
 const CAMPAIGN_ENEMIES_PER_STAGE: int = 4
 const CAMPAIGN_CHESTS_PER_STAGE: int = 3
+const FLOOR_TEXTURE_PATH := "res://assets_3/groundEarth_checkered.png"
+const WALL_TEXTURE_PATH := "res://assets_3/wallStone.png"
 
 # --- State ---
 var stage_data: Dictionary = {}
@@ -30,6 +32,7 @@ var chests_in_level: Array[Node2D] = []
 var portal_node: Node2D = null
 var player_node: Node2D = null
 var visual_root: Node2D = null
+var visual_sprites: Node2D = null
 var _maze_passable: Array = []
 var _maze_grid_width: int = 0
 var _maze_grid_height: int = 0
@@ -91,6 +94,7 @@ func _clear_entities() -> void:
 	if is_instance_valid(visual_root):
 		visual_root.queue_free()
 	visual_root = null
+	visual_sprites = null
 
 	_maze_passable.clear()
 	_maze_main_path.clear()
@@ -916,20 +920,31 @@ func _count_room_paths_dfs(current: Vector2i, end_room: Vector2i, max_paths: int
 
 
 func _spawn_maze_visuals() -> void:
+	self.y_sort_enabled = true
+	
 	visual_root = Node2D.new()
 	visual_root.name = "MazeVisuals"
+	visual_root.y_sort_enabled = true
 	add_child(visual_root)
 	move_child(visual_root, 0)
+	
+	visual_sprites = Node2D.new()
+	visual_sprites.name = "VisualSprites"
+	visual_sprites.y_sort_enabled = true
+	visual_root.add_child(visual_sprites)
 
 	var bounds := _get_stage_bounds()
 	
-	# Solid floor (light gray/white)
-	var floor_rect := ColorRect.new()
-	floor_rect.color = Color(0.92, 0.92, 0.94)
-	floor_rect.position = Vector2.ZERO
-	floor_rect.size = bounds.size
-	floor_rect.z_index = -20
-	visual_root.add_child(floor_rect)
+	# Tiled floor using groundEarth_checkered
+	var floor_tex := load(FLOOR_TEXTURE_PATH) as Texture2D
+	if floor_tex != null:
+		_add_tiled_sprites(floor_tex, bounds.size, Vector2.ZERO, true)
+	else:
+		var floor_rect := ColorRect.new()
+		floor_rect.color = Color(0.82, 0.72, 0.55)
+		floor_rect.position = Vector2.ZERO
+		floor_rect.size = bounds.size
+		visual_root.add_child(floor_rect)
 
 	if _spawn_generated_maze_walls():
 		return
@@ -1058,12 +1073,15 @@ func _add_boundary(pos: Vector2, size: Vector2) -> void:
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	var rect := ColorRect.new()
-	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
-	rect.size = size
-	rect.position = -size / 2.0
-	rect.z_index = -5
-	body.add_child(rect)
+	var wall_tex := load(WALL_TEXTURE_PATH) as Texture2D
+	if wall_tex != null:
+		_add_tiled_sprites(wall_tex, size, pos - size / 2.0)
+	else:
+		var rect := ColorRect.new()
+		rect.color = Color(0.18, 0.18, 0.20)
+		rect.size = size
+		rect.position = -size / 2.0
+		body.add_child(rect)
 
 	visual_root.add_child(body)
 
@@ -1080,12 +1098,15 @@ func _add_obstacle(pos: Vector2, size: Vector2) -> void:
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	var rect := ColorRect.new()
-	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
-	rect.size = size
-	rect.position = -size / 2.0
-	rect.z_index = -2
-	body.add_child(rect)
+	var wall_tex2 := load(WALL_TEXTURE_PATH) as Texture2D
+	if wall_tex2 != null:
+		_add_tiled_sprites(wall_tex2, size, pos - size / 2.0)
+	else:
+		var rect := ColorRect.new()
+		rect.color = Color(0.18, 0.18, 0.20)
+		rect.size = size
+		rect.position = -size / 2.0
+		body.add_child(rect)
 
 	visual_root.add_child(body)
 
@@ -1102,11 +1123,45 @@ func _add_wall_segment(pos: Vector2, size: Vector2) -> void:
 	shape_node.shape = shape
 	body.add_child(shape_node)
 
-	var rect := ColorRect.new()
-	rect.color = Color(0.18, 0.18, 0.20)  # Dark gray
-	rect.size = size
-	rect.position = -size / 2.0
-	rect.z_index = -4
-	body.add_child(rect)
+	var wall_tex3 := load(WALL_TEXTURE_PATH) as Texture2D
+	if wall_tex3 != null:
+		_add_tiled_sprites(wall_tex3, size, pos - size / 2.0)
+	else:
+		var rect := ColorRect.new()
+		rect.color = Color(0.18, 0.18, 0.20)
+		rect.size = size
+		rect.position = -size / 2.0
+		body.add_child(rect)
 
 	visual_root.add_child(body)
+
+func _add_tiled_sprites(tex: Texture2D, rect_size: Vector2, global_rect_pos: Vector2, is_floor: bool = false) -> void:
+	if visual_sprites == null:
+		return
+
+	var start_x := int(floor(global_rect_pos.x / MAZE_TILE_SIZE))
+	var start_y := int(floor(global_rect_pos.y / MAZE_TILE_SIZE))
+	var cols := maxi(1, int(round(rect_size.x / MAZE_TILE_SIZE)))
+	var rows := maxi(1, int(round(rect_size.y / MAZE_TILE_SIZE)))
+
+	# Always use full texture height so the 3/4-view front-face shadow overlaps the row below.
+	# Floors get an extra row of sprites so their front-face is covered by the next row.
+	var region_h := tex.get_height()
+
+	for y in range(start_y, start_y + rows):
+		for x in range(start_x, start_x + cols):
+			var y_sorter := Node2D.new()
+			# Y-sort key = TOP of cell so that row N+1 (higher key) draws ON TOP of row N.
+			# This makes the light top-face of row N+1 cover the dark front-face of row N.
+			y_sorter.position = Vector2(int(x * MAZE_TILE_SIZE), int(y * MAZE_TILE_SIZE))
+
+			var sprite := Sprite2D.new()
+			sprite.texture = tex
+			sprite.centered = false
+			sprite.region_enabled = true
+			sprite.region_rect = Rect2(0, 0, MAZE_TILE_SIZE, region_h)
+			# Sprite top-left sits exactly at the cell's top-left
+			sprite.position = Vector2.ZERO
+
+			y_sorter.add_child(sprite)
+			visual_sprites.add_child(y_sorter)
