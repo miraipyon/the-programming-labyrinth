@@ -231,6 +231,8 @@ func _on_item_use_pressed(item_id: String) -> void:
 						item_use_requested.emit(item_id)
 						_refresh()
 						return
+					if inventory_manager.has_method("register_artifact_use"):
+						inventory_manager.call("register_artifact_use", item_id)
 
 	item_use_requested.emit(item_id)
 	_refresh()

@@ -291,6 +291,8 @@ func _handle_game_over(reason: String) -> void:
 	var stage_id := ""
 	if game_manager != null:
 		stage_id = str(game_manager.get("current_stage_id")).strip_edges()
+		if game_manager.has_method("set_stage_stars") and not stage_id.is_empty():
+			game_manager.call("set_stage_stars", stage_id, 0)
 
 	if telemetry_manager != null and telemetry_manager.has_method("log_game_over"):
 		telemetry_manager.call("log_game_over", reason, stage_id)

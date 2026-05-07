@@ -5,13 +5,16 @@ var _stage_clear_committed := false
 var _stage_clear_result: Dictionary = {}
 var _cleared_chapter := 1
 var _cleared_stage_id := "ch1_stage1"
+var _stage_stars := 0
 
 const MenuVisuals := preload("res://scenes/menus/MenuVisuals.gd")
 const ICON_PLAY_PATH := "res://assets_2/png/Button/Icon/Play.png"
 const ICON_HOME_PATH := "res://assets_2/png/Button/Icon/Levels.png"
 const ICON_REPLAY_PATH := "res://assets_2/png/Button/Icon/Replay.png"
-const STAR_ACTIVE_PATH := "res://assets_2/png/Star/Active.png"
-const STAR_UNACTIVE_PATH := "res://assets_2/png/Star/Unactive.png"
+const BACKGROUND_PATH := "res://assets_2/png/Scene/Background.png"
+const STAR_ACTIVE_PATH := "res://assets_2/png/Level/Star/Active.png"
+const STAR_UNACTIVE_PATH := "res://assets_2/png/Level/Star/Unactive.png"
+const CHAPTER_TIME_MAP := {1: 360.0, 2: 480.0, 3: 600.0, 4: 720.0}
 
 
 func _ready() -> void:
@@ -28,8 +31,8 @@ func _ready() -> void:
 	_connect_button("ContinueButton", _on_continue_pressed)
 	_connect_button("NextStageButton", _on_continue_pressed)
 	_connect_button("MainMenuButton", _on_main_menu_pressed)
-	_set_title_text("Congratulations! You cleared the stage.")
-	_render_stage_score()
+	_stage_stars = _calculate_stage_stars(false)
+	_render_stage_stars(_stage_stars)
 	_render_temporary_loot()
 	_update_next_button_state()
 
@@ -83,6 +86,9 @@ func _commit_stage_clear() -> Dictionary:
 		inventory_manager.call("confirm_loot")
 
 	var game_manager: Node = _get_game_manager()
+	if game_manager != null and game_manager.has_method("set_stage_stars"):
+		game_manager.call("set_stage_stars", _cleared_stage_id, _stage_stars)
+
 	if game_manager != null and game_manager.has_method("save_on_stage_clear"):
 		var result_variant: Variant = game_manager.call("save_on_stage_clear")
 		if typeof(result_variant) == TYPE_DICTIONARY:
@@ -124,6 +130,8 @@ func _connect_button(node_name: String, callback: Callable) -> void:
 
 func _find_button(node_name: String) -> Button:
 	var node: Node = get_node_or_null(node_name)
+	if node == null:
+		node = get_node_or_null("ButtonsRow/%s" % node_name)
 	if node == null:
 		node = get_node_or_null("VBox/%s" % node_name)
 	if node is Button:
@@ -264,62 +272,101 @@ func _set_loot_text(message: String) -> void:
 	add_child(fallback_label)
 
 
-func _render_stage_score() -> void:
-	var score := 0
-	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
-	if hp_time_manager != null:
-		score += maxi(int(hp_time_manager.get("current_hp")), 0) * 10
-		var time_remaining_variant: Variant = hp_time_manager.get("time_remaining")
-		if typeof(time_remaining_variant) == TYPE_FLOAT or typeof(time_remaining_variant) == TYPE_INT:
-			score += maxi(int(round(float(time_remaining_variant))), 0)
-
-	var score_node: Node = get_node_or_null("ScoreLabel")
-	if score_node == null:
-		score_node = get_node_or_null("VBox/ScoreLabel")
-	if score_node is Label:
-		(score_node as Label).text = "SCORE · %d" % score
-
-	var stars := 1
-	if score >= 750:
-		stars = 3
-	elif score >= 350:
-		stars = 2
-
+func _render_stage_stars(stars: int = -1) -> void:
+	var resolved_stars := stars
+	if resolved_stars < 0:
+		resolved_stars = _stage_stars
+	resolved_stars = clampi(resolved_stars, 0, 3)
 	for i in range(1, 4):
 		var star_path := "StageStars/Star%d" % i
 		var star_node: Node = get_node_or_null(star_path)
 		if star_node is TextureRect:
 			var star_rect: TextureRect = star_node
-			star_rect.texture = load(STAR_ACTIVE_PATH if i <= stars else STAR_UNACTIVE_PATH)
+			star_rect.texture = load(STAR_ACTIVE_PATH if i <= resolved_stars else STAR_UNACTIVE_PATH)
+			star_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _calculate_stage_stars(failed: bool) -> int:
+	if failed:
+		return 0
+
+	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
+	if hp_time_manager == null:
+		return 1
+
+	var time_remaining_variant: Variant = hp_time_manager.get("time_remaining")
+	var time_remaining := float(time_remaining_variant) if typeof(time_remaining_variant) in [TYPE_FLOAT, TYPE_INT] else 0.0
+	if time_remaining <= 0.0:
+		return 0
+
+	var total_time := _stage_time_limit_seconds(_cleared_chapter, _cleared_stage_id)
+	if total_time <= 0.0:
+		return 1
+
+	var elapsed := clampf(total_time - time_remaining, 0.0, total_time)
+	if elapsed < total_time / 3.0:
+		return 3
+	if elapsed < (2.0 * total_time) / 3.0:
+		return 2
+	return 1
+
+
+func _stage_time_limit_seconds(chapter: int, stage_id: String) -> float:
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if data_manager != null and data_manager.has_method("get_stage_data"):
+		var stage_variant: Variant = data_manager.call("get_stage_data", stage_id)
+		if typeof(stage_variant) == TYPE_DICTIONARY:
+			var stage_data: Dictionary = stage_variant
+			var stage_time := float(stage_data.get("time_limit_seconds", 0.0))
+			if stage_time > 0.0:
+				return stage_time
+	return float(CHAPTER_TIME_MAP.get(chapter, 360.0))
 
 
 func _apply_skin() -> void:
+	var background_node := get_node_or_null("Background") as TextureRect
+	if background_node != null:
+		background_node.texture = MenuVisuals.load_texture(BACKGROUND_PATH)
+		background_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var shade_node := get_node_or_null("ReadableShade") as ColorRect
+	if shade_node != null:
+		shade_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	var title_node: Node = get_node_or_null("TitleLabel")
 	if title_node == null:
 		title_node = get_node_or_null("VBox/TitleLabel")
 	if title_node is Label:
-		MenuVisuals.style_title(title_node as Label, 22)
+		var title_label := title_node as Label
+		MenuVisuals.style_title(title_label, 66)
+		title_label.text = "LEVEL COMPLETE"
+		title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	var loot_node: Node = get_node_or_null("LootLabel")
-	if loot_node == null:
-		loot_node = get_node_or_null("VBox/LootLabel")
-	if loot_node is Label:
-		var loot_label: Label = loot_node
-		loot_label.add_theme_color_override("font_color", Color(0.95, 0.96, 0.86))
-		loot_label.add_theme_font_size_override("font_size", 14)
+	var score_node := get_node_or_null("ScoreLabel") as Control
+	if score_node != null:
+		score_node.visible = false
+		score_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var loot_node := get_node_or_null("LootLabel") as Control
+	if loot_node != null:
+		loot_node.visible = false
+		loot_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var retry_button := _find_button("RetryButton")
 	if retry_button != null:
 		MenuVisuals.style_square_button(retry_button, ICON_REPLAY_PATH, Vector2(104, 104))
 		retry_button.text = ""
 		retry_button.tooltip_text = "Replay stage"
+		retry_button.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	var continue_button := _find_button("ContinueButton")
 	if continue_button != null:
 		MenuVisuals.style_square_button(continue_button, ICON_PLAY_PATH, Vector2(104, 104))
 		continue_button.text = ""
+		continue_button.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	var main_menu_button := _find_button("MainMenuButton")
 	if main_menu_button != null:
 		MenuVisuals.style_square_button(main_menu_button, ICON_HOME_PATH, Vector2(104, 104))
 		main_menu_button.text = ""
+		main_menu_button.mouse_filter = Control.MOUSE_FILTER_STOP

@@ -545,6 +545,7 @@ func mark_correct_lines(lines: Array) -> void:
 
 	for key in _line_rows.keys():
 		_update_line_tick(int(key))
+	_update_first_selected_line()
 
 
 func clear_correct_lines() -> void:
@@ -554,12 +555,23 @@ func clear_correct_lines() -> void:
 
 
 func _on_line_toggled(line: int, is_pressed: bool) -> void:
+	if _resolved_lines.has(line):
+		if _line_rows.has(line):
+			var row: Dictionary = _line_rows[line]
+			var checkbox: CheckBox = row.get("checkbox", null)
+			if checkbox != null:
+				checkbox.set_pressed_no_signal(false)
+		_selected_lines.erase(line)
+		_update_first_selected_line()
+		return
 	_mark_line_selected(line, is_pressed)
 
 
 func _mark_line_selected(line: int, is_selected: bool) -> void:
 	if not _line_rows.has(line):
 		return
+	if _resolved_lines.has(line):
+		is_selected = false
 	var row: Dictionary = _line_rows[line]
 	var checkbox: CheckBox = row.get("checkbox", null)
 	var option: OptionButton = row.get("option", null)
@@ -595,16 +607,25 @@ func _update_line_tick(line: int) -> void:
 	var row_data: Dictionary = _line_rows[line]
 	var tick: Label = row_data.get("tick", null)
 	var checkbox: CheckBox = row_data.get("checkbox", null)
+	var option: OptionButton = row_data.get("option", null)
 	var solved := _resolved_lines.has(line)
 	if tick != null:
 		tick.text = "✔" if solved else ""
 		tick.visible = solved
 	if checkbox != null:
 		checkbox.text = "Line %02d%s" % [line, " (OK)" if solved else ""]
+		checkbox.disabled = solved
+		if solved and checkbox.button_pressed:
+			checkbox.set_pressed_no_signal(false)
 		if solved:
 			checkbox.add_theme_color_override("font_color", Color(0.6, 1.0, 0.68))
 		else:
 			checkbox.remove_theme_color_override("font_color")
+	if option != null and solved:
+		option.disabled = true
+		option.visible = false
+	if solved:
+		_selected_lines.erase(line)
 
 
 func _find_fix_input() -> Node:

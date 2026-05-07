@@ -15,15 +15,17 @@ func _ready() -> void:
 func set_reason(reason: String) -> void:
 	var reason_text := reason.strip_edges()
 	if reason_text.is_empty():
-		reason_text = "You have fallen in the labyrinth."
+		reason_text = ""
 
 	var reason_node: Node = _find_reason_node()
 	if reason_node is Label:
 		var label: Label = reason_node
 		label.text = reason_text
+		label.visible = false
 	elif reason_node is RichTextLabel:
 		var rich_label: RichTextLabel = reason_node
 		rich_label.text = reason_text
+		rich_label.visible = false
 	else:
 		push_warning("[GameOverScreen] Missing reason label node.")
 
@@ -32,6 +34,8 @@ func _on_retry_pressed() -> void:
 	if game_manager == null or not game_manager.has_method("start_stage"):
 		push_warning("[GameOverScreen] GameManager.start_stage() not available.")
 		return
+
+	_mark_failed_stage_zero_stars(game_manager)
 
 	var inventory_manager: Node = _get_inventory_manager()
 	if inventory_manager != null and inventory_manager.has_method("discard_loot"):
@@ -47,11 +51,13 @@ func _on_retry_pressed() -> void:
 	queue_free()
 
 func _on_quit_pressed() -> void:
+	var game_manager: Node = _get_game_manager()
+	_mark_failed_stage_zero_stars(game_manager)
+
 	var inventory_manager: Node = _get_inventory_manager()
 	if inventory_manager != null and inventory_manager.has_method("discard_loot"):
 		inventory_manager.call("discard_loot")
 
-	var game_manager: Node = _get_game_manager()
 	get_tree().paused = false
 	if game_manager != null and game_manager.has_method("go_to_main_menu"):
 		game_manager.call("go_to_main_menu")
@@ -67,6 +73,15 @@ func _get_game_manager() -> Node:
 
 func _get_inventory_manager() -> Node:
 	return get_node_or_null("/root/InventoryManager")
+
+
+func _mark_failed_stage_zero_stars(game_manager: Node) -> void:
+	if game_manager == null or not game_manager.has_method("set_stage_stars"):
+		return
+	var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
+	if stage_id.is_empty():
+		return
+	game_manager.call("set_stage_stars", stage_id, 0)
 
 
 func _connect_button(node_name: String, callback: Callable) -> void:
@@ -103,26 +118,24 @@ func _apply_skin() -> void:
 	var title_node: Node = get_node_or_null("GameOverTitle")
 	if title_node is Label:
 		var title_label: Label = title_node
-		MenuVisuals.style_title(title_label, 72)
-		title_label.text = "GAME OVER"
+		title_label.visible = false
 
 	var reason_node: Node = _find_reason_node()
 	if reason_node is Label:
 		var reason_label: Label = reason_node
-		reason_label.add_theme_font_size_override("font_size", 18)
-		reason_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.80))
+		reason_label.visible = false
 	elif reason_node is RichTextLabel:
-		(reason_node as RichTextLabel).add_theme_color_override("default_color", Color(0.86, 0.88, 0.80))
+		(reason_node as RichTextLabel).visible = false
 
 	var retry_button := _find_button("RetryButton")
 	if retry_button != null:
-		MenuVisuals.style_square_button(retry_button, ICON_REPLAY_PATH, Vector2(104, 104))
+		MenuVisuals.style_square_button(retry_button, ICON_REPLAY_PATH, Vector2(122, 122))
 		retry_button.text = ""
 		retry_button.tooltip_text = "Retry"
 
 	var quit_button := _find_button("QuitButton")
 	if quit_button != null:
-		MenuVisuals.style_square_button(quit_button, ICON_LEVELS_PATH, Vector2(104, 104))
+		MenuVisuals.style_square_button(quit_button, ICON_LEVELS_PATH, Vector2(122, 122))
 		quit_button.text = ""
 		quit_button.tooltip_text = "Main menu"
 

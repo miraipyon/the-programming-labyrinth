@@ -126,8 +126,20 @@ func _test_scene_contracts() -> void:
 		"VBox/ContinueButton",
 		"VBox/LoreButton",
 		"VBox/GuideButton",
-		"VBox/ChapterSelect",
 		"VBox/QuitButton"
+	])
+	await _assert_scene_contract("res://scenes/menus/StageSelect.tscn", "StageSelectOverlay", [
+		"Panel/ChapterGrid/Chapter1Button",
+		"Panel/ChapterGrid/Chapter2Button",
+		"Panel/ChapterGrid/Chapter3Button",
+		"Panel/ChapterGrid/Chapter4Button",
+		"Panel/ChapterTitleLabel",
+		"Panel/StageGrid/Stage01Button",
+		"Panel/StageGrid/Stage02Button",
+		"Panel/StageGrid/Stage03Button",
+		"Panel/StageGrid/Stage04Button",
+		"Panel/StageGrid/Stage05Button",
+		"HomeButton"
 	])
 	await _assert_scene_contract("res://scenes/maze/MazeLevel.tscn", "MazeLevel", [
 		"MazeManager",

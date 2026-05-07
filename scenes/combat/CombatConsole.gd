@@ -190,6 +190,8 @@ func use_hint_or_snap(item_id: String) -> Dictionary:
 					if not bool(activate_result.get("success", false)):
 						_refresh_quick_inventory()
 						return _status_result(false, str(activate_result.get("message", "Cannot activate artifact.")))
+					if inventory_manager.has_method("register_artifact_use"):
+						inventory_manager.call("register_artifact_use", item_id)
 
 	_refresh_quick_inventory()
 	return _status_result(true, str(use_result.get("message", "Item used.")))

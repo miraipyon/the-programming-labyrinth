@@ -166,8 +166,13 @@ func _spawn_chests() -> void:
 	if typeof(spawns_variant) != TYPE_ARRAY:
 		return
 
+	var stage_id := str(stage_data.get("id", "")).strip_edges()
+	var game_manager: Node = get_node_or_null("/root/GameManager")
+	if stage_id.is_empty() and game_manager != null:
+		stage_id = str(game_manager.get("current_stage_id")).strip_edges()
 	var spawns: Array = spawns_variant
-	for spawn_variant in spawns:
+	for idx in range(spawns.size()):
+		var spawn_variant: Variant = spawns[idx]
 		if typeof(spawn_variant) != TYPE_DICTIONARY:
 			continue
 
@@ -184,6 +189,15 @@ func _spawn_chests() -> void:
 		chest.position = _extract_position(spawn.get("position", spawn), Vector2.ZERO)
 		if chest.has_method("set"):
 			chest.set("chest_type", str(spawn.get("type", "normal")))
+			var chest_id := str(spawn.get("id", "")).strip_edges()
+			if chest_id.is_empty():
+				chest_id = "chest_%02d" % idx
+			chest.set("chest_id", chest_id)
+			if game_manager != null \
+			and game_manager.has_method("is_chest_opened") \
+			and not stage_id.is_empty() \
+			and bool(game_manager.call("is_chest_opened", stage_id, chest_id)):
+				chest.set("is_opened", true)
 
 		add_child(chest)
 		chests_in_level.append(chest)

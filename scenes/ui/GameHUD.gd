@@ -160,13 +160,6 @@ func _build_inv_panel() -> void:
 	header.text = "Inventory"
 	root_vbox.add_child(header)
 
-	var note := Label.new()
-	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.text = "[ITEM] one-time use. Green Tea and Focus Pill apply immediately. Hint Chip and Block Snap Chip are combat-only. [ARTIFACT] can stay active for the current stage."
-	note.modulate = Color(0.8, 0.8, 0.6)
-	note.add_theme_font_size_override("font_size", 11)
-	root_vbox.add_child(note)
-
 	var sep := HSeparator.new()
 	root_vbox.add_child(sep)
 
@@ -314,10 +307,14 @@ func _on_maze_use_item(
 			if typeof(activate_result_variant) == TYPE_DICTIONARY:
 				var activate_result: Dictionary = activate_result_variant
 				if bool(activate_result.get("success", false)):
+					if inv_manager.has_method("register_artifact_use"):
+						inv_manager.call("register_artifact_use", item_id)
 					_update_pending_label("✓ %s activated -> active for this stage." % item_id)
 				else:
 					_update_pending_label(str(activate_result.get("message", "Cannot activate artifact.")))
 			else:
+				if inv_manager.has_method("register_artifact_use"):
+					inv_manager.call("register_artifact_use", item_id)
 				_update_pending_label("✓ %s activated -> active for this stage." % item_id)
 
 	_refresh_inv_panel()

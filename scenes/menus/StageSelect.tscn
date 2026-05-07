@@ -1,0 +1,271 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scenes/menus/StageSelect.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets_2/png/Scene/Background.png" id="2_bg"]
+
+[node name="StageSelectOverlay" type="Control"]
+visible = false
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Panel" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ChapterGrid" type="HBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -270.0
+offset_top = 82.0
+offset_right = 270.0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Chapter1Button" type="Button" parent="Panel/ChapterGrid"]
+custom_minimum_size = Vector2(116, 70)
+layout_mode = 2
+text = "1"
+
+[node name="Chapter2Button" type="Button" parent="Panel/ChapterGrid"]
+custom_minimum_size = Vector2(116, 70)
+layout_mode = 2
+text = "2"
+
+[node name="Chapter3Button" type="Button" parent="Panel/ChapterGrid"]
+custom_minimum_size = Vector2(116, 70)
+layout_mode = 2
+text = "3"
+
+[node name="Chapter4Button" type="Button" parent="Panel/ChapterGrid"]
+custom_minimum_size = Vector2(116, 70)
+layout_mode = 2
+text = "4"
+
+[node name="ChapterTitleLabel" type="Label" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_top = 176.0
+offset_right = 360.0
+offset_bottom = 222.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.88, 0.92, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 30
+text = "Chapter 1 - Syntax Forest"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StageGrid" type="GridContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -460.0
+offset_top = 238.0
+offset_right = 460.0
+offset_bottom = 450.0
+grow_horizontal = 2
+theme_override_constants/h_separation = 28
+theme_override_constants/v_separation = 16
+columns = 5
+
+[node name="Stage01Button" type="Button" parent="Panel/StageGrid"]
+custom_minimum_size = Vector2(156, 206)
+layout_mode = 2
+text = ""
+
+[node name="CardTexture" type="TextureRect" parent="Panel/StageGrid/Stage01Button"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = -2.0
+offset_right = 69.5
+offset_bottom = 181.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NumberLabel" type="Label" parent="Panel/StageGrid/Stage01Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stage02Button" type="Button" parent="Panel/StageGrid"]
+custom_minimum_size = Vector2(156, 206)
+layout_mode = 2
+text = ""
+
+[node name="CardTexture" type="TextureRect" parent="Panel/StageGrid/Stage02Button"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = -2.0
+offset_right = 69.5
+offset_bottom = 181.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NumberLabel" type="Label" parent="Panel/StageGrid/Stage02Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stage03Button" type="Button" parent="Panel/StageGrid"]
+custom_minimum_size = Vector2(156, 206)
+layout_mode = 2
+text = ""
+
+[node name="CardTexture" type="TextureRect" parent="Panel/StageGrid/Stage03Button"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = -2.0
+offset_right = 69.5
+offset_bottom = 181.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NumberLabel" type="Label" parent="Panel/StageGrid/Stage03Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stage04Button" type="Button" parent="Panel/StageGrid"]
+custom_minimum_size = Vector2(156, 206)
+layout_mode = 2
+text = ""
+
+[node name="CardTexture" type="TextureRect" parent="Panel/StageGrid/Stage04Button"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = -2.0
+offset_right = 69.5
+offset_bottom = 181.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NumberLabel" type="Label" parent="Panel/StageGrid/Stage04Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Stage05Button" type="Button" parent="Panel/StageGrid"]
+custom_minimum_size = Vector2(156, 206)
+layout_mode = 2
+text = ""
+
+[node name="CardTexture" type="TextureRect" parent="Panel/StageGrid/Stage05Button"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = -2.0
+offset_right = 69.5
+offset_bottom = 181.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NumberLabel" type="Label" parent="Panel/StageGrid/Stage05Button"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HomeButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -126.0
+offset_top = -118.0
+offset_right = -32.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+text = ""

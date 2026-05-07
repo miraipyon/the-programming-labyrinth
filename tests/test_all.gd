@@ -157,6 +157,14 @@ func _test_ui_components() -> void:
 	var answer: Dictionary = answer_variant if typeof(answer_variant) == TYPE_DICTIONARY else {}
 	_assert_eq(int(answer.get("line", -1)), 1, "CodeFixUI default answer line")
 	_assert_eq(str(answer.get("fix", "")), "print(a)", "CodeFixUI default answer fix")
+	code_fix_ui.call("mark_correct_lines", [1])
+	await process_frame
+	var solved_checkbox := code_fix_ui.get_node_or_null("VBox/AnswerRows/LineRow_1/LineCheck_1") as CheckBox
+	var solved_option := code_fix_ui.get_node_or_null("VBox/AnswerRows/LineRow_1/FixOption_1") as OptionButton
+	_assert_true(solved_checkbox != null and solved_checkbox.disabled, "CodeFixUI locks solved line checkbox")
+	_assert_true(solved_option != null and solved_option.disabled and not solved_option.visible, "CodeFixUI hides and locks solved line options")
+	code_fix_ui.call("_on_line_toggled", 1, true)
+	_assert_true(not bool(code_fix_ui.call("has_line_selection")), "CodeFixUI ignores selection on solved line")
 	code_fix_ui.queue_free()
 
 	# BlockAssemblyUI
@@ -191,6 +199,13 @@ func _test_ui_components() -> void:
 	hud.call("update_time", 29.5)
 	_assert_true(hp_lbl.text.find("80") != -1, "GameHUD updates HP label")
 	_assert_true(time_lbl.text.find("00:30") != -1, "GameHUD formats time")
+	var has_deprecated_inv_note := false
+	for node in hud.find_children("*", "Label", true, false):
+		var label := node as Label
+		if label != null and label.text.find("[ITEM] one-time use") != -1:
+			has_deprecated_inv_note = true
+			break
+	_assert_true(not has_deprecated_inv_note, "GameHUD inventory no longer shows old usage note")
 	hud.queue_free()
 
 	# LootPopup
@@ -446,6 +461,7 @@ func _test_menu_and_stage_flow() -> void:
 	var root := get_root()
 	var game_manager: Node = root.get_node_or_null("GameManager")
 	var inventory_manager: Node = root.get_node_or_null("InventoryManager")
+	var hp_time_manager: Node = root.get_node_or_null("HPTimeManager")
 	_assert_true(game_manager != null, "GameManager exists for menu test")
 	_assert_true(inventory_manager != null, "InventoryManager exists for menu test")
 	if game_manager == null or inventory_manager == null:
@@ -457,9 +473,12 @@ func _test_menu_and_stage_flow() -> void:
 		"state": int(game_manager.get("current_state")),
 		"unlocked": game_manager.get("chapters_unlocked"),
 		"stage_unlocks": game_manager.get("unlocked_stages_by_chapter"),
+		"stage_stars": game_manager.get("stage_stars_by_stage_id"),
+		"opened_chests": game_manager.get("opened_chests_by_stage"),
 		"campaign_complete": bool(game_manager.get("campaign_complete")),
 		"perm": inventory_manager.get("permanent_inventory"),
-		"temp": inventory_manager.get("temporary_inventory")
+		"temp": inventory_manager.get("temporary_inventory"),
+		"time_remaining": float(hp_time_manager.get("time_remaining")) if hp_time_manager != null else 0.0
 	}
 
 	# MainMenu
@@ -468,6 +487,7 @@ func _test_menu_and_stage_flow() -> void:
 	game_manager.set("current_stage_id", "ch1_stage1")
 	game_manager.set("chapters_unlocked", default_chapters)
 	game_manager.set("unlocked_stages_by_chapter", {1: 1})
+	game_manager.set("stage_stars_by_stage_id", {})
 	game_manager.set("campaign_complete", false)
 	var menu_scene: PackedScene = load("res://scenes/menus/MainMenu.tscn")
 	var menu := menu_scene.instantiate()
@@ -486,28 +506,84 @@ func _test_menu_and_stage_flow() -> void:
 		await process_frame
 		var guide_body: Node = menu.get_node_or_null("InfoOverlay/InfoPanel/VBox/ScrollContainer/BodyText")
 		_assert_true(guide_body is RichTextLabel and (guide_body as RichTextLabel).text.find("MAIN OBJECTIVE") != -1, "MainMenu guide modal explains gameplay")
-	# Chapter picker must show all chapters but lock chapters 2-4 by default.
-	var ch_opt: Node = menu.get_node_or_null("VBox/ChapterSelect/ChapterOptionButton")
-	if ch_opt is OptionButton:
-		_assert_eq((ch_opt as OptionButton).item_count, 4, "MainMenu chapter picker has exactly 4 entries")
-		_assert_true(not (ch_opt as OptionButton).is_item_disabled(0), "MainMenu chapter 1 unlocked by default")
-		_assert_true((ch_opt as OptionButton).is_item_disabled(1), "MainMenu chapter 2 locked by default")
-		_assert_true((ch_opt as OptionButton).is_item_disabled(2), "MainMenu chapter 3 locked by default")
-		_assert_true((ch_opt as OptionButton).is_item_disabled(3), "MainMenu chapter 4 locked by default")
-	else:
-		_fail("MainMenu missing ChapterOptionButton")
+	var stage_overlay_init: Node = menu.get_node_or_null("StageSelectOverlay")
+	_assert_true(menu.get_node_or_null("ChapterSelectOverlay") == null, "MainMenu does not use a separate chapter select overlay")
+	_assert_true(stage_overlay_init is Control, "MainMenu has StageSelectOverlay")
 
 	menu.call("_on_new_game_pressed")
 	await process_frame
-	var level_overlay: Node = menu.get_node_or_null("LevelSelectOverlay")
-	_assert_true(level_overlay is Control and (level_overlay as Control).visible, "MainMenu Play opens level select overlay")
-	var ch2_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/ChapterGrid/Chapter2Button")
+	_assert_eq(int(game_manager.call("get_unlocked_stage_count", 1)), 1, "New Game resets chapter 1 to only stage 1 unlocked")
+	_assert_true(not bool(game_manager.call("is_chapter_unlocked", 2)), "New Game locks chapter 2 by default")
+	var stage_overlay: Node = menu.get_node_or_null("StageSelectOverlay")
+	_assert_true(stage_overlay is Control and (stage_overlay as Control).visible, "MainMenu Play opens stage select overlay")
+	var ch1_button: Node = menu.get_node_or_null("StageSelectOverlay/Panel/ChapterGrid/Chapter1Button")
+	var ch2_button: Node = menu.get_node_or_null("StageSelectOverlay/Panel/ChapterGrid/Chapter2Button")
+	_assert_true(ch1_button is Button and not (ch1_button as Button).disabled, "MainMenu chapter 1 unlocked by default")
 	_assert_true(ch2_button is Button and (ch2_button as Button).disabled, "MainMenu chapter 2 button locked by default")
-	var stage1_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage01Button")
-	var stage2_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage02Button")
+	var stage1_button: Node = menu.get_node_or_null("StageSelectOverlay/Panel/StageGrid/Stage01Button")
+	var stage2_button: Node = menu.get_node_or_null("StageSelectOverlay/Panel/StageGrid/Stage02Button")
 	_assert_true(stage1_button is Button and not (stage1_button as Button).disabled, "MainMenu stage 1 unlocked by default")
 	_assert_true(stage2_button is Button and (stage2_button as Button).disabled, "MainMenu stage 2 locked by default")
-	menu.call("_on_start_selected_pressed")
+	if stage1_button is Button:
+		var stage1_card := (stage1_button as Button).get_node_or_null("CardTexture") as TextureRect
+		var stage1_icon_path := str(stage1_card.texture.resource_path) if stage1_card != null and stage1_card.texture != null else ""
+		_assert_eq(stage1_icon_path.get_file(), "Dummy.png", "Unlocked stage uses Dummy.png")
+		var stage1_scale := stage1_card.scale if stage1_card != null else Vector2.ZERO
+		_assert_true(absf(stage1_scale.x - 1.0) < 0.01 and absf(stage1_scale.y - 1.0) < 0.01, "Unlocked stage keeps base scale")
+		var number_label: Node = (stage1_button as Button).get_node_or_null("NumberLabel")
+		_assert_true(number_label is Label and (number_label as Label).visible and (number_label as Label).text == "1", "Unlocked stage shows number over Dummy.png")
+		var star_badge := (stage1_button as Button).get_node_or_null("StageStarBadge") as TextureRect
+		var star_path := str(star_badge.texture.resource_path) if star_badge != null and star_badge.texture != null else ""
+		_assert_eq(star_path.get_file(), "0-3.png", "Unlocked stage shows default 0-star badge")
+	if stage2_button is Button:
+		var stage2_card := (stage2_button as Button).get_node_or_null("CardTexture") as TextureRect
+		var stage2_icon_path := ""
+		if stage2_card != null and stage2_card.texture != null:
+			if stage2_card.texture is AtlasTexture:
+				stage2_icon_path = str((stage2_card.texture as AtlasTexture).atlas.resource_path)
+			else:
+				stage2_icon_path = str(stage2_card.texture.resource_path)
+		_assert_eq(stage2_icon_path.get_file(), "Locked.png", "Locked stage uses Locked.png")
+		var stage2_scale := stage2_card.scale if stage2_card != null else Vector2.ZERO
+		_assert_true(absf(stage2_scale.x - 1.0) < 0.01 and absf(stage2_scale.y - 1.0) < 0.01, "Locked stage keeps base card scale")
+		var stage2_badge := (stage2_button as Button).get_node_or_null("StageStarBadge") as TextureRect
+		_assert_true(stage2_badge == null or not stage2_badge.visible, "Locked stage hides star badge")
+	if menu.has_method("_on_play_pressed"):
+		game_manager.set("chapters_unlocked", [1, 2])
+		game_manager.set("unlocked_stages_by_chapter", {1: 3, 2: 1})
+		game_manager.set("stage_stars_by_stage_id", {"ch1_stage1": 3})
+		game_manager.set("opened_chests_by_stage", {"ch1_stage3": {"chest_00": true}})
+		game_manager.set("current_chapter", 1)
+		game_manager.set("current_stage_id", "ch1_stage3")
+		inventory_manager.set("permanent_inventory", {"green_tea": 2, "github_cape": 1})
+		menu.call("_on_play_pressed")
+		await process_frame
+		_assert_eq(int(game_manager.call("get_unlocked_stage_count", 1)), 1, "MainMenu Play resets chapter 1 to only stage 1 unlocked")
+		_assert_true(not bool(game_manager.call("is_chapter_unlocked", 2)), "MainMenu Play locks chapter 2 by default")
+		_assert_eq(int(game_manager.call("get_stage_stars", "ch1_stage1")), 0, "MainMenu Play resets earned stage stars")
+		_assert_true(not bool(game_manager.call("is_chest_opened", "ch1_stage3", "chest_00")), "MainMenu Play clears opened chest progress")
+		_assert_true(not bool(inventory_manager.call("has_item", "green_tea")), "MainMenu Play resets inventory progression")
+	_assert_true(menu.get_node_or_null("StageSelectOverlay/ScoreRow") == null, "StageSelect does not show score star/count row")
+	_assert_true(menu.get_node_or_null("StageSelectOverlay/Panel/NavRow") == null, "StageSelect does not show bottom chapter arrow row")
+	if game_manager.has_method("set_stage_stars"):
+		game_manager.call("set_stage_stars", "ch1_stage1", 3)
+	if stage_overlay is Control and stage_overlay.has_method("sync_progress"):
+		stage_overlay.call("sync_progress")
+		await process_frame
+	if menu.has_method("_on_continue_pressed"):
+		menu.call("_on_continue_pressed")
+		await process_frame
+		var continue_overlay: Node = menu.get_node_or_null("StageSelectOverlay")
+		_assert_true(continue_overlay is Control and (continue_overlay as Control).visible, "MainMenu Continue opens stage select overlay")
+	stage1_button = menu.get_node_or_null("StageSelectOverlay/Panel/StageGrid/Stage01Button")
+	if stage1_button is Button:
+		var stage1_badge_3 := (stage1_button as Button).get_node_or_null("StageStarBadge") as TextureRect
+		var badge_path_3 := str(stage1_badge_3.texture.resource_path) if stage1_badge_3 != null and stage1_badge_3.texture != null else ""
+		_assert_eq(badge_path_3.get_file(), "3-3.png", "Unlocked stage updates badge to 3 stars")
+	stage1_button = menu.get_node_or_null("StageSelectOverlay/Panel/StageGrid/Stage01Button")
+	if stage1_button is Button:
+		(stage1_button as Button).pressed.emit()
+		await process_frame
 	await process_frame
 	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage1", "MainMenu default selected stage starts ch1_stage1")
 	_assert_eq(int(game_manager.get("current_state")), 1, "MainMenu selected stage enters PLAYING")
@@ -552,13 +628,18 @@ func _test_menu_and_stage_flow() -> void:
 	else:
 		_fail("GameOverScreen missing RetryButton in fixture")
 	go.call("set_reason", "Test Reason")
-	_assert_eq(reason.text, "Test Reason", "GameOverScreen set_reason")
+	_assert_eq(reason.text, "Test Reason", "GameOverScreen keeps reason internally")
+	_assert_true(not reason.visible, "GameOverScreen hides reason label")
+	if game_manager.has_method("set_stage_stars"):
+		game_manager.call("set_stage_stars", "ch1_stage1", 2)
 	if retry_button_node is Button:
 		(retry_button_node as Button).pressed.emit()
 	else:
 		go.call("_on_retry_pressed")
 	await process_frame
 	_assert_eq(int(game_manager.get("current_state")), 1, "GameOverScreen retry enters PLAYING")
+	if game_manager.has_method("get_stage_stars"):
+		_assert_eq(int(game_manager.call("get_stage_stars", "ch1_stage1")), 0, "GameOverScreen retry marks failed stage as 0 stars")
 
 	# VictoryScreen
 	game_manager.set("current_chapter", 1)
@@ -566,8 +647,11 @@ func _test_menu_and_stage_flow() -> void:
 	var victory_default_chapters: Array[int] = [1]
 	game_manager.set("chapters_unlocked", victory_default_chapters)
 	game_manager.set("unlocked_stages_by_chapter", {1: 1})
+	game_manager.set("stage_stars_by_stage_id", {})
 	game_manager.set("campaign_complete", false)
 	inventory_manager.set("temporary_inventory", {"green_tea": 1})
+	if hp_time_manager != null:
+		hp_time_manager.set("time_remaining", 260.0)
 	var victory := Control.new()
 	victory.set_script(load("res://scenes/menus/VictoryScreen.gd"))
 	var vv := VBoxContainer.new()
@@ -598,6 +682,34 @@ func _test_menu_and_stage_flow() -> void:
 	_assert_true(int(permanent.get("green_tea", 0)) > 0, "VictoryScreen continue confirms loot")
 	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage2", "VictoryScreen continue advances to next stage")
 	_assert_true(not bool(game_manager.get("campaign_complete")), "VictoryScreen continue does not mark campaign complete before final stage")
+	if game_manager.has_method("get_stage_stars"):
+		_assert_eq(int(game_manager.call("get_stage_stars", "ch1_stage1")), 3, "VictoryScreen awards 3 stars when clear time is under 1/3 limit")
+
+	var victory_calc := Control.new()
+	victory_calc.set_script(load("res://scenes/menus/VictoryScreen.gd"))
+	var vc_vbox := VBoxContainer.new()
+	vc_vbox.name = "VBox"
+	victory_calc.add_child(vc_vbox)
+	for label_name in ["TitleLabel", "LootLabel"]:
+		var label := Label.new()
+		label.name = label_name
+		vc_vbox.add_child(label)
+	for button_name in ["ContinueButton", "MainMenuButton"]:
+		var button := Button.new()
+		button.name = button_name
+		vc_vbox.add_child(button)
+	root.add_child(victory_calc)
+	await process_frame
+	if hp_time_manager != null:
+		hp_time_manager.set("time_remaining", 180.0)
+		_assert_eq(int(victory_calc.call("_calculate_stage_stars", false)), 2, "VictoryScreen awards 2 stars when elapsed time is under 2/3 limit")
+		hp_time_manager.set("time_remaining", 30.0)
+		_assert_eq(int(victory_calc.call("_calculate_stage_stars", false)), 1, "VictoryScreen awards 1 star when stage is cleared late but before timeout")
+		hp_time_manager.set("time_remaining", 0.0)
+		_assert_eq(int(victory_calc.call("_calculate_stage_stars", false)), 0, "VictoryScreen awards 0 stars when time is already expired")
+		_assert_eq(int(victory_calc.call("_calculate_stage_stars", true)), 0, "VictoryScreen awards 0 stars when failed flag is true")
+	victory_calc.queue_free()
+	await process_frame
 
 	game_manager.set("current_chapter", 4)
 	game_manager.set("current_stage_id", "ch4_stage5")
@@ -610,17 +722,46 @@ func _test_menu_and_stage_flow() -> void:
 	_assert_true(bool(final_result.get("campaign_complete", false)), "Final stage clear marks campaign complete")
 	_assert_true(not bool(final_result.get("has_next_stage", true)), "Final stage clear has no next stage")
 	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch4_stage5", "Final stage clear does not loop to ch4_stage1")
+	if game_manager.has_method("set_stage_stars") and game_manager.has_method("get_stage_stars"):
+		game_manager.call("set_stage_stars", "ch2_stage3", 2)
+		game_manager.call("_save_game")
+		game_manager.set("stage_stars_by_stage_id", {})
+		game_manager.call("_load_save")
+		_assert_eq(int(game_manager.call("get_stage_stars", "ch2_stage3")), 2, "GameManager persists stage star data across save/load")
+
+	var victory_scene_real: PackedScene = load("res://scenes/menus/VictoryScreen.tscn")
+	var victory_real := victory_scene_real.instantiate() as Control
+	root.add_child(victory_real)
+	await process_frame
+	var expected_buttons := {
+		"RetryButton": "_on_retry_pressed",
+		"ContinueButton": "_on_continue_pressed",
+		"MainMenuButton": "_on_main_menu_pressed"
+	}
+	for button_name in expected_buttons.keys():
+		var button := victory_real.get_node_or_null("ButtonsRow/%s" % button_name) as Button
+		_assert_true(button != null, "VictoryScreen scene exposes %s in ButtonsRow" % button_name)
+		if button == null:
+			continue
+		_assert_true(button.pressed.is_connected(Callable(victory_real, str(expected_buttons[button_name]))), "VictoryScreen connects %s signal on real scene nodes" % button_name)
+		_assert_true(button.icon != null, "VictoryScreen styles %s icon on real scene nodes" % button_name)
+	victory_real.queue_free()
+	await process_frame
 
 	# Restore state
 	game_manager.set("current_chapter", int(snapshot["chapter"]))
 	game_manager.set("current_stage_id", str(snapshot["stage"]))
 	game_manager.set("chapters_unlocked", snapshot["unlocked"])
 	game_manager.set("unlocked_stages_by_chapter", snapshot["stage_unlocks"])
+	game_manager.set("stage_stars_by_stage_id", snapshot["stage_stars"])
+	game_manager.set("opened_chests_by_stage", snapshot["opened_chests"])
 	game_manager.set("campaign_complete", bool(snapshot["campaign_complete"]))
 	if game_manager.has_method("set_state"):
 		game_manager.call("set_state", int(snapshot["state"]))
 	inventory_manager.set("permanent_inventory", snapshot["perm"])
 	inventory_manager.set("temporary_inventory", snapshot["temp"])
+	if hp_time_manager != null:
+		hp_time_manager.set("time_remaining", float(snapshot["time_remaining"]))
 
 
 func _collect_gd_files(dir_path: String, out: Array[String]) -> void:

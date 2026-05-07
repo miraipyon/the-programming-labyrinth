@@ -27,6 +27,7 @@ func _run_suite() -> void:
 	await _test_inventory_panel_applies_consumables()
 	await _test_maze_hud_applies_items_immediately()
 	_test_artifact_damage_flow()
+	_test_stage_failure_consumes_used_artifacts()
 	_restore_state()
 
 
@@ -169,6 +170,33 @@ func _test_maze_hud_applies_items_immediately() -> void:
 	await get_tree().process_frame
 
 
+func _test_stage_failure_consumes_used_artifacts() -> void:
+	var inventory := _inventory_manager()
+	_assert_true(inventory != null, "InventoryManager exists for failure penalty test")
+	if inventory == null:
+		return
+
+	inventory.call("init_for_stage")
+	inventory.set("permanent_inventory", {"runtime_patch": 1, "github_cape": 2, "green_tea": 1})
+	inventory.call("register_artifact_use", "runtime_patch")
+	inventory.call("register_artifact_use", "github_cape")
+	inventory.call("register_artifact_use", "github_cape")
+
+	var before_fail: Dictionary = inventory.get("permanent_inventory")
+	_assert_eq(int(before_fail.get("runtime_patch", 0)), 1, "Artifact remains before stage failure")
+	_assert_eq(int(before_fail.get("github_cape", 0)), 2, "Multiple artifact stacks remain before stage failure")
+
+	inventory.call("discard_loot")
+	var after_fail: Dictionary = inventory.get("permanent_inventory")
+	_assert_true(not after_fail.has("runtime_patch"), "Used artifact is removed after stage failure")
+	_assert_true(not after_fail.has("github_cape"), "All used artifact stacks are consumed after stage failure")
+	_assert_eq(int(after_fail.get("green_tea", 0)), 1, "Unused consumable remains unchanged after stage failure")
+
+	inventory.call("discard_loot")
+	var after_retry_discard: Dictionary = inventory.get("permanent_inventory")
+	_assert_eq(int(after_retry_discard.get("green_tea", 0)), 1, "Repeated discard on retry does not remove extra items")
+
+
 func _capture_state() -> void:
 	var inventory := _inventory_manager()
 	var hp_time := _hp_time_manager()
@@ -176,6 +204,7 @@ func _capture_state() -> void:
 	if inventory != null:
 		_snapshot["permanent_inventory"] = inventory.get("permanent_inventory").duplicate(true)
 		_snapshot["temporary_inventory"] = inventory.get("temporary_inventory").duplicate(true)
+		_snapshot["used_artifacts_in_stage"] = inventory.get("_used_artifacts_in_stage").duplicate(true)
 	if hp_time != null:
 		_snapshot["max_hp"] = int(hp_time.get("max_hp"))
 		_snapshot["current_hp"] = int(hp_time.get("current_hp"))
@@ -190,6 +219,8 @@ func _restore_state() -> void:
 	if inventory != null and _snapshot.has("permanent_inventory"):
 		inventory.set("permanent_inventory", _snapshot["permanent_inventory"])
 		inventory.set("temporary_inventory", _snapshot["temporary_inventory"])
+		if _snapshot.has("used_artifacts_in_stage"):
+			inventory.set("_used_artifacts_in_stage", _snapshot["used_artifacts_in_stage"])
 		if inventory.has_signal("inventory_changed"):
 			inventory.emit_signal("inventory_changed")
 	if hp_time != null and _snapshot.has("current_hp"):

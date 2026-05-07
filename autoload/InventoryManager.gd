@@ -12,12 +12,21 @@ signal item_used(item_id: String, result: Dictionary)
 # temporary_inventory: loot nhặt trong stage hiện tại (mất nếu thua)
 var permanent_inventory: Dictionary = {}  # {"item_id": count}
 var temporary_inventory: Dictionary = {}  # {"item_id": count}
+var _used_artifacts_in_stage: Dictionary = {}  # {"artifact_id": used_count}
+
+
+func reset_all_progress() -> void:
+	permanent_inventory.clear()
+	temporary_inventory.clear()
+	_used_artifacts_in_stage.clear()
+	inventory_changed.emit()
 
 
 # --- Init ---
 func init_for_stage() -> void:
 	# Xóa temporary_inventory (bắt đầu stage mới)
 	temporary_inventory.clear()
+	_used_artifacts_in_stage.clear()
 
 	# Emit inventory_changed
 	inventory_changed.emit()
@@ -66,8 +75,12 @@ func confirm_loot() -> void:
 
 func discard_loot() -> void:
 	# Gọi khi THUA stage
+	# Artifact đã kích hoạt trong màn sẽ bị mất khi thua.
+	_consume_used_artifacts_on_failure()
+
 	# Xóa temporary_inventory (mất hết loot)
 	temporary_inventory.clear()
+	_used_artifacts_in_stage.clear()
 
 	# Emit inventory_changed
 	inventory_changed.emit()
@@ -150,3 +163,30 @@ func use_item(item_id: String) -> Dictionary:
 
 	item_used.emit(key, result)
 	return result
+
+
+func register_artifact_use(item_id: String) -> void:
+	var key := item_id.strip_edges()
+	if key.is_empty():
+		return
+	if not has_permanent_item(key):
+		return
+	_used_artifacts_in_stage[key] = int(_used_artifacts_in_stage.get(key, 0)) + 1
+
+
+func _consume_used_artifacts_on_failure() -> void:
+	for item_id_variant in _used_artifacts_in_stage.keys():
+		var item_id := str(item_id_variant)
+		var used_count := maxi(int(_used_artifacts_in_stage.get(item_id_variant, 0)), 0)
+		if used_count <= 0:
+			continue
+
+		var current_count := maxi(int(permanent_inventory.get(item_id, 0)), 0)
+		if current_count <= 0:
+			continue
+
+		var remaining := maxi(current_count - used_count, 0)
+		if remaining > 0:
+			permanent_inventory[item_id] = remaining
+		else:
+			permanent_inventory.erase(item_id)

@@ -118,6 +118,20 @@ func _initialize() -> void:
 		if not bool(game_manager.get("campaign_complete")):
 			failures.append("_load_save did not restore campaign_complete")
 
+		if game_manager.has_method("mark_chest_opened") and game_manager.has_method("is_chest_opened"):
+			game_manager.call("mark_chest_opened", "ch2_stage1", "chest_00")
+			if not bool(game_manager.call("is_chest_opened", "ch2_stage1", "chest_00")):
+				failures.append("mark_chest_opened did not mark chest as opened")
+			game_manager.set("opened_chests_by_stage", {})
+			if game_manager.has_method("_load_save"):
+				game_manager.call("_load_save")
+			if not bool(game_manager.call("is_chest_opened", "ch2_stage1", "chest_00")):
+				failures.append("_load_save did not restore opened chest progress")
+			if game_manager.has_method("reset_campaign_progress"):
+				game_manager.call("reset_campaign_progress")
+			if bool(game_manager.call("is_chest_opened", "ch2_stage1", "chest_00")):
+				failures.append("reset_campaign_progress should clear opened chest progress")
+
 		# Data query
 		var stage_variant: Variant = data_manager.call("get_stage_data", "ch1_stage1") if data_manager.has_method("get_stage_data") else {}
 		var stage: Dictionary = stage_variant if typeof(stage_variant) == TYPE_DICTIONARY else {}

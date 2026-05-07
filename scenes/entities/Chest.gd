@@ -6,6 +6,7 @@ signal chest_opened(loot_item_id: String)
 
 # --- Exports ---
 @export var chest_type: String = "normal"
+@export var chest_id: String = ""
 
 # --- Sprites ---
 const NORMAL_CHEST_CLOSED := "res://assets/chests/silver_chest/close.png"
@@ -32,6 +33,7 @@ func open_chest() -> String:
 		return ""
 
 	is_opened = true
+	_persist_opened_state()
 	var loot_id: String = ""
 
 	if DataManager:
@@ -43,6 +45,22 @@ func open_chest() -> String:
 
 	_update_appearance()
 	return loot_id
+
+
+func _persist_opened_state() -> void:
+	var game_manager: Node = get_node_or_null("/root/GameManager")
+	if game_manager == null or not game_manager.has_method("mark_chest_opened"):
+		return
+
+	var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
+	if stage_id.is_empty():
+		return
+
+	var chest_key := chest_id.strip_edges()
+	if chest_key.is_empty():
+		chest_key = "pos_%d_%d_%s" % [int(round(position.x)), int(round(position.y)), chest_type]
+		chest_id = chest_key
+	game_manager.call("mark_chest_opened", stage_id, chest_key)
 
 
 # --- Appearance ---

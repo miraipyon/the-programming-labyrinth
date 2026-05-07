@@ -28,6 +28,8 @@ var current_chapter: int = 1
 var current_stage_id: String = ""
 var chapters_unlocked: Array[int] = [1]  # Chapter 1 mở mặc định
 var unlocked_stages_by_chapter: Dictionary = {1: 1}  # chapter -> highest unlocked stage number
+var stage_stars_by_stage_id: Dictionary = {}  # stage_id -> 0..3 stars
+var opened_chests_by_stage: Dictionary = {}  # stage_id -> {chest_id: true}
 var campaign_complete: bool = false
 
 # --- Lifecycle ---
@@ -70,6 +72,18 @@ func resume_game() -> void:
 func go_to_main_menu() -> void:
 	set_state(GameState.MENU)
 	_change_scene("res://scenes/menus/MainMenu.tscn")
+
+
+func reset_campaign_progress() -> void:
+	current_chapter = 1
+	current_stage_id = _default_stage_for_chapter(1)
+	chapters_unlocked = [1]
+	unlocked_stages_by_chapter = {1: 1}
+	stage_stars_by_stage_id.clear()
+	opened_chests_by_stage.clear()
+	campaign_complete = false
+	_save_game()
+	print("[GameManager] Progress reset to new game defaults.")
 
 # Ham nay hien tai chua co MazeLevel.tscn
 func start_stage(chapter: int, stage_id: String) -> void:
@@ -139,11 +153,64 @@ func is_stage_unlocked(chapter: int, stage_id: String) -> bool:
 
 	return stage_number <= get_unlocked_stage_count(chapter_safe)
 
+
+func set_stage_stars(stage_id: String, stars: int) -> void:
+	var key := stage_id.strip_edges()
+	if key.is_empty():
+		return
+	var clamped_stars := clampi(stars, 0, 3)
+	if int(stage_stars_by_stage_id.get(key, -1)) == clamped_stars:
+		return
+	stage_stars_by_stage_id[key] = clamped_stars
+	_save_game()
+
+
+func get_stage_stars(stage_id: String) -> int:
+	var key := stage_id.strip_edges()
+	if key.is_empty():
+		return 0
+	return clampi(int(stage_stars_by_stage_id.get(key, stage_stars_by_stage_id.get(str(key), 0))), 0, 3)
+
+
+func get_all_stage_stars() -> Dictionary:
+	return stage_stars_by_stage_id.duplicate(true)
+
+
+func mark_chest_opened(stage_id: String, chest_id: String) -> void:
+	var stage_key := stage_id.strip_edges()
+	var chest_key := chest_id.strip_edges()
+	if stage_key.is_empty() or chest_key.is_empty():
+		return
+
+	var stage_entry_variant: Variant = opened_chests_by_stage.get(stage_key, {})
+	var stage_entry: Dictionary = stage_entry_variant if typeof(stage_entry_variant) == TYPE_DICTIONARY else {}
+	if bool(stage_entry.get(chest_key, false)):
+		return
+
+	stage_entry[chest_key] = true
+	opened_chests_by_stage[stage_key] = stage_entry
+	_save_game()
+
+
+func is_chest_opened(stage_id: String, chest_id: String) -> bool:
+	var stage_key := stage_id.strip_edges()
+	var chest_key := chest_id.strip_edges()
+	if stage_key.is_empty() or chest_key.is_empty():
+		return false
+
+	var stage_entry_variant: Variant = opened_chests_by_stage.get(stage_key, {})
+	if typeof(stage_entry_variant) != TYPE_DICTIONARY:
+		return false
+	var stage_entry: Dictionary = stage_entry_variant
+	return bool(stage_entry.get(chest_key, false))
+
 # --- Save / Load ---
 func _save_game() -> void:
 	var save_data = {
 		"chapters_unlocked": chapters_unlocked,
 		"unlocked_stages_by_chapter": _serialize_stage_unlocks(),
+		"stage_stars_by_stage_id": _serialize_stage_stars(),
+		"opened_chests_by_stage": _serialize_opened_chests(),
 		"current_chapter": current_chapter,
 		"current_stage_id": current_stage_id,
 		"campaign_complete": campaign_complete
@@ -169,6 +236,8 @@ func _load_save() -> void:
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
 		unlocked_stages_by_chapter = {1: 1}
+		stage_stars_by_stage_id = {}
+		opened_chests_by_stage = {}
 		campaign_complete = false
 		return
 
@@ -179,6 +248,8 @@ func _load_save() -> void:
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
 		unlocked_stages_by_chapter = {1: 1}
+		stage_stars_by_stage_id = {}
+		opened_chests_by_stage = {}
 		campaign_complete = false
 		return
 
@@ -194,6 +265,8 @@ func _load_save() -> void:
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
 		unlocked_stages_by_chapter = {1: 1}
+		stage_stars_by_stage_id = {}
+		opened_chests_by_stage = {}
 		campaign_complete = false
 		return
 
@@ -222,6 +295,8 @@ func _load_save() -> void:
 		chapters_unlocked.sort()
 		campaign_complete = bool(data.get("campaign_complete", false))
 		_load_stage_unlocks(data)
+		_load_stage_stars(data)
+		_load_opened_chests(data)
 
 		print("[GameManager] Saved data loaded successfully!")
 	else:
@@ -229,6 +304,8 @@ func _load_save() -> void:
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
 		unlocked_stages_by_chapter = {1: 1}
+		stage_stars_by_stage_id = {}
+		opened_chests_by_stage = {}
 		campaign_complete = false
 
 func save_on_stage_clear() -> Dictionary:
@@ -342,6 +419,41 @@ func _serialize_stage_unlocks() -> Dictionary:
 	return result
 
 
+func _serialize_stage_stars() -> Dictionary:
+	var result := {}
+	for stage_id_variant in stage_stars_by_stage_id.keys():
+		var stage_id := str(stage_id_variant).strip_edges()
+		if stage_id.is_empty():
+			continue
+		var stars := clampi(int(stage_stars_by_stage_id.get(stage_id_variant, 0)), 0, 3)
+		result[stage_id] = stars
+	return result
+
+
+func _serialize_opened_chests() -> Dictionary:
+	var result := {}
+	for stage_id_variant in opened_chests_by_stage.keys():
+		var stage_id := str(stage_id_variant).strip_edges()
+		if stage_id.is_empty():
+			continue
+		var raw_stage_entry: Variant = opened_chests_by_stage.get(stage_id_variant, {})
+		if typeof(raw_stage_entry) != TYPE_DICTIONARY:
+			continue
+		var stage_entry: Dictionary = raw_stage_entry
+		var chest_ids: Array[String] = []
+		for chest_id_variant in stage_entry.keys():
+			var chest_id := str(chest_id_variant).strip_edges()
+			if chest_id.is_empty():
+				continue
+			if bool(stage_entry.get(chest_id_variant, false)):
+				chest_ids.append(chest_id)
+		if chest_ids.is_empty():
+			continue
+		chest_ids.sort()
+		result[stage_id] = chest_ids
+	return result
+
+
 func _load_stage_unlocks(save_data: Dictionary) -> void:
 	unlocked_stages_by_chapter.clear()
 
@@ -362,6 +474,44 @@ func _load_stage_unlocks(save_data: Dictionary) -> void:
 
 	if int(unlocked_stages_by_chapter.get(1, 0)) <= 0:
 		unlocked_stages_by_chapter[1] = 1
+
+
+func _load_stage_stars(save_data: Dictionary) -> void:
+	stage_stars_by_stage_id.clear()
+	var raw_stars: Variant = save_data.get("stage_stars_by_stage_id", {})
+	if typeof(raw_stars) != TYPE_DICTIONARY:
+		return
+
+	var stars_dict: Dictionary = raw_stars
+	for stage_id_variant in stars_dict.keys():
+		var stage_id := str(stage_id_variant).strip_edges()
+		if stage_id.is_empty():
+			continue
+		stage_stars_by_stage_id[stage_id] = clampi(int(stars_dict[stage_id_variant]), 0, 3)
+
+
+func _load_opened_chests(save_data: Dictionary) -> void:
+	opened_chests_by_stage.clear()
+	var raw_opened: Variant = save_data.get("opened_chests_by_stage", {})
+	if typeof(raw_opened) != TYPE_DICTIONARY:
+		return
+
+	var opened_dict: Dictionary = raw_opened
+	for stage_id_variant in opened_dict.keys():
+		var stage_id := str(stage_id_variant).strip_edges()
+		if stage_id.is_empty():
+			continue
+		var chest_ids_variant: Variant = opened_dict[stage_id_variant]
+		if typeof(chest_ids_variant) != TYPE_ARRAY:
+			continue
+		var stage_entry := {}
+		for chest_id_variant in Array(chest_ids_variant):
+			var chest_id := str(chest_id_variant).strip_edges()
+			if chest_id.is_empty():
+				continue
+			stage_entry[chest_id] = true
+		if not stage_entry.is_empty():
+			opened_chests_by_stage[stage_id] = stage_entry
 
 
 func _migrate_stage_unlocks_from_legacy_save() -> void:
