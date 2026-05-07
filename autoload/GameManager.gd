@@ -27,6 +27,7 @@ var current_state: GameState = GameState.MENU
 var current_chapter: int = 1
 var current_stage_id: String = ""
 var chapters_unlocked: Array[int] = [1]  # Chapter 1 mở mặc định
+var unlocked_stages_by_chapter: Dictionary = {1: 1}  # chapter -> highest unlocked stage number
 var campaign_complete: bool = false
 
 # --- Lifecycle ---
@@ -103,6 +104,7 @@ func exit_combat() -> void:
 # --- Chapter Progression ---
 func unlock_chapter(chapter: int) -> void:
 	var chapter_safe := clampi(chapter, 1, TOTAL_CHAPTERS)
+	_unlock_stage_number(chapter_safe, 1)
 	if not chapters_unlocked.has(chapter_safe):
 		chapters_unlocked.append(chapter_safe)
 		chapters_unlocked.sort()
@@ -113,10 +115,35 @@ func unlock_chapter(chapter: int) -> void:
 func is_chapter_unlocked(chapter: int) -> bool:
 	return chapters_unlocked.has(chapter)
 
+
+func get_unlocked_stage_count(chapter: int) -> int:
+	var chapter_safe := clampi(chapter, 1, TOTAL_CHAPTERS)
+	if campaign_complete:
+		return _stage_count_for_chapter(chapter_safe)
+
+	var count := int(unlocked_stages_by_chapter.get(chapter_safe, unlocked_stages_by_chapter.get(str(chapter_safe), 0)))
+	if count <= 0 and chapters_unlocked.has(chapter_safe):
+		count = 1
+
+	return clampi(count, 0, _stage_count_for_chapter(chapter_safe))
+
+
+func is_stage_unlocked(chapter: int, stage_id: String) -> bool:
+	var chapter_safe := clampi(chapter, 1, TOTAL_CHAPTERS)
+	if not is_chapter_unlocked(chapter_safe):
+		return false
+
+	var stage_number := _extract_stage_number(stage_id)
+	if stage_number <= 0:
+		stage_number = 1
+
+	return stage_number <= get_unlocked_stage_count(chapter_safe)
+
 # --- Save / Load ---
 func _save_game() -> void:
 	var save_data = {
 		"chapters_unlocked": chapters_unlocked,
+		"unlocked_stages_by_chapter": _serialize_stage_unlocks(),
 		"current_chapter": current_chapter,
 		"current_stage_id": current_stage_id,
 		"campaign_complete": campaign_complete
@@ -141,6 +168,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		unlocked_stages_by_chapter = {1: 1}
 		campaign_complete = false
 		return
 
@@ -150,6 +178,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		unlocked_stages_by_chapter = {1: 1}
 		campaign_complete = false
 		return
 
@@ -164,6 +193,7 @@ func _load_save() -> void:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		unlocked_stages_by_chapter = {1: 1}
 		campaign_complete = false
 		return
 
@@ -191,15 +221,24 @@ func _load_save() -> void:
 
 		chapters_unlocked.sort()
 		campaign_complete = bool(data.get("campaign_complete", false))
+		_load_stage_unlocks(data)
 
 		print("[GameManager] Saved data loaded successfully!")
 	else:
 		current_chapter = 1
 		chapters_unlocked = [1]
 		current_stage_id = _default_stage_for_chapter(current_chapter)
+		unlocked_stages_by_chapter = {1: 1}
 		campaign_complete = false
 
 func save_on_stage_clear() -> Dictionary:
+	var cleared_chapter := current_chapter
+	var cleared_stage_id := current_stage_id.strip_edges()
+	var cleared_stage_number := _extract_stage_number(cleared_stage_id)
+	if cleared_stage_number <= 0:
+		cleared_stage_number = 1
+	_unlock_stage_number(cleared_chapter, cleared_stage_number)
+
 	var next_chapter := current_chapter
 	var next_stage_id := current_stage_id.strip_edges()
 	var has_next_stage := false
@@ -213,12 +252,16 @@ func save_on_stage_clear() -> Dictionary:
 		if current_index >= 0 and current_index < chapter_stages.size() - 1:
 			next_stage_id = _stage_id_from_entry(chapter_stages[current_index + 1])
 			has_next_stage = true
+			_unlock_stage_number(current_chapter, _extract_stage_number(next_stage_id))
 		elif current_index == -1 and chapter_stages.size() > 0:
 			next_stage_id = _stage_id_from_entry(chapter_stages[0])
 			has_next_stage = true
+			_unlock_stage_number(current_chapter, _extract_stage_number(next_stage_id))
 		elif current_chapter >= TOTAL_CHAPTERS:
 			completed_campaign = true
+			_unlock_stage_number(current_chapter, _stage_count_for_chapter(current_chapter))
 		else:
+			_unlock_stage_number(current_chapter, _stage_count_for_chapter(current_chapter))
 			next_chapter = current_chapter + 1
 			if not chapters_unlocked.has(next_chapter):
 				chapters_unlocked.append(next_chapter)
@@ -229,12 +272,20 @@ func save_on_stage_clear() -> Dictionary:
 			if next_chapter_stages.size() > 0:
 				next_stage_id = _stage_id_from_entry(next_chapter_stages[0])
 				has_next_stage = true
+				_unlock_stage_number(next_chapter, 1)
 	elif current_chapter >= TOTAL_CHAPTERS:
 		completed_campaign = true
+		_unlock_stage_number(current_chapter, _stage_count_for_chapter(current_chapter))
 	else:
+		_unlock_stage_number(current_chapter, _stage_count_for_chapter(current_chapter))
 		next_chapter = current_chapter + 1
 		next_stage_id = _default_stage_for_chapter(next_chapter)
 		has_next_stage = true
+		if not chapters_unlocked.has(next_chapter):
+			chapters_unlocked.append(next_chapter)
+			chapters_unlocked.sort()
+			chapter_unlocked.emit(next_chapter)
+		_unlock_stage_number(next_chapter, 1)
 
 	if has_next_stage and next_stage_id.is_empty():
 		next_stage_id = _default_stage_for_chapter(next_chapter)
@@ -280,6 +331,71 @@ func _change_scene(scene_path: String) -> void:
 
 func _default_stage_for_chapter(chapter: int) -> String:
 	return "ch%d_stage1" % clampi(chapter, 1, TOTAL_CHAPTERS)
+
+
+func _serialize_stage_unlocks() -> Dictionary:
+	var result := {}
+	for chapter in range(1, TOTAL_CHAPTERS + 1):
+		var count := int(unlocked_stages_by_chapter.get(chapter, unlocked_stages_by_chapter.get(str(chapter), 0)))
+		if count > 0:
+			result[str(chapter)] = clampi(count, 1, _stage_count_for_chapter(chapter))
+	return result
+
+
+func _load_stage_unlocks(save_data: Dictionary) -> void:
+	unlocked_stages_by_chapter.clear()
+
+	var raw_unlocks: Variant = save_data.get("unlocked_stages_by_chapter", {})
+	if typeof(raw_unlocks) == TYPE_DICTIONARY:
+		var unlocks: Dictionary = raw_unlocks
+		for key_variant in unlocks.keys():
+			var chapter := clampi(int(str(key_variant)), 1, TOTAL_CHAPTERS)
+			var count := clampi(int(unlocks[key_variant]), 1, _stage_count_for_chapter(chapter))
+			unlocked_stages_by_chapter[chapter] = maxi(int(unlocked_stages_by_chapter.get(chapter, 0)), count)
+
+	if unlocked_stages_by_chapter.is_empty():
+		_migrate_stage_unlocks_from_legacy_save()
+
+	if not chapters_unlocked.has(1):
+		chapters_unlocked.append(1)
+		chapters_unlocked.sort()
+
+	if int(unlocked_stages_by_chapter.get(1, 0)) <= 0:
+		unlocked_stages_by_chapter[1] = 1
+
+
+func _migrate_stage_unlocks_from_legacy_save() -> void:
+	var current_stage_number := _extract_stage_number(current_stage_id)
+	if current_stage_number <= 0:
+		current_stage_number = 1
+
+	for chapter in chapters_unlocked:
+		var chapter_int := clampi(int(chapter), 1, TOTAL_CHAPTERS)
+		var unlocked_count := 1
+		if campaign_complete or chapter_int < current_chapter:
+			unlocked_count = _stage_count_for_chapter(chapter_int)
+		elif chapter_int == current_chapter:
+			unlocked_count = current_stage_number
+
+		unlocked_stages_by_chapter[chapter_int] = clampi(unlocked_count, 1, _stage_count_for_chapter(chapter_int))
+
+
+func _unlock_stage_number(chapter: int, stage_number: int) -> void:
+	var chapter_safe := clampi(chapter, 1, TOTAL_CHAPTERS)
+	var stage_safe := clampi(stage_number, 1, _stage_count_for_chapter(chapter_safe))
+	var previous := int(unlocked_stages_by_chapter.get(chapter_safe, unlocked_stages_by_chapter.get(str(chapter_safe), 0)))
+	if stage_safe > previous:
+		unlocked_stages_by_chapter[chapter_safe] = stage_safe
+
+
+func _stage_count_for_chapter(chapter: int) -> int:
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if data_manager != null and data_manager.has_method("get_stages_by_chapter"):
+		var stages_variant: Variant = data_manager.call("get_stages_by_chapter", clampi(chapter, 1, TOTAL_CHAPTERS))
+		if typeof(stages_variant) == TYPE_ARRAY and Array(stages_variant).size() > 0:
+			return Array(stages_variant).size()
+
+	return 5
 
 
 func _sorted_stage_list(raw: Variant) -> Array:

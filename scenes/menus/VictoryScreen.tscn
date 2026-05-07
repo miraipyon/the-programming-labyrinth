@@ -1,6 +1,7 @@
-[gd_scene format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/menus/VictoryScreen.gd" id="1_victory"]
+[ext_resource type="Texture2D" path="res://assets_2/png/Scene/LevelComplete_Fullscreen.png" id="2_bg"]
 
 [node name="VictoryScreen" type="Control"]
 process_mode = 3
@@ -12,45 +13,166 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_victory")
 
-[node name="Backdrop" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.06, 0.07, 0.86)
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
 
-[node name="VBox" type="VBoxContainer" parent="."]
-custom_minimum_size = Vector2(420, 240)
+[node name="ReadableShade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.025, 0.025, 0.14)
+
+[node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -210.0
-offset_top = -120.0
-offset_right = 210.0
-offset_bottom = 120.0
+offset_left = -340.0
+offset_top = -194.0
+offset_right = 340.0
+offset_bottom = -108.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 10
-
-[node name="TitleLabel" type="Label" parent="VBox"]
-layout_mode = 2
+text = "LEVEL COMPLETE"
 horizontal_alignment = 1
-text = "Victory"
 
-[node name="LootLabel" type="Label" parent="VBox"]
+[node name="StageStars" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -171.0
+offset_top = -80.0
+offset_right = 171.0
+offset_bottom = 26.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Star1" type="TextureRect" parent="StageStars"]
+custom_minimum_size = Vector2(98, 98)
 layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star2" type="TextureRect" parent="StageStars"]
+custom_minimum_size = Vector2(98, 98)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Star3" type="TextureRect" parent="StageStars"]
+custom_minimum_size = Vector2(98, 98)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ScoreLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -239.0
+offset_top = 26.0
+offset_right = 239.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "SCORE · 0"
+horizontal_alignment = 1
+
+[node name="ButtonsRow" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -198.0
+offset_top = 130.0
+offset_right = 198.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="RetryButton" type="Button" parent="ButtonsRow"]
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="ButtonsRow"]
+layout_mode = 2
+
+[node name="MainMenuButton" type="Button" parent="ButtonsRow"]
+layout_mode = 2
+
+[node name="LootLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = -130.0
+offset_right = 460.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
 text = "Loot"
+horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="ContinueButton" type="Button" parent="VBox"]
+[node name="VBox" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="VBox"]
+visible = false
 layout_mode = 2
-text = "Continue to Next Stage"
+text = "Stage Cleared"
+
+[node name="LootLabel" type="Label" parent="VBox"]
+visible = false
+layout_mode = 2
+text = "Loot"
+
+[node name="ContinueButton" type="Button" parent="VBox"]
+visible = false
+layout_mode = 2
+text = "Continue"
 
 [node name="MainMenuButton" type="Button" parent="VBox"]
+visible = false
 layout_mode = 2
-text = "Back to Main Menu"
+text = "Main Menu"

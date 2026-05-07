@@ -1,8 +1,14 @@
 ## Menu Tạm Dừng Game
 extends Control
 
+const MenuVisuals := preload("res://scenes/menus/MenuVisuals.gd")
+const ICON_PLAY_PATH := "res://assets_2/png/Button/Icon/Play.png"
+const ICON_REPLAY_PATH := "res://assets_2/png/Button/Icon/Replay.png"
+const ICON_LEVELS_PATH := "res://assets_2/png/Button/Icon/Levels.png"
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	_apply_skin()
 	_connect_button("ResumeButton", _on_resume_pressed)
 	_connect_button("RestartButton", _on_restart_pressed)
 	_connect_button("QuitButton", _on_quit_pressed)
@@ -58,3 +64,40 @@ func _connect_button(node_name: String, callback: Callable) -> void:
 		var button: Button = node
 		if not button.pressed.is_connected(callback):
 			button.pressed.connect(callback)
+
+
+func _apply_skin() -> void:
+	var title_node: Node = get_node_or_null("PauseTitle")
+	if title_node == null:
+		title_node = get_node_or_null("VBox/TitleLabel")
+	if title_node is Label:
+		var title_label: Label = title_node
+		MenuVisuals.style_title(title_label, 72)
+		title_label.text = "PAUSE"
+
+	var resume_button := _find_button("ResumeButton")
+	if resume_button != null:
+		MenuVisuals.style_square_button(resume_button, ICON_PLAY_PATH, Vector2(104, 104))
+		resume_button.text = ""
+		resume_button.tooltip_text = "Resume"
+
+	var restart_button := _find_button("RestartButton")
+	if restart_button != null:
+		MenuVisuals.style_square_button(restart_button, ICON_REPLAY_PATH, Vector2(104, 104))
+		restart_button.text = ""
+		restart_button.tooltip_text = "Restart stage"
+
+	var quit_button := _find_button("QuitButton")
+	if quit_button != null:
+		MenuVisuals.style_square_button(quit_button, ICON_LEVELS_PATH, Vector2(104, 104))
+		quit_button.text = ""
+		quit_button.tooltip_text = "Main menu"
+
+
+func _find_button(node_name: String) -> Button:
+	var node: Node = get_node_or_null(node_name)
+	if node == null:
+		node = get_node_or_null("VBox/%s" % node_name)
+	if node is Button:
+		return node
+	return null

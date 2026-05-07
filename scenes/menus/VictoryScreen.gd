@@ -3,16 +3,46 @@ extends Control
 
 var _stage_clear_committed := false
 var _stage_clear_result: Dictionary = {}
+var _cleared_chapter := 1
+var _cleared_stage_id := "ch1_stage1"
+
+const MenuVisuals := preload("res://scenes/menus/MenuVisuals.gd")
+const ICON_PLAY_PATH := "res://assets_2/png/Button/Icon/Play.png"
+const ICON_HOME_PATH := "res://assets_2/png/Button/Icon/Levels.png"
+const ICON_REPLAY_PATH := "res://assets_2/png/Button/Icon/Replay.png"
+const STAR_ACTIVE_PATH := "res://assets_2/png/Star/Active.png"
+const STAR_UNACTIVE_PATH := "res://assets_2/png/Star/Unactive.png"
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	var game_manager: Node = _get_game_manager()
+	if game_manager != null:
+		_cleared_chapter = maxi(int(game_manager.get("current_chapter")), 1)
+		_cleared_stage_id = str(game_manager.get("current_stage_id")).strip_edges()
+		if _cleared_stage_id.is_empty():
+			_cleared_stage_id = "ch%d_stage1" % _cleared_chapter
+
+	_apply_skin()
+	_connect_button("RetryButton", _on_retry_pressed)
 	_connect_button("ContinueButton", _on_continue_pressed)
 	_connect_button("NextStageButton", _on_continue_pressed)
 	_connect_button("MainMenuButton", _on_main_menu_pressed)
 	_set_title_text("Congratulations! You cleared the stage.")
+	_render_stage_score()
 	_render_temporary_loot()
 	_update_next_button_state()
+
+func _on_retry_pressed() -> void:
+	_commit_stage_clear()
+	var game_manager: Node = _get_game_manager()
+	get_tree().paused = false
+	if game_manager != null and game_manager.has_method("start_stage"):
+		game_manager.call("start_stage", _cleared_chapter, _cleared_stage_id)
+	else:
+		push_warning("[VictoryScreen] GameManager.start_stage() not available.")
+	queue_free()
+
 
 func _on_continue_pressed() -> void:
 	var result := _commit_stage_clear()
@@ -109,10 +139,12 @@ func _update_next_button_state() -> void:
 		return
 
 	if _has_next_stage_after_current():
-		button.text = "Continue to Next Stage"
+		button.text = ""
+		button.tooltip_text = "Continue to next stage"
 		button.disabled = false
 	else:
-		button.text = "No More Stages"
+		button.text = ""
+		button.tooltip_text = "No more stages"
 		button.disabled = true
 
 
@@ -230,3 +262,64 @@ func _set_loot_text(message: String) -> void:
 	fallback_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	fallback_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	add_child(fallback_label)
+
+
+func _render_stage_score() -> void:
+	var score := 0
+	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
+	if hp_time_manager != null:
+		score += maxi(int(hp_time_manager.get("current_hp")), 0) * 10
+		var time_remaining_variant: Variant = hp_time_manager.get("time_remaining")
+		if typeof(time_remaining_variant) == TYPE_FLOAT or typeof(time_remaining_variant) == TYPE_INT:
+			score += maxi(int(round(float(time_remaining_variant))), 0)
+
+	var score_node: Node = get_node_or_null("ScoreLabel")
+	if score_node == null:
+		score_node = get_node_or_null("VBox/ScoreLabel")
+	if score_node is Label:
+		(score_node as Label).text = "SCORE · %d" % score
+
+	var stars := 1
+	if score >= 750:
+		stars = 3
+	elif score >= 350:
+		stars = 2
+
+	for i in range(1, 4):
+		var star_path := "StageStars/Star%d" % i
+		var star_node: Node = get_node_or_null(star_path)
+		if star_node is TextureRect:
+			var star_rect: TextureRect = star_node
+			star_rect.texture = load(STAR_ACTIVE_PATH if i <= stars else STAR_UNACTIVE_PATH)
+
+
+func _apply_skin() -> void:
+	var title_node: Node = get_node_or_null("TitleLabel")
+	if title_node == null:
+		title_node = get_node_or_null("VBox/TitleLabel")
+	if title_node is Label:
+		MenuVisuals.style_title(title_node as Label, 22)
+
+	var loot_node: Node = get_node_or_null("LootLabel")
+	if loot_node == null:
+		loot_node = get_node_or_null("VBox/LootLabel")
+	if loot_node is Label:
+		var loot_label: Label = loot_node
+		loot_label.add_theme_color_override("font_color", Color(0.95, 0.96, 0.86))
+		loot_label.add_theme_font_size_override("font_size", 14)
+
+	var retry_button := _find_button("RetryButton")
+	if retry_button != null:
+		MenuVisuals.style_square_button(retry_button, ICON_REPLAY_PATH, Vector2(104, 104))
+		retry_button.text = ""
+		retry_button.tooltip_text = "Replay stage"
+
+	var continue_button := _find_button("ContinueButton")
+	if continue_button != null:
+		MenuVisuals.style_square_button(continue_button, ICON_PLAY_PATH, Vector2(104, 104))
+		continue_button.text = ""
+
+	var main_menu_button := _find_button("MainMenuButton")
+	if main_menu_button != null:
+		MenuVisuals.style_square_button(main_menu_button, ICON_HOME_PATH, Vector2(104, 104))
+		main_menu_button.text = ""

@@ -1,8 +1,13 @@
 ## Màn hình thất bại (Hết máu hoặc Timeout)
 extends Control
 
+const MenuVisuals := preload("res://scenes/menus/MenuVisuals.gd")
+const ICON_REPLAY_PATH := "res://assets_2/png/Button/Icon/Replay.png"
+const ICON_LEVELS_PATH := "res://assets_2/png/Button/Icon/Levels.png"
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_apply_skin()
 	_connect_button("RetryButton", _on_retry_pressed)
 	_connect_button("QuitButton", _on_quit_pressed)
 
@@ -91,4 +96,41 @@ func _find_reason_node() -> Node:
 		if node is Label or node is RichTextLabel:
 			return node
 
+	return null
+
+
+func _apply_skin() -> void:
+	var title_node: Node = get_node_or_null("GameOverTitle")
+	if title_node is Label:
+		var title_label: Label = title_node
+		MenuVisuals.style_title(title_label, 72)
+		title_label.text = "GAME OVER"
+
+	var reason_node: Node = _find_reason_node()
+	if reason_node is Label:
+		var reason_label: Label = reason_node
+		reason_label.add_theme_font_size_override("font_size", 18)
+		reason_label.add_theme_color_override("font_color", Color(0.86, 0.88, 0.80))
+	elif reason_node is RichTextLabel:
+		(reason_node as RichTextLabel).add_theme_color_override("default_color", Color(0.86, 0.88, 0.80))
+
+	var retry_button := _find_button("RetryButton")
+	if retry_button != null:
+		MenuVisuals.style_square_button(retry_button, ICON_REPLAY_PATH, Vector2(104, 104))
+		retry_button.text = ""
+		retry_button.tooltip_text = "Retry"
+
+	var quit_button := _find_button("QuitButton")
+	if quit_button != null:
+		MenuVisuals.style_square_button(quit_button, ICON_LEVELS_PATH, Vector2(104, 104))
+		quit_button.text = ""
+		quit_button.tooltip_text = "Main menu"
+
+
+func _find_button(node_name: String) -> Button:
+	var node: Node = get_node_or_null(node_name)
+	if node == null:
+		node = get_node_or_null("VBox/%s" % node_name)
+	if node is Button:
+		return node
 	return null

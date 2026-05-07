@@ -456,12 +456,19 @@ func _test_menu_and_stage_flow() -> void:
 		"stage": str(game_manager.get("current_stage_id")),
 		"state": int(game_manager.get("current_state")),
 		"unlocked": game_manager.get("chapters_unlocked"),
+		"stage_unlocks": game_manager.get("unlocked_stages_by_chapter"),
 		"campaign_complete": bool(game_manager.get("campaign_complete")),
 		"perm": inventory_manager.get("permanent_inventory"),
 		"temp": inventory_manager.get("temporary_inventory")
 	}
 
 	# MainMenu
+	var default_chapters: Array[int] = [1]
+	game_manager.set("current_chapter", 1)
+	game_manager.set("current_stage_id", "ch1_stage1")
+	game_manager.set("chapters_unlocked", default_chapters)
+	game_manager.set("unlocked_stages_by_chapter", {1: 1})
+	game_manager.set("campaign_complete", false)
 	var menu_scene: PackedScene = load("res://scenes/menus/MainMenu.tscn")
 	var menu := menu_scene.instantiate()
 	root.add_child(menu)
@@ -479,32 +486,31 @@ func _test_menu_and_stage_flow() -> void:
 		await process_frame
 		var guide_body: Node = menu.get_node_or_null("InfoOverlay/InfoPanel/VBox/ScrollContainer/BodyText")
 		_assert_true(guide_body is RichTextLabel and (guide_body as RichTextLabel).text.find("MAIN OBJECTIVE") != -1, "MainMenu guide modal explains gameplay")
-	# Chapter picker must always have exactly 4 entries (MVP: all chapters visible)
+	# Chapter picker must show all chapters but lock chapters 2-4 by default.
 	var ch_opt: Node = menu.get_node_or_null("VBox/ChapterSelect/ChapterOptionButton")
 	if ch_opt is OptionButton:
 		_assert_eq((ch_opt as OptionButton).item_count, 4, "MainMenu chapter picker has exactly 4 entries")
+		_assert_true(not (ch_opt as OptionButton).is_item_disabled(0), "MainMenu chapter 1 unlocked by default")
+		_assert_true((ch_opt as OptionButton).is_item_disabled(1), "MainMenu chapter 2 locked by default")
+		_assert_true((ch_opt as OptionButton).is_item_disabled(2), "MainMenu chapter 3 locked by default")
+		_assert_true((ch_opt as OptionButton).is_item_disabled(3), "MainMenu chapter 4 locked by default")
 	else:
 		_fail("MainMenu missing ChapterOptionButton")
-	# Selecting Chapter 4 + New Game must start ch4_stage1
-	if ch_opt is OptionButton:
-		var ob: OptionButton = ch_opt as OptionButton
-		var ch4_idx := -1
-		for i in range(ob.item_count):
-			if ob.get_item_id(i) == 4:
-				ch4_idx = i
-				break
-		if ch4_idx >= 0:
-			ob.select(ch4_idx)
-			ob.item_selected.emit(ch4_idx)
-			await process_frame
-			menu.call("_on_new_game_pressed")
-			await process_frame
-			_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch4_stage1", "MainMenu ch4 New Game starts ch4_stage1")
-	else:
-		_fail("MainMenu no ch4 entry for stage test")
+
 	menu.call("_on_new_game_pressed")
 	await process_frame
-	_assert_eq(int(game_manager.get("current_state")), 1, "MainMenu NewGame enters PLAYING")
+	var level_overlay: Node = menu.get_node_or_null("LevelSelectOverlay")
+	_assert_true(level_overlay is Control and (level_overlay as Control).visible, "MainMenu Play opens level select overlay")
+	var ch2_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/ChapterGrid/Chapter2Button")
+	_assert_true(ch2_button is Button and (ch2_button as Button).disabled, "MainMenu chapter 2 button locked by default")
+	var stage1_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage01Button")
+	var stage2_button: Node = menu.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage02Button")
+	_assert_true(stage1_button is Button and not (stage1_button as Button).disabled, "MainMenu stage 1 unlocked by default")
+	_assert_true(stage2_button is Button and (stage2_button as Button).disabled, "MainMenu stage 2 locked by default")
+	menu.call("_on_start_selected_pressed")
+	await process_frame
+	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage1", "MainMenu default selected stage starts ch1_stage1")
+	_assert_eq(int(game_manager.get("current_state")), 1, "MainMenu selected stage enters PLAYING")
 	menu.queue_free()
 
 	# PauseMenu
@@ -557,7 +563,9 @@ func _test_menu_and_stage_flow() -> void:
 	# VictoryScreen
 	game_manager.set("current_chapter", 1)
 	game_manager.set("current_stage_id", "ch1_stage1")
-	game_manager.set("chapters_unlocked", [1])
+	var victory_default_chapters: Array[int] = [1]
+	game_manager.set("chapters_unlocked", victory_default_chapters)
+	game_manager.set("unlocked_stages_by_chapter", {1: 1})
 	game_manager.set("campaign_complete", false)
 	inventory_manager.set("temporary_inventory", {"green_tea": 1})
 	var victory := Control.new()
@@ -593,6 +601,9 @@ func _test_menu_and_stage_flow() -> void:
 
 	game_manager.set("current_chapter", 4)
 	game_manager.set("current_stage_id", "ch4_stage5")
+	var all_chapters: Array[int] = [1, 2, 3, 4]
+	game_manager.set("chapters_unlocked", all_chapters)
+	game_manager.set("unlocked_stages_by_chapter", {1: 5, 2: 5, 3: 5, 4: 5})
 	game_manager.set("campaign_complete", false)
 	var final_result_variant: Variant = game_manager.call("save_on_stage_clear")
 	var final_result: Dictionary = final_result_variant if typeof(final_result_variant) == TYPE_DICTIONARY else {}
@@ -604,6 +615,7 @@ func _test_menu_and_stage_flow() -> void:
 	game_manager.set("current_chapter", int(snapshot["chapter"]))
 	game_manager.set("current_stage_id", str(snapshot["stage"]))
 	game_manager.set("chapters_unlocked", snapshot["unlocked"])
+	game_manager.set("unlocked_stages_by_chapter", snapshot["stage_unlocks"])
 	game_manager.set("campaign_complete", bool(snapshot["campaign_complete"]))
 	if game_manager.has_method("set_state"):
 		game_manager.call("set_state", int(snapshot["state"]))

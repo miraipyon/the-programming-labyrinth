@@ -56,6 +56,7 @@ func _take_snapshot(game_manager: Node, inventory_manager: Node) -> Dictionary:
 			"chapter": int(game_manager.get("current_chapter")),
 			"stage": str(game_manager.get("current_stage_id")),
 			"unlocked": game_manager.get("chapters_unlocked"),
+			"stage_unlocks": game_manager.get("unlocked_stages_by_chapter"),
 			"campaign_complete": bool(game_manager.get("campaign_complete"))
 		}
 
@@ -105,6 +106,8 @@ func _restore_snapshot(game_manager: Node, inventory_manager: Node, snapshot: Di
 			game_manager.set("current_stage_id", str(game_snapshot["stage"]))
 		if game_snapshot.has("unlocked") and typeof(game_snapshot["unlocked"]) == TYPE_ARRAY:
 			game_manager.set("chapters_unlocked", game_snapshot["unlocked"])
+		if game_snapshot.has("stage_unlocks") and typeof(game_snapshot["stage_unlocks"]) == TYPE_DICTIONARY:
+			game_manager.set("unlocked_stages_by_chapter", game_snapshot["stage_unlocks"])
 		if game_snapshot.has("campaign_complete"):
 			game_manager.set("campaign_complete", bool(game_snapshot["campaign_complete"]))
 		if game_snapshot.has("state") and game_manager.has_method("set_state"):
@@ -145,9 +148,24 @@ func _test_main_menu_scene(root: Window, failures: Array[String]) -> void:
 		failures.append("Cannot load scenes/menus/MainMenu.tscn")
 		return
 
+	var game_manager: Node = root.get_node_or_null("GameManager")
+	if game_manager != null:
+		var default_chapters: Array[int] = [1]
+		game_manager.set("current_chapter", 1)
+		game_manager.set("current_stage_id", "ch1_stage1")
+		game_manager.set("chapters_unlocked", default_chapters)
+		game_manager.set("unlocked_stages_by_chapter", {1: 1})
+		game_manager.set("campaign_complete", false)
+
 	var menu_instance: Node = packed_scene.instantiate()
 	root.add_child(menu_instance)
 	await process_frame
+	if menu_instance.get_node_or_null("PlayButton") == null:
+		failures.append("MainMenu missing PlayButton")
+	if menu_instance.get_node_or_null("SoundButton") == null:
+		failures.append("MainMenu missing SoundButton")
+	if menu_instance.get_node_or_null("OptionsButton") == null:
+		failures.append("MainMenu missing OptionsButton")
 	if menu_instance.get_node_or_null("VBox/LoreButton") == null:
 		failures.append("MainMenu missing LoreButton")
 	if menu_instance.get_node_or_null("VBox/GuideButton") == null:
@@ -160,35 +178,50 @@ func _test_main_menu_scene(root: Window, failures: Array[String]) -> void:
 		var option_button: OptionButton = option_node
 		if option_button.item_count <= 0:
 			failures.append("MainMenu chapter option has no items")
-		# MVP: all 4 chapters must always appear
 		if option_button.item_count != 4:
 			failures.append("MainMenu chapter option must have exactly 4 entries (got %d)" % option_button.item_count)
-
-		# Verify Chapter 4 exists and selecting it leads to ch4_stage1
-		var ch4_index := -1
-		for i in range(option_button.item_count):
-			if option_button.get_item_id(i) == 4:
-				ch4_index = i
-				break
-		if ch4_index == -1:
-			failures.append("MainMenu chapter option missing Chapter 4 entry")
-		else:
-			option_button.select(ch4_index)
-			option_button.item_selected.emit(ch4_index)
-			await process_frame
-			var game_manager: Node = root.get_node_or_null("GameManager")
-			if menu_instance.has_method("_on_new_game_pressed"):
-				menu_instance.call("_on_new_game_pressed")
-				await process_frame
-				if game_manager != null:
-					var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
-					if stage_id != "ch4_stage1":
-						failures.append("Chapter 4 New Game should start ch4_stage1, got: %s" % stage_id)
+		if option_button.item_count >= 4:
+			if option_button.is_item_disabled(0):
+				failures.append("Chapter 1 should be unlocked by default")
+			for i in range(1, 4):
+				if not option_button.is_item_disabled(i):
+					failures.append("Chapter %d should be locked by default" % (i + 1))
 
 	if menu_instance.has_method("_on_new_game_pressed"):
 		menu_instance.call("_on_new_game_pressed")
+		await process_frame
+		var overlay: Node = menu_instance.get_node_or_null("LevelSelectOverlay")
+		if not (overlay is Control) or not (overlay as Control).visible:
+			failures.append("MainMenu Play should open LevelSelectOverlay")
+		var ch2_button: Node = menu_instance.get_node_or_null("LevelSelectOverlay/Panel/VBox/ChapterGrid/Chapter2Button")
+		if ch2_button is Button and not (ch2_button as Button).disabled:
+			failures.append("Chapter 2 button should be locked by default")
+		var stage1_button: Node = menu_instance.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage01Button")
+		if stage1_button is Button and (stage1_button as Button).disabled:
+			failures.append("Stage 1 should be unlocked by default")
+		var stage2_button: Node = menu_instance.get_node_or_null("LevelSelectOverlay/Panel/VBox/StageGrid/Stage02Button")
+		if stage2_button is Button and not (stage2_button as Button).disabled:
+			failures.append("Stage 2 should be locked by default")
+		if menu_instance.has_method("_on_start_selected_pressed"):
+			menu_instance.call("_on_start_selected_pressed")
+			await process_frame
+			if game_manager != null:
+				var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
+				if stage_id != "ch1_stage1":
+					failures.append("Default selected stage should start ch1_stage1, got: %s" % stage_id)
 	else:
 		failures.append("MainMenu missing _on_new_game_pressed")
+
+	if menu_instance.has_method("_on_options_pressed"):
+		menu_instance.call("_on_options_pressed")
+		await process_frame
+		var options_box: Node = menu_instance.get_node_or_null("VBox")
+		if options_box is Control and not (options_box as Control).visible:
+			failures.append("MainMenu options should be visible after pressing star/options button")
+		menu_instance.call("_on_options_pressed")
+		await process_frame
+		if options_box is Control and (options_box as Control).visible:
+			failures.append("MainMenu options should hide when pressing star/options button again")
 
 	if menu_instance.has_method("_on_continue_pressed"):
 		menu_instance.call("_on_continue_pressed")
@@ -249,18 +282,38 @@ func _test_pause_menu_script(root: Window, failures: Array[String]) -> void:
 	var restart_menu := _build_pause_menu_fixture(script)
 	root.add_child(restart_menu)
 	await process_frame
+	if restart_menu.process_mode != Node.PROCESS_MODE_WHEN_PAUSED:
+		failures.append("PauseMenu should process only while paused")
+	var restart_button_node: Node = restart_menu.get_node_or_null("VBox/RestartButton")
+	if restart_button_node is Button:
+		if not (restart_button_node as Button).pressed.is_connected(Callable(restart_menu, "_on_restart_pressed")):
+			failures.append("PauseMenu RestartButton signal not connected")
+	else:
+		failures.append("PauseMenu fixture missing RestartButton")
 	restart_menu.call("_on_restart_pressed")
 	await process_frame
 
 	var resume_menu := _build_pause_menu_fixture(script)
 	root.add_child(resume_menu)
 	await process_frame
+	var resume_button_node: Node = resume_menu.get_node_or_null("VBox/ResumeButton")
+	if resume_button_node is Button:
+		if not (resume_button_node as Button).pressed.is_connected(Callable(resume_menu, "_on_resume_pressed")):
+			failures.append("PauseMenu ResumeButton signal not connected")
+	else:
+		failures.append("PauseMenu fixture missing ResumeButton")
 	resume_menu.call("_on_resume_pressed")
 	await process_frame
 
 	var quit_menu := _build_pause_menu_fixture(script)
 	root.add_child(quit_menu)
 	await process_frame
+	var quit_button_node: Node = quit_menu.get_node_or_null("VBox/QuitButton")
+	if quit_button_node is Button:
+		if not (quit_button_node as Button).pressed.is_connected(Callable(quit_menu, "_on_quit_pressed")):
+			failures.append("PauseMenu QuitButton signal not connected")
+	else:
+		failures.append("PauseMenu fixture missing QuitButton")
 	quit_menu.call("_on_quit_pressed")
 	await process_frame
 
@@ -366,9 +419,11 @@ func _test_victory_script(root: Window, failures: Array[String]) -> void:
 	var inventory_manager: Node = root.get_node_or_null("InventoryManager")
 	var game_manager: Node = root.get_node_or_null("GameManager")
 	if game_manager != null:
+		var default_chapters: Array[int] = [1]
 		game_manager.set("current_chapter", 1)
 		game_manager.set("current_stage_id", "ch1_stage1")
-		game_manager.set("chapters_unlocked", [1])
+		game_manager.set("chapters_unlocked", default_chapters)
+		game_manager.set("unlocked_stages_by_chapter", {1: 1})
 		game_manager.set("campaign_complete", false)
 	if inventory_manager != null:
 		inventory_manager.set("temporary_inventory", {"green_tea": 2})

@@ -35,9 +35,11 @@ func _initialize() -> void:
 
 	if failures.is_empty():
 		# Baseline save
+		var default_chapters: Array[int] = [1]
 		game_manager.set("current_chapter", 1)
 		game_manager.set("current_stage_id", "ch1_stage1")
-		game_manager.set("chapters_unlocked", [1])
+		game_manager.set("chapters_unlocked", default_chapters)
+		game_manager.set("unlocked_stages_by_chapter", {1: 1})
 		game_manager.set("campaign_complete", false)
 		var unlocked_reset_variant: Variant = game_manager.get("chapters_unlocked")
 		if typeof(unlocked_reset_variant) == TYPE_ARRAY:
@@ -66,6 +68,10 @@ func _initialize() -> void:
 		var chapters_unlocked: Array = chapters_unlocked_variant if typeof(chapters_unlocked_variant) == TYPE_ARRAY else []
 		if chapters_unlocked.has(2):
 			failures.append("chapter 2 unlocked too early")
+		if game_manager.has_method("get_unlocked_stage_count") and int(game_manager.call("get_unlocked_stage_count", 1)) != 2:
+			failures.append("stage 2 was not unlocked after clearing ch1_stage1")
+		if game_manager.has_method("is_stage_unlocked") and bool(game_manager.call("is_stage_unlocked", 1, "ch1_stage3")):
+			failures.append("stage 3 unlocked too early")
 
 		# Finish chapter 1 and verify chapter unlock progression
 		for _i in range(4):
@@ -79,9 +85,14 @@ func _initialize() -> void:
 		chapters_unlocked = chapters_unlocked_variant if typeof(chapters_unlocked_variant) == TYPE_ARRAY else []
 		if not chapters_unlocked.has(2):
 			failures.append("chapter 2 was not unlocked after chapter 1 completion")
+		if game_manager.has_method("get_unlocked_stage_count") and int(game_manager.call("get_unlocked_stage_count", 2)) != 1:
+			failures.append("chapter 2 should start with only stage 1 unlocked")
 
 		game_manager.set("current_chapter", 4)
 		game_manager.set("current_stage_id", "ch4_stage5")
+		var all_chapters: Array[int] = [1, 2, 3, 4]
+		game_manager.set("chapters_unlocked", all_chapters)
+		game_manager.set("unlocked_stages_by_chapter", {1: 5, 2: 5, 3: 5, 4: 5})
 		game_manager.set("campaign_complete", false)
 		var final_clear: Dictionary = {}
 		if game_manager.has_method("save_on_stage_clear"):

@@ -1,8 +1,10 @@
 [gd_scene format=3 uid="uid://dkdketea4hbtp"]
 
 [ext_resource type="Script" uid="uid://b30gj16tsif4x" path="res://scenes/menus/MainMenu.gd" id="1_menu"]
+[ext_resource type="Texture2D" uid="uid://cefoir3mip6i1" path="res://assets_2/png/Scene/Home.png" id="2_home"]
 
 [node name="MainMenu" type="Control" unique_id=410898545]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,68 +13,104 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="BG" type="ColorRect" parent="." unique_id=810029028]
+[node name="Background" type="TextureRect" parent="." unique_id=810029028]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0.08, 0.12, 1)
+mouse_filter = 2
+texture = ExtResource("2_home")
+expand_mode = 1
 
-[node name="VBox" type="VBoxContainer" parent="." unique_id=1470385183]
+[node name="ReadableShade" type="ColorRect" parent="." unique_id=269069072]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.025, 0.025, 0.1)
+
+[node name="PlayButton" type="Button" parent="." unique_id=1470385183]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -260.0
-offset_right = 200.0
-offset_bottom = 260.0
+offset_left = -96.0
+offset_top = 128.0
+offset_right = 96.0
+offset_bottom = 222.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 15
+text = "Play"
 
-[node name="Title" type="Label" parent="VBox" unique_id=842580608]
-layout_mode = 2
-text = "THE PROGRAMMING LABYRINTH"
-horizontal_alignment = 1
+[node name="SoundButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 38.0
+offset_top = -128.0
+offset_right = 126.0
+offset_bottom = -38.0
+grow_vertical = 0
 
-[node name="Slogan" type="Label" parent="VBox" unique_id=344354934]
-modulate = Color(0.6, 0.8, 1, 0.7)
-layout_mode = 2
-text = "Code to Survive - Debug to Escape"
-horizontal_alignment = 1
+[node name="OptionsButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -126.0
+offset_top = -128.0
+offset_right = -38.0
+offset_bottom = -38.0
+grow_horizontal = 0
+grow_vertical = 0
 
-[node name="Separator" type="HSeparator" parent="VBox" unique_id=675514383]
-layout_mode = 2
+[node name="VBox" type="VBoxContainer" parent="." unique_id=77276972]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -218.0
+offset_top = -8.0
+offset_right = 218.0
+offset_bottom = 272.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
 
 [node name="NewGameButton" type="Button" parent="VBox" unique_id=710253903]
+visible = false
 layout_mode = 2
-text = "New Game"
+text = "Play"
 
 [node name="ContinueButton" type="Button" parent="VBox" unique_id=292594512]
 layout_mode = 2
 text = "Continue"
 
-[node name="ChapterLabel" type="Label" parent="VBox" unique_id=1915399193]
-layout_mode = 2
-text = "Select Chapter"
-horizontal_alignment = 1
-
-[node name="ChapterSelect" type="VBoxContainer" parent="VBox" unique_id=77276972]
-layout_mode = 2
-
-[node name="LoreButton" type="Button" parent="VBox"]
+[node name="LoreButton" type="Button" parent="VBox" unique_id=1327167252]
 layout_mode = 2
 text = "Game Lore"
 
-[node name="GuideButton" type="Button" parent="VBox"]
+[node name="GuideButton" type="Button" parent="VBox" unique_id=1564326901]
 layout_mode = 2
 text = "How to Play"
 
 [node name="QuitButton" type="Button" parent="VBox" unique_id=1907162965]
 layout_mode = 2
 text = "Quit"
+
+[node name="ChapterSelect" type="VBoxContainer" parent="VBox" unique_id=1915399193]
+visible = false
+layout_mode = 2
