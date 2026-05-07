@@ -12,6 +12,7 @@ func _initialize() -> void:
 	await _test_all_scripts_loadable()
 	_test_no_todo_pass_markers()
 	await _test_autoloads_basic()
+	await _test_audio_managers()
 	await _test_ui_components()
 	await _test_entities_and_combat()
 	await _test_maze_system()
@@ -98,7 +99,7 @@ func _test_no_todo_pass_markers() -> void:
 
 func _test_autoloads_basic() -> void:
 	var root := get_root()
-	var names := ["DataManager", "GameManager", "HPTimeManager", "InventoryManager", "TelemetryManager"]
+	var names := ["DataManager", "GameManager", "HPTimeManager", "InventoryManager", "TelemetryManager", "BackgroundMusicManager", "SoundManager"]
 	for name in names:
 		var node := root.get_node_or_null(name)
 		_assert_true(node != null, "Autoload exists: %s" % name)
@@ -134,6 +135,51 @@ func _test_autoloads_basic() -> void:
 	if game_manager != null:
 		game_manager.call("start_stage", 1, "ch1_stage1")
 		_assert_eq(int(game_manager.get("current_state")), 1, "GameManager enters PLAYING after start_stage")
+
+
+func _test_audio_managers() -> void:
+	var root := get_root()
+
+	# BackgroundMusicManager
+	var bgm: Node = root.get_node_or_null("BackgroundMusicManager")
+	_assert_true(bgm != null, "BackgroundMusicManager autoload exists")
+	if bgm != null:
+		var tracks_variant: Variant = bgm.call("get_track_paths")
+		var tracks: Array = tracks_variant if typeof(tracks_variant) == TYPE_ARRAY else []
+		_assert_true(tracks.size() > 0, "BackgroundMusicManager finds background music tracks")
+		_assert_true(bgm.has_method("play_random_track"), "BackgroundMusicManager has play_random_track method")
+		_assert_true(bgm.has_method("stop_music"), "BackgroundMusicManager has stop_music method")
+		_assert_true(bgm.has_method("set_music_enabled"), "BackgroundMusicManager has set_music_enabled method")
+		# Verify each track path points to an existing file
+		var all_exist := true
+		for track_path in tracks:
+			if not ResourceLoader.exists(str(track_path)):
+				all_exist = false
+				break
+		_assert_true(all_exist, "All BGM track paths are valid resources")
+
+	# SoundManager
+	var sm: Node = root.get_node_or_null("SoundManager")
+	_assert_true(sm != null, "SoundManager autoload exists")
+	if sm != null:
+		_assert_true(sm.has_method("play"), "SoundManager has play method")
+		_assert_true(sm.has_method("set_sfx_enabled"), "SoundManager has set_sfx_enabled method")
+		# Verify known SFX events map to existing files
+		var sfx_map: Dictionary = sm.get("SFX_MAP") if sm.get("SFX_MAP") != null else {}
+		_assert_true(sfx_map.size() > 0, "SoundManager.SFX_MAP is populated")
+		var all_sfx_exist := true
+		for event in sfx_map.keys():
+			var sfx_path := "res://music/audio/" + str(sfx_map[event])
+			if not ResourceLoader.exists(sfx_path):
+				all_sfx_exist = false
+				_fail("SFX file missing for event '%s': %s" % [event, sfx_path])
+		_assert_true(all_sfx_exist, "All SFX map entries point to valid resource files")
+		# Test that play() does not crash on a known event
+		sm.call("play", "ui_click")
+		_ok("SoundManager.play('ui_click') does not crash")
+		# Test play with unknown event is safe
+		sm.call("play", "__nonexistent__")
+		_ok("SoundManager.play with unknown event is safe")
 
 
 func _test_ui_components() -> void:
@@ -182,23 +228,30 @@ func _test_ui_components() -> void:
 	block_ui.queue_free()
 
 	# GameHUD
-	var hud := CanvasLayer.new()
-	hud.set_script(load("res://scenes/ui/GameHUD.gd"))
-	var hp_lbl := Label.new()
-	hp_lbl.name = "HPLabel"
-	hud.add_child(hp_lbl)
-	var time_lbl := Label.new()
-	time_lbl.name = "TimeLabel"
-	hud.add_child(time_lbl)
-	var hp_bar := ProgressBar.new()
-	hp_bar.name = "HPBar"
-	hud.add_child(hp_bar)
+	var hud_scene: PackedScene = load("res://scenes/ui/GameHUD.tscn")
+	var hud := hud_scene.instantiate()
 	root.add_child(hud)
 	await process_frame
 	hud.call("update_hp", 80, 100)
 	hud.call("update_time", 29.5)
-	_assert_true(hp_lbl.text.find("80") != -1, "GameHUD updates HP label")
-	_assert_true(time_lbl.text.find("00:30") != -1, "GameHUD formats time")
+	
+	# Find HP bar (it's inside a container now)
+	var hp_bar_node := hud.get_node_or_null("TopBar/HPBarContainer/HPBar") as ProgressBar
+	var time_lbl_node := hud.get_node_or_null("TopBar/TimeLabel") as Label
+	var status_lbl_node := hud.get_node_or_null("TopBar/StatusLabel") as Label
+	
+	_assert_true(hp_bar_node != null, "GameHUD has HPBar")
+	if hp_bar_node != null:
+		_assert_eq(int(hp_bar_node.value), 80, "GameHUD updates HP bar")
+	
+	_assert_true(time_lbl_node != null, "GameHUD has TimeLabel")
+	if time_lbl_node != null:
+		_assert_true(time_lbl_node.text.find("00:30") != -1, "GameHUD formats time")
+	
+	_assert_true(status_lbl_node != null, "GameHUD has StatusLabel")
+	if status_lbl_node != null:
+		_assert_true(status_lbl_node.text.find("Chapter") != -1, "GameHUD shows chapter title in status")
+
 	var has_deprecated_inv_note := false
 	for node in hud.find_children("*", "Label", true, false):
 		var label := node as Label
@@ -496,6 +549,13 @@ func _test_menu_and_stage_flow() -> void:
 	_assert_true(menu.get_node_or_null("VBox/NewGameButton") != null, "MainMenu has NewGameButton")
 	_assert_true(menu.get_node_or_null("VBox/LoreButton") != null, "MainMenu has lore button")
 	_assert_true(menu.get_node_or_null("VBox/GuideButton") != null, "MainMenu has guide button")
+	# Quit button deve essere nel corner inferiore sinistro
+	var quit_corner: Node = menu.get_node_or_null("QuitCorner")
+	_assert_true(quit_corner != null, "MainMenu has QuitCorner container at bottom-left")
+	if quit_corner is Control:
+		var qc: Control = quit_corner
+		_assert_true(absf(qc.anchor_left) < 0.01 and absf(qc.anchor_top - 1.0) < 0.01, "QuitCorner anchored to bottom-left")
+		_assert_true(quit_corner.get_node_or_null("QuitButton") != null, "QuitCorner contains QuitButton")
 	if menu.has_method("_on_lore_pressed"):
 		menu.call("_on_lore_pressed")
 		await process_frame

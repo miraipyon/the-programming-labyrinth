@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://co7x4q8fy0mqt"
+path="res://.godot/imported/DARK SOULS Ⅲ - Yuka Kitamura.mp3-670c45d7f22491c4e9a573a38bf02e69.mp3str"
+
+[deps]
+
+source_file="res://music/background_music/DARK SOULS Ⅲ - Yuka Kitamura.mp3"
+dest_files=["res://.godot/imported/DARK SOULS Ⅲ - Yuka Kitamura.mp3-670c45d7f22491c4e9a573a38bf02e69.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

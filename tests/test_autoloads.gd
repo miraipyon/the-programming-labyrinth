@@ -14,7 +14,7 @@ func _initialize():
 			print(name, ": FOUND at /root/" + name)
 			if inst.has_method("get_stages_by_chapter"):
 				var stages = inst.get_stages_by_chapter(1)
-				print("  -> get_stages_by_chapter(1):", stages)
+				print("  -> get_stages_by_chapter(1):", stagesasd)
 			else:
 				print("  -> get_stages_by_chapter: not present")
 			if inst.has_method("roll_loot"):

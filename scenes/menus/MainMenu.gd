@@ -10,10 +10,10 @@ const ICON_LEVELS_PATH := "res://assets_2/png/Button/Icon/Levels.png"
 const ICON_CROSS_PATH := "res://assets_2/png/Icon/Cross.png"
 const ICON_SOUND_ON_PATH := "res://assets_2/png/Button/Icon/SoundOn.png"
 const ICON_SOUND_OFF_PATH := "res://assets_2/png/Button/Icon/SoundOff.png"
-const CONTINUE_ARROW_DEFAULT_PATH := "res://assets_2/png/Buttons/Square/ArrowRight-Bold/Default.png"
-const CONTINUE_ARROW_HOVER_PATH := "res://assets_2/png/Buttons/Square/ArrowRight-Bold/Hover.png"
 const PLAYTEXT_DEFAULT_PATH := "res://assets_2/png/Buttons/Rect/PlayText/Default.png"
 const PLAYTEXT_HOVER_PATH := "res://assets_2/png/Buttons/Rect/PlayText/Hover.png"
+const CONTINUE_PLAYICON_DEFAULT_PATH := "res://assets_2/png/Buttons/Rect/PlayIcon/Default.png"
+const CONTINUE_PLAYICON_HOVER_PATH := "res://assets_2/png/Buttons/Rect/PlayIcon/Hover.png"
 
 const LORE_TEXT := """The Programming Labyrinth begins after the Core Kernel collapsed under corrupted malware.
 
@@ -52,6 +52,7 @@ var _info_overlay: Control = null
 var _info_title: Label = null
 var _info_body: RichTextLabel = null
 var _is_muted := false
+var _quit_button_corner: Control = null   # Quit ở góc dưới trái
 
 
 func _ready() -> void:
@@ -69,14 +70,18 @@ func _ready() -> void:
 
 func _connect_buttons() -> void:
 	_connect_button("PlayButton", _on_play_pressed)
+	_connect_button("ContinueTopButton", _on_continue_pressed)
 	_connect_button("SoundButton", _on_sound_pressed)
 	_connect_button("VBox/NewGameButton", _on_new_game_pressed)
 	_connect_button("VBox/ContinueButton", _on_continue_pressed)
 	_connect_button("VBox/LoreButton", _on_lore_pressed)
 	_connect_button("VBox/GuideButton", _on_guide_pressed)
 	_connect_button("VBox/QuitButton", _on_quit_pressed)
+	_setup_quit_corner_button()
 
-	var continue_node: Node = get_node_or_null("VBox/ContinueButton")
+	var continue_node: Node = get_node_or_null("ContinueTopButton")
+	if continue_node == null:
+		continue_node = get_node_or_null("VBox/ContinueButton")
 	if continue_node is Button:
 		continue_button = continue_node
 
@@ -111,6 +116,7 @@ func _ensure_select_overlays() -> void:
 
 
 func _on_play_pressed() -> void:
+	_sfx("ui_click")
 	_reset_run_progress()
 	_refresh_continue_state()
 	_refresh_selection_overlays()
@@ -118,6 +124,7 @@ func _on_play_pressed() -> void:
 
 
 func _on_new_game_pressed() -> void:
+	_sfx("ui_click")
 	_reset_run_progress()
 	_refresh_continue_state()
 	_refresh_selection_overlays()
@@ -125,26 +132,33 @@ func _on_new_game_pressed() -> void:
 
 
 func _on_continue_pressed() -> void:
+	_sfx("ui_click")
 	_refresh_continue_state()
 	_refresh_selection_overlays()
 	_show_stage_select(_current_or_first_unlocked_chapter())
 
 
 func _on_lore_pressed() -> void:
+	_sfx("ui_open")
 	_show_info_modal("Game Lore", LORE_TEXT)
 
 
 func _on_guide_pressed() -> void:
+	_sfx("ui_open")
 	_show_info_modal("How to Play", GUIDE_TEXT)
 
 
 func _on_quit_pressed() -> void:
+	_sfx("ui_back")
 	get_tree().quit()
 
 
 func _on_sound_pressed() -> void:
 	_is_muted = not _is_muted
 	AudioServer.set_bus_mute(0, _is_muted)
+	var sm: Node = get_node_or_null("/root/SoundManager")
+	if sm != null and sm.has_method("set_sfx_enabled"):
+		sm.call("set_sfx_enabled", not _is_muted)
 	_apply_home_skin()
 
 
@@ -235,6 +249,7 @@ func _show_info_modal(title: String, body: String) -> void:
 
 
 func _hide_info_modal() -> void:
+	_sfx("ui_close")
 	if _info_overlay != null:
 		_info_overlay.visible = false
 
@@ -329,6 +344,17 @@ func _apply_home_skin() -> void:
 		play_button.text = ""
 		play_button.tooltip_text = "Play"
 
+	var continue_top_node: Node = get_node_or_null("ContinueTopButton")
+	if continue_top_node is Button:
+		var continue_top_button: Button = continue_top_node
+		MenuVisuals.style_rect_button(continue_top_button, "", Vector2(198, 96))
+		continue_top_button.add_theme_stylebox_override("normal", MenuVisuals.make_texture_style(CONTINUE_PLAYICON_DEFAULT_PATH))
+		continue_top_button.add_theme_stylebox_override("hover", MenuVisuals.make_texture_style(CONTINUE_PLAYICON_HOVER_PATH))
+		continue_top_button.add_theme_stylebox_override("pressed", MenuVisuals.make_texture_style(CONTINUE_PLAYICON_DEFAULT_PATH))
+		continue_top_button.add_theme_stylebox_override("disabled", MenuVisuals.make_texture_style(CONTINUE_PLAYICON_DEFAULT_PATH))
+		continue_top_button.text = ""
+		continue_top_button.tooltip_text = "Continue"
+
 	var sound_node: Node = get_node_or_null("SoundButton")
 	if sound_node is Button:
 		var sound_button: Button = sound_node
@@ -338,10 +364,8 @@ func _apply_home_skin() -> void:
 		sound_button.tooltip_text = "Sound Off" if _is_muted else "Sound On"
 
 	var option_button_icons := {
-		"VBox/ContinueButton": "",
 		"VBox/LoreButton": ICON_STAR_PATH,
-		"VBox/GuideButton": ICON_LEVELS_PATH,
-		"VBox/QuitButton": ICON_CROSS_PATH
+		"VBox/GuideButton": ICON_LEVELS_PATH
 	}
 	for path in option_button_icons.keys():
 		var node: Node = get_node_or_null(path)
@@ -349,30 +373,34 @@ func _apply_home_skin() -> void:
 			var option_button: Button = node
 			MenuVisuals.style_square_button(option_button, str(option_button_icons[path]), Vector2(96, 96))
 			option_button.text = ""
-			match option_button.name:
-				"ContinueButton":
-					option_button.add_theme_stylebox_override("normal", MenuVisuals.make_texture_style(CONTINUE_ARROW_DEFAULT_PATH))
-					option_button.add_theme_stylebox_override("hover", MenuVisuals.make_texture_style(CONTINUE_ARROW_HOVER_PATH))
-					option_button.add_theme_stylebox_override("pressed", MenuVisuals.make_texture_style(CONTINUE_ARROW_DEFAULT_PATH))
-					option_button.add_theme_stylebox_override("disabled", MenuVisuals.make_texture_style(CONTINUE_ARROW_DEFAULT_PATH))
-					option_button.tooltip_text = "Continue"
-				"LoreButton":
-					option_button.tooltip_text = "Game lore"
-				"GuideButton":
-					option_button.tooltip_text = "How to play"
-				"QuitButton":
-					option_button.tooltip_text = "Quit"
+			if option_button.name == "LoreButton":
+				option_button.tooltip_text = "Game lore"
+			elif option_button.name == "GuideButton":
+				option_button.tooltip_text = "How to play"
+
+	var legacy_continue_node: Node = get_node_or_null("VBox/ContinueButton")
+	if legacy_continue_node is Control:
+		(legacy_continue_node as Control).visible = false
 
 
 func _set_home_options_visible(visible: bool) -> void:
+	var continue_top_node: Node = get_node_or_null("ContinueTopButton")
+	if continue_top_node is Control:
+		(continue_top_node as Control).visible = visible
+
 	var vbox_node: Node = get_node_or_null("VBox")
 	if vbox_node is Control:
 		(vbox_node as Control).visible = visible
 
-	for path in ["VBox/ContinueButton", "VBox/LoreButton", "VBox/GuideButton", "VBox/QuitButton"]:
+	for path in ["VBox/LoreButton", "VBox/GuideButton"]:
 		var node: Node = get_node_or_null(path)
 		if node is Control:
 			(node as Control).visible = visible
+
+
+	var hidden_continue_node: Node = get_node_or_null("VBox/ContinueButton")
+	if hidden_continue_node is Control:
+		(hidden_continue_node as Control).visible = false
 
 	var hidden_node: Node = get_node_or_null("VBox/NewGameButton")
 	if hidden_node is Control:
@@ -403,3 +431,43 @@ func _load_texture(path: String) -> Texture2D:
 	if texture is Texture2D:
 		return texture
 	return null
+
+
+# --- Quit corner button ---
+func _setup_quit_corner_button() -> void:
+	# Xóa hẳn nút Quit cũ trong VBox (nếu tồn tại)
+	var old_quit: Node = get_node_or_null("VBox/QuitButton")
+	if old_quit != null:
+		old_quit.queue_free()
+
+	# Tạo container góc dưới trái, đối xứng với SoundButton ở góc dưới phải
+	# SoundButton offsets in .tscn: L:-126, T:-126, R:-34, B:-34 (Distance 34 from edges, size 92)
+	_quit_button_corner = Control.new()
+	_quit_button_corner.name = "QuitCorner"
+	_quit_button_corner.anchor_left   = 0.0
+	_quit_button_corner.anchor_top    = 1.0
+	_quit_button_corner.anchor_right  = 0.0
+	_quit_button_corner.anchor_bottom = 1.0
+	_quit_button_corner.offset_left   = 34.0
+	_quit_button_corner.offset_top    = -126.0
+	_quit_button_corner.offset_right  = 126.0
+	_quit_button_corner.offset_bottom = -34.0
+	add_child(_quit_button_corner)
+
+	var btn := Button.new()
+	btn.name = "QuitButton"
+	btn.set_anchors_preset(Control.PRESET_FULL_RECT)
+	# SoundButton uses (92, 92) in _apply_home_skin
+	MenuVisuals.style_square_button(btn, ICON_CROSS_PATH, Vector2(92, 92))
+	btn.text = ""
+	btn.tooltip_text = "Quit"
+	if not btn.pressed.is_connected(_on_quit_pressed):
+		btn.pressed.connect(_on_quit_pressed)
+	_quit_button_corner.add_child(btn)
+
+
+# --- SFX helper ---
+func _sfx(event: String) -> void:
+	var sm: Node = get_node_or_null("/root/SoundManager")
+	if sm != null and sm.has_method("play"):
+		sm.call("play", event)

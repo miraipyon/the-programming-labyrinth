@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scenes/ui/GameHUD.gd" id="1_hud"]
+[ext_resource type="Texture2D" path="res://assets_2/png/Counter/Icon/Time.png" id="2_time_icon"]
 
 [node name="GameHUD" type="CanvasLayer"]
 layer = 5
@@ -14,33 +15,51 @@ anchor_right = 0.98
 anchor_bottom = 0.10
 theme_override_constants/separation = 16
 
-[node name="HPLabel" type="Label" parent="TopBar"]
+[node name="HPBarContainer" type="MarginContainer" parent="TopBar"]
 layout_mode = 2
-custom_minimum_size = Vector2(140, 24)
-text = "HP: 100 / 100"
+size_flags_vertical = 4
+theme_override_constants/margin_top = 4
 
-[node name="HPBar" type="ProgressBar" parent="TopBar"]
+[node name="HPBar" type="ProgressBar" parent="TopBar/HPBarContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(200, 24)
 max_value = 100.0
 value = 100.0
+show_percentage = false
+
+[node name="TimeIconContainer" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/margin_top = 6
+
+[node name="TimeIcon" type="TextureRect" parent="TopBar/TimeIconContainer"]
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+texture = ExtResource("2_time_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TimeLabel" type="Label" parent="TopBar"]
 layout_mode = 2
-custom_minimum_size = Vector2(130, 24)
+size_flags_vertical = 4
+custom_minimum_size = Vector2(110, 24)
 text = "Time: 06:00"
 
 [node name="StatusLabel" type="Label" parent="TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Explore the labyrinth"
+size_flags_vertical = 4
+horizontal_alignment = 2
+text = "Chapter 1: The Source Forest"
 
 [node name="ArtifactBar" type="Label" parent="TopBar"]
 layout_mode = 2
+size_flags_vertical = 4
 theme_override_font_sizes/font_size = 11
 visible = false
 
 [node name="InventoryButton" type="Button" parent="TopBar"]
 layout_mode = 2
-custom_minimum_size = Vector2(120, 24)
+size_flags_vertical = 4
+custom_minimum_size = Vector2(120, 32)
 text = "📦 Inventory"

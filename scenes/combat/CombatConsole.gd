@@ -67,6 +67,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 	visible = true
 	if _root_control != null:
 		_root_control.visible = true
+	_sfx("combat_start")
 
 	if _enemy_label != null:
 		var enemy_name := str(enemy_data.get("name", str(enemy_data.get("id", "Enemy"))))
@@ -198,6 +199,7 @@ func use_hint_or_snap(item_id: String) -> Dictionary:
 
 
 func _on_completed(_success: bool) -> void:
+	_sfx("combat_end")
 	if _turn_label != null:
 		_turn_label.text = ""
 		_turn_label.visible = false
@@ -224,6 +226,7 @@ func _on_submit_pressed() -> void:
 			answer = block_ui.call("get_user_answer")
 
 	if answer != null:
+		_sfx("combat_submit")
 		encounter_manager.call("submit_turn", answer)
 
 
@@ -798,3 +801,9 @@ func _get_resolved_code_lines_sorted() -> Array[int]:
 	for key in keys:
 		result.append(int(key))
 	return result
+
+
+func _sfx(event: String) -> void:
+	var sm: Node = get_node_or_null("/root/SoundManager")
+	if sm != null and sm.has_method("play"):
+		sm.call("play", event)

@@ -26,14 +26,21 @@ const ITEM_ICON_PATHS := {
 	"ide_armor": "res://assets/artifacts/ide_armor.png",
 	"runtime_patch": "res://assets/artifacts/runtime_patch.png"
 }
+const CHAPTER_NAMES := {
+	1: "The Source Forest",
+	2: "The Logic Ruins",
+	3: "The Array Abyss",
+	4: "The Final Kernel"
+}
+const TIME_ICON_PATH := "res://assets_2/png/Counter/Icon/Time.png"
 
 
 func _ready() -> void:
-	_ensure_layout()
-	hp_label = _find_label(["HPLabel", "VBox/HPLabel", "TopBar/HPLabel", "Stats/HPLabel"])
-	time_label = _find_label(["TimeLabel", "VBox/TimeLabel", "TopBar/TimeLabel", "Stats/TimeLabel"])
-	hp_bar = _find_range(["HPBar", "VBox/HPBar", "TopBar/HPBar", "Stats/HPBar"])
-	status_label = _find_label(["StatusLabel", "VBox/StatusLabel", "TopBar/StatusLabel", "Stats/StatusLabel"])
+	# hp_label = _find_label(["TopBar/HPLabel"]) # Removed per request
+	time_label = _find_label(["TopBar/TimeLabel", "TopBar/TimeIconContainer/TimeLabel"])
+	hp_bar = _find_range(["TopBar/HPBarContainer/HPBar", "TopBar/HPBar"])
+	status_label = _find_label(["TopBar/StatusLabel"])
+	_update_chapter_display()
 
 	# Wire inventory button (may come from scene or from _ensure_layout)
 	var inv_btn: Node = get_node_or_null("TopBar/InventoryButton")
@@ -72,8 +79,7 @@ func update_hp(hp: int, max_hp: int) -> void:
 	var safe_max := maxi(max_hp, 1)
 	var safe_hp := clampi(hp, 0, safe_max)
 
-	if hp_label != null:
-		hp_label.text = "HP: %d / %d" % [safe_hp, safe_max]
+	# hp_label removed per request
 
 	if hp_bar != null:
 		hp_bar.min_value = 0
@@ -97,7 +103,12 @@ func update_time(time_left: float) -> void:
 
 
 func update_status(message: String) -> void:
-	if status_label != null:
+	if status_label == null:
+		return
+	
+	if message.is_empty() or message == "Explore the labyrinth":
+		_update_chapter_display()
+	else:
 		status_label.text = message
 
 
@@ -389,62 +400,7 @@ func _effect_summary(effect: String, value: Variant) -> String:
 		_:
 			return "Special effect."
 
-
-# --- Layout ---
-func _ensure_layout() -> void:
-	if _find_label(["HPLabel", "VBox/HPLabel", "TopBar/HPLabel", "Stats/HPLabel"]) != null:
-		return
-
-	var top_bar := HBoxContainer.new()
-	top_bar.name = "TopBar"
-	top_bar.anchor_left = 0.02
-	top_bar.anchor_top = 0.02
-	top_bar.anchor_right = 0.98
-	top_bar.anchor_bottom = 0.10
-	top_bar.offset_left = 0
-	top_bar.offset_top = 0
-	top_bar.offset_right = 0
-	top_bar.offset_bottom = 0
-	top_bar.add_theme_constant_override("separation", 16)
-	add_child(top_bar)
-
-	var hp_text := Label.new()
-	hp_text.name = "HPLabel"
-	hp_text.custom_minimum_size = Vector2(140, 24)
-	top_bar.add_child(hp_text)
-
-	var bar := ProgressBar.new()
-	bar.name = "HPBar"
-	bar.custom_minimum_size = Vector2(200, 24)
-	top_bar.add_child(bar)
-
-	var time_text := Label.new()
-	time_text.name = "TimeLabel"
-	time_text.custom_minimum_size = Vector2(130, 24)
-	top_bar.add_child(time_text)
-
-	var status := Label.new()
-	status.name = "StatusLabel"
-	status.text = "Explore the labyrinth"
-	status.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top_bar.add_child(status)
-
-	# Artifact status bar
-	_artifact_bar = Label.new()
-	_artifact_bar.name = "ArtifactBar"
-	_artifact_bar.add_theme_font_size_override("font_size", 11)
-	_artifact_bar.modulate = Color(0.5, 1.0, 0.8)
-	_artifact_bar.visible = false
-	top_bar.add_child(_artifact_bar)
-
-	# Inventory toggle button
-	var inv_btn := Button.new()
-	inv_btn.name = "InventoryButton"
-	inv_btn.text = "📦 Inventory"
-	inv_btn.custom_minimum_size = Vector2(120, 24)
-	inv_btn.pressed.connect(toggle_inventory)
-	top_bar.add_child(inv_btn)
-
+# --- Inventory Toggle ---
 
 func _find_label(paths: Array[String]) -> Label:
 	for path in paths:
@@ -460,3 +416,13 @@ func _find_range(paths: Array[String]) -> Range:
 		if node is Range:
 			return node
 	return null
+
+
+func _update_chapter_display() -> void:
+	if status_label == null:
+		return
+	var gm := get_node_or_null("/root/GameManager")
+	if gm != null:
+		var ch := int(gm.get("current_chapter"))
+		var ch_name := str(CHAPTER_NAMES.get(ch, "Unknown Chapter"))
+		status_label.text = "Chapter %d: %s" % [ch, ch_name]

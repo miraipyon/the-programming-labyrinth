@@ -48,6 +48,20 @@ offset_bottom = 76.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="ContinueTopButton" type="Button" parent="." unique_id=118903453]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -98.0
+offset_top = 92.0
+offset_right = 98.0
+offset_bottom = 188.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="SoundButton" type="Button" parent="." unique_id=193539616]
 layout_mode = 1
 anchors_preset = 3
@@ -70,9 +84,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -246.0
-offset_top = 90.0
+offset_top = 200.0
 offset_right = 246.0
-offset_bottom = 190.0
+offset_bottom = 300.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 18
@@ -89,7 +103,4 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="GuideButton" type="Button" parent="VBox" unique_id=1564326901]
-layout_mode = 2
-
-[node name="QuitButton" type="Button" parent="VBox" unique_id=1907162965]
 layout_mode = 2

@@ -44,6 +44,9 @@ func open_chest() -> String:
 		chest_opened.emit(loot_id)
 
 	_update_appearance()
+	var sm: Node = get_node_or_null("/root/SoundManager")
+	if sm != null and sm.has_method("play"):
+		sm.call("play", "chest_open")
 	return loot_id
 
 

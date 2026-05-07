@@ -24,10 +24,10 @@ const STAGE_STAR_GROUP_PATHS := {
 const STAR_BADGE_NODE_NAME := "StageStarBadge"
 
 const CHAPTER_NAMES := {
-	1: "Syntax Forest",
-	2: "Reference Catacombs",
-	3: "Loop Citadel",
-	4: "Core Kernel"
+	1: "The Source Forest",
+	2: "The Logic Ruins",
+	3: "The Array Abyss",
+	4: "The Final Kernel"
 }
 
 var current_chapter: int = 1

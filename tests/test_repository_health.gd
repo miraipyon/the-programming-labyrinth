@@ -125,8 +125,7 @@ func _test_scene_contracts() -> void:
 		"VBox/NewGameButton",
 		"VBox/ContinueButton",
 		"VBox/LoreButton",
-		"VBox/GuideButton",
-		"VBox/QuitButton"
+		"VBox/GuideButton"
 	])
 	await _assert_scene_contract("res://scenes/menus/StageSelect.tscn", "StageSelectOverlay", [
 		"Panel/ChapterGrid/Chapter1Button",
@@ -172,8 +171,8 @@ func _test_scene_contracts() -> void:
 		"VBox/BlockRows"
 	])
 	await _assert_scene_contract("res://scenes/ui/GameHUD.tscn", "GameHUD", [
-		"TopBar/HPLabel",
-		"TopBar/HPBar",
+		"TopBar/HPBarContainer/HPBar",
+		"TopBar/TimeIconContainer/TimeIcon",
 		"TopBar/TimeLabel",
 		"TopBar/StatusLabel"
 	])

@@ -22,6 +22,8 @@ HPTimeManager="*res://autoload/HPTimeManager.gd"
 InventoryManager="*res://autoload/InventoryManager.gd"
 DataManager="*res://autoload/DataManager.gd"
 TelemetryManager="*res://autoload/TelemetryManager.gd"
+BackgroundMusicManager="*res://autoload/BackgroundMusicManager.gd"
+SoundManager="*res://autoload/SoundManager.gd"
 
 [display]
 

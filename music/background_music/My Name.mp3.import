@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dtu2o7vbryad4"
+path="res://.godot/imported/My Name.mp3-bc7a06e333fe26af2922c01eccf6f960.mp3str"
+
+[deps]
+
+source_file="res://music/background_music/My Name.mp3"
+dest_files=["res://.godot/imported/My Name.mp3-bc7a06e333fe26af2922c01eccf6f960.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

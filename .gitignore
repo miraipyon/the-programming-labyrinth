@@ -1,5 +1,10 @@
 # Godot editor/cache artifacts
-.godot/
+# Keep .godot/ tracked so CI can use pre-imported resources.
+# Only exclude generated desktop/editor-only files:
+.godot/editor/
+.godot/mono/
+
+# Legacy Godot 3 import folder
 .import/
 
 # Godot export/build artifacts
@@ -31,3 +36,7 @@
 Thumbs.db
 .vscode/
 .idea/
+
+# Python cache
+__pycache__/
+*.pyc

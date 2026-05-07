@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b4q5hclx6sf2g"
+path="res://.godot/imported/Granblue Fantasy Versus Soundtrack - The Prettiest Alchemist VS Cagliostro.mp3-a53d0b0f62f9271425faf0f3643dddb8.mp3str"
+
+[deps]
+
+source_file="res://music/background_music/Granblue Fantasy Versus Soundtrack - The Prettiest Alchemist VS Cagliostro.mp3"
+dest_files=["res://.godot/imported/Granblue Fantasy Versus Soundtrack - The Prettiest Alchemist VS Cagliostro.mp3-a53d0b0f62f9271425faf0f3643dddb8.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

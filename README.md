@@ -15,8 +15,8 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
   - `4 enemies`
   - `3 chests` (`1 rare + 2 normal`)
 - Puzzle combat modes:
-  - Multi-bug code fix (chapter 1-3)
-  - Block assembly (chapter 4)
+  - Multi-bug Python code fix (chapter 1-3)
+  - Block assembly algorithm (chapter 4)
 - Inventory system with consumables and artifacts.
 - Failure rules:
   - Lose when `HP = 0` or `timer = 0`.
@@ -26,27 +26,31 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
   - `2 stars`: elapsed `< 2/3` total stage time
   - `1 star`: cleared before timeout
   - `0 star`: failed
+- **Background music**: random shuffle from `music/background_music/` via `BackgroundMusicManager` autoload.
+- **SFX**: contextual sound effects from `music/audio/` via `SoundManager` autoload (UI clicks, combat events, chest open, portal, stage clear, etc.).
 
 ## Tech Stack
 
-- Engine: **Godot 4.6.2 stable**
+- Engine: **Godot 4.6.1 stable**
 - Language: **GDScript**
 - Data: JSON-driven content (`data/*.json`)
 - Validation helper: Python 3 script (`scripts/check_resource_refs.py`)
 
 ## Project Structure
 
-- `autoload/`: global managers (state, hp/time, inventory, data, telemetry)
+- `autoload/`: global managers (state, hp/time, inventory, data, telemetry, BGM, SFX)
 - `scenes/`: menus, maze, combat, entities, UI
 - `scripts/`: reusable gameplay systems
 - `data/`: enemies, stages, bugs, rules, loot tables
 - `tests/`: headless tests and embedded suites
-- `assets/`, `assets_2/`: game assets
+- `assets/`, `assets_2/`: game art assets
+- `music/background_music/`: background music tracks (MP3)
+- `music/audio/`: sound effect library (OGG)
 - `docs/`: GDD and project documentation
 
 ## Requirements
 
-- Godot `4.6.2` (desktop/editor + headless for CI tests)
+- Godot `4.6.1` (desktop/editor + headless for CI tests)
 - Python `3.x`
 
 ## Run
@@ -67,6 +71,7 @@ godot --headless --path . --quit-after 3
 - Interact: `E` / `Enter`
 - Pause: `Esc`
 - Combat: select/fix, then `Submit`
+- Home screen: **Quit** button is at the **bottom-left corner**
 
 ## Test
 
@@ -94,6 +99,7 @@ python3 scripts/check_resource_refs.py
 - Repository health tests verify scene contracts and data constraints.
 - Stage generation tests verify unique route and required enemy/chest distribution.
 - Menu/game-flow tests verify unlock logic, victory/game-over flow, star persistence, and UI hooks.
+- Audio tests verify all BGM tracks and SFX files exist and are reachable.
 
 ## Contributing
 
