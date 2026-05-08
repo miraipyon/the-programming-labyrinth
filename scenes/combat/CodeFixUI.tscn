@@ -1,6 +1,8 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scenes/combat/CodeFixUI.gd" id="1_code_fix"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1"]
 
 [node name="CodeFixUI" type="Control"]
 layout_mode = 3
@@ -9,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+clip_contents = true
 script = ExtResource("1_code_fix")
 
 [node name="VBox" type="VBoxContainer" parent="."]
@@ -20,35 +23,115 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="RequirementLabel" type="Label" parent="VBox"]
+[node name="MainFrame" type="PanelContainer" parent="VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
+theme_override_styles/panel = SubResource("StyleBoxEmpty_1")
+
+[node name="CodeMargin" type="MarginContainer" parent="VBox/MainFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="InlineHost" type="VBoxContainer" parent="VBox/MainFrame/CodeMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="RequirementLabel" type="Label" parent="VBox/MainFrame/CodeMargin/InlineHost"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="CodeScroll" type="ScrollContainer" parent="VBox/MainFrame/CodeMargin/InlineHost"]
+visible = false
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+horizontal_scroll_mode = 1
+
+[node name="SnippetText" type="RichTextLabel" parent="VBox/MainFrame/CodeMargin/InlineHost/CodeScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="AnswerRows" type="ScrollContainer" parent="VBox/MainFrame/CodeMargin/InlineHost"]
+custom_minimum_size = Vector2(0, 126)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+horizontal_scroll_mode = 0
+
+[node name="RowsVBox" type="VBoxContainer" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="AnswerPanel" type="VBoxContainer" parent="VBox/MainFrame/CodeMargin/InlineHost"]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+theme_override_constants/separation = 8
+
+[node name="AnswerHeader" type="Label" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 text = ""
 autowrap_mode = 3
 
-[node name="CodeLabel" type="ScrollContainer" parent="VBox"]
-custom_minimum_size = Vector2(0, 128)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 1
-horizontal_scroll_mode = 0
-
-[node name="SnippetText" type="Label" parent="VBox/CodeLabel"]
+[node name="AnswerGrid" type="GridContainer" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-text = "Code snippet"
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="OptionCard_0" type="Button" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = ""
 autowrap_mode = 3
+alignment = 0
 
-[node name="AnswerRows" type="ScrollContainer" parent="VBox"]
-custom_minimum_size = Vector2(0, 154)
+[node name="OptionCard_1" type="Button" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid"]
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
+text = ""
+autowrap_mode = 3
+alignment = 0
 
-[node name="RowsVBox" type="VBoxContainer" parent="VBox/AnswerRows"]
+[node name="OptionCard_2" type="Button" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid"]
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+size_flags_vertical = 3
+text = ""
+autowrap_mode = 3
+alignment = 0
+
+[node name="OptionCard_3" type="Button" parent="VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = ""
+autowrap_mode = 3
+alignment = 0
+

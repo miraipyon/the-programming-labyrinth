@@ -199,19 +199,40 @@ func _test_ui_components() -> void:
 		"bugs": [{"line": 1, "accepted_fixes": ["print(a)"]}]
 	}
 	code_fix_ui.call("populate_code", bug_data)
+	var first_code_line := code_fix_ui.find_child("CodeText_0", true, false) as RichTextLabel
+	_assert_true(first_code_line != null and first_code_line.text.find("00") == -1 and first_code_line.text.find("01") == -1, "CodeFixUI hides numeric line prefixes")
 	var answer_variant: Variant = code_fix_ui.call("get_user_answer")
 	var answer: Dictionary = answer_variant if typeof(answer_variant) == TYPE_DICTIONARY else {}
 	_assert_eq(int(answer.get("line", -1)), 1, "CodeFixUI default answer line")
 	_assert_eq(str(answer.get("fix", "")), "print(a)", "CodeFixUI default answer fix")
 	code_fix_ui.call("mark_correct_lines", [1])
 	await process_frame
-	var solved_checkbox := code_fix_ui.get_node_or_null("VBox/AnswerRows/LineRow_1/LineCheck_1") as CheckBox
-	var solved_option := code_fix_ui.get_node_or_null("VBox/AnswerRows/LineRow_1/FixOption_1") as OptionButton
+	var solved_checkbox := code_fix_ui.find_child("LineCheck_1", true, false) as CheckBox
+	var solved_option := code_fix_ui.find_child("FixOption_1", true, false) as OptionButton
 	_assert_true(solved_checkbox != null and solved_checkbox.disabled, "CodeFixUI locks solved line checkbox")
 	_assert_true(solved_option != null and solved_option.disabled and not solved_option.visible, "CodeFixUI hides and locks solved line options")
 	code_fix_ui.call("_on_line_toggled", 1, true)
 	_assert_true(not bool(code_fix_ui.call("has_line_selection")), "CodeFixUI ignores selection on solved line")
 	code_fix_ui.queue_free()
+
+	# CodeFixUI scene runtime (regression): objective, rows, and answer cards must render
+	var code_fix_scene: PackedScene = load("res://scenes/combat/CodeFixUI.tscn")
+	var code_fix_scene_node := code_fix_scene.instantiate()
+	root.add_child(code_fix_scene_node)
+	await process_frame
+	code_fix_scene_node.call("populate_code", {
+		"goal": "Initialize character info and print it.",
+		"snippet": ["player = {", "    'name': 'Hero'", "    'hp': 100", "}"],
+		"bugs": [{"line": 0, "accepted_fixes": ["player = {"]}]
+	})
+	var requirement_label := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/RequirementLabel") as Label
+	var rows_vbox := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerRows/RowsVBox") as VBoxContainer
+	var card0 := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0") as Button
+	_assert_true(requirement_label != null and requirement_label.visible and requirement_label.text.find("Objective:") != -1, "CodeFixUI scene shows objective text")
+	_assert_true(rows_vbox != null and rows_vbox.get_child_count() > 0, "CodeFixUI scene renders code line rows")
+	_assert_true(card0 != null, "CodeFixUI scene keeps answer cards visible")
+	_assert_true(card0.modulate.a < 0.1, "CodeFixUI scene hides answer cards when no line selected")
+	code_fix_scene_node.queue_free()
 
 	# BlockAssemblyUI
 	var block_ui := Control.new()
@@ -234,23 +255,23 @@ func _test_ui_components() -> void:
 	await process_frame
 	hud.call("update_hp", 80, 100)
 	hud.call("update_time", 29.5)
-	
-	# Find HP bar (it's inside a container now)
-	var hp_bar_node := hud.get_node_or_null("TopBar/HPBarContainer/HPBar") as ProgressBar
-	var time_lbl_node := hud.get_node_or_null("TopBar/TimeLabel") as Label
+	var time_lbl_node := hud.get_node_or_null("TopBar/LeftStats/TimeGroup/TimeLabel") as Label
 	var status_lbl_node := hud.get_node_or_null("TopBar/StatusLabel") as Label
-	
-	_assert_true(hp_bar_node != null, "GameHUD has HPBar")
-	if hp_bar_node != null:
-		_assert_eq(int(hp_bar_node.value), 80, "GameHUD updates HP bar")
 	
 	_assert_true(time_lbl_node != null, "GameHUD has TimeLabel")
 	if time_lbl_node != null:
-		_assert_true(time_lbl_node.text.find("00:30") != -1, "GameHUD formats time")
+		_assert_true(time_lbl_node.text == "00:30", "GameHUD formats time")
 	
 	_assert_true(status_lbl_node != null, "GameHUD has StatusLabel")
 	if status_lbl_node != null:
 		_assert_true(status_lbl_node.text.find("Chapter") != -1, "GameHUD shows chapter title in status")
+
+	# Check HP bar after a small delay for tween
+	var hp_bar_node := hud.get_node_or_null("TopBar/LeftStats/HPGroup/HPBarContainer/HPBar") as Range
+	await create_timer(0.6).timeout
+	_assert_true(hp_bar_node != null, "GameHUD has HPBar")
+	if hp_bar_node != null:
+		_assert_eq(int(hp_bar_node.value), 80, "GameHUD updates HP bar")
 
 	var has_deprecated_inv_note := false
 	for node in hud.find_children("*", "Label", true, false):
@@ -317,9 +338,42 @@ func _test_ui_components() -> void:
 
 	console.call("show_console", {}, {"type": "code_fix", "snippet": ["a"], "bugs": []})
 	_assert_true(console.visible, "CombatConsole shows when encounter starts")
+	var combat_hp_row := console.find_child("HPRow", true, false)
+	var top_hbox := combat_hp_row.get_parent() as HBoxContainer if combat_hp_row != null else null
+	var combat_enemy_label := console.find_child("EnemyLabel", true, false) as Label
+	var combat_turn_label := console.find_child("TurnLabel", true, false) as Label
+	_assert_true(top_hbox != null and combat_hp_row != null and combat_hp_row.get_index() == 0, "CombatConsole places HP on the left")
+	_assert_true(top_hbox != null and combat_enemy_label != null and combat_enemy_label.get_index() == top_hbox.get_child_count() - 1 and combat_enemy_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_RIGHT, "CombatConsole places enemy name on the right")
+	_assert_true(combat_turn_label != null and not combat_turn_label.visible, "CombatConsole hides turn label from combat HUD")
 	console.call("hide_console")
 	_assert_true(not console.visible, "CombatConsole hides correctly")
 	wrapper.queue_free()
+
+	# CombatConsole scene runtime (regression): code UI + skip button must be visible/populated
+	var wrapper_scene := Node.new()
+	wrapper_scene.name = "WrapperScene"
+	root.add_child(wrapper_scene)
+	var encounter_scene: Node = encounter_script.new()
+	encounter_scene.name = "EncounterManager"
+	wrapper_scene.add_child(encounter_scene)
+	var console_scene: PackedScene = load("res://scenes/combat/CombatConsole.tscn")
+	var console_real := console_scene.instantiate()
+	wrapper_scene.add_child(console_real)
+	await process_frame
+	console_real.call("show_console", {"id": "syntax_slime", "name": "Syntax Slime"}, {
+		"type": "code_fix",
+		"goal": "Initialize character info and print it.",
+		"snippet": ["player = {", "    'name': 'Hero'", "    'hp': 100", "}"],
+		"bugs": [{"line": 1, "accepted_fixes": ["    'name': 'Hero',"]}]
+	})
+	await process_frame
+	var real_skip := console_real.get_node_or_null("CombatRoot/Panel/VBox/SkipButton") as Button
+	var real_rows := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/AnswerRows/RowsVBox") as VBoxContainer
+	var real_req := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/RequirementLabel") as Label
+	_assert_true(real_skip != null and real_skip.visible, "CombatConsole scene keeps Skip button visible")
+	_assert_true(real_rows != null and real_rows.get_child_count() > 0, "CombatConsole scene renders code rows in combat")
+	_assert_true(real_req != null and real_req.visible and real_req.text.find("Objective:") != -1, "CombatConsole scene shows combat objective")
+	wrapper_scene.queue_free()
 
 	# InventoryPanel
 	var inv_manager_for_panel: Node = root.get_node_or_null("InventoryManager")

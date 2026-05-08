@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" path="res://scenes/ui/GameHUD.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://assets_2/png/Counter/Icon/Time.png" id="2_time_icon"]
+[ext_resource type="Texture2D" path="res://assets_4/bg.png" id="3_hp_bg"]
+[ext_resource type="Texture2D" path="res://assets_4/green.png" id="4_hp_fill"]
+[ext_resource type="Texture2D" path="res://assets_4/hp_heart.png" id="5_hp_heart"]
 
 [node name="GameHUD" type="CanvasLayer"]
 layer = 5
@@ -12,54 +15,78 @@ anchors_preset = -1
 anchor_left = 0.02
 anchor_top = 0.02
 anchor_right = 0.98
-anchor_bottom = 0.10
+anchor_bottom = 0.15
 theme_override_constants/separation = 16
 
-[node name="HPBarContainer" type="MarginContainer" parent="TopBar"]
+[node name="LeftStats" type="VBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = -4
+
+[node name="HPGroup" type="HBoxContainer" parent="TopBar/LeftStats"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPHeartIcon" type="TextureRect" parent="TopBar/LeftStats/HPGroup"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("5_hp_heart")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HPBarContainer" type="MarginContainer" parent="TopBar/LeftStats/HPGroup"]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/margin_top = 4
 
-[node name="HPBar" type="ProgressBar" parent="TopBar/HPBarContainer"]
+[node name="HPBar" type="TextureProgressBar" parent="TopBar/LeftStats/HPGroup/HPBarContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(200, 24)
 max_value = 100.0
 value = 100.0
-show_percentage = false
+nine_patch_stretch = true
+stretch_margin_left = 4
+stretch_margin_top = 4
+stretch_margin_right = 4
+stretch_margin_bottom = 4
+texture_under = ExtResource("3_hp_bg")
+texture_progress = ExtResource("4_hp_fill")
 
-[node name="TimeIconContainer" type="MarginContainer" parent="TopBar"]
+[node name="TimeGroup" type="HBoxContainer" parent="TopBar/LeftStats"]
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_constants/margin_top = 6
+theme_override_constants/separation = 8
 
-[node name="TimeIcon" type="TextureRect" parent="TopBar/TimeIconContainer"]
-custom_minimum_size = Vector2(44, 44)
+[node name="TimeIconContainer" type="MarginContainer" parent="TopBar/LeftStats/TimeGroup"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/margin_top = 4
+
+[node name="TimeIcon" type="TextureRect" parent="TopBar/LeftStats/TimeGroup/TimeIconContainer"]
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 texture = ExtResource("2_time_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TimeLabel" type="Label" parent="TopBar"]
+[node name="TimeLabel" type="Label" parent="TopBar/LeftStats/TimeGroup"]
 layout_mode = 2
 size_flags_vertical = 4
-custom_minimum_size = Vector2(110, 24)
-text = "Time: 06:00"
+theme_override_font_sizes/font_size = 18
+text = "06:00"
 
 [node name="StatusLabel" type="Label" parent="TopBar"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 4
+size_flags_vertical = 0
+theme_override_constants/margin_top = 4
 horizontal_alignment = 2
 text = "Chapter 1: The Source Forest"
 
-[node name="ArtifactBar" type="Label" parent="TopBar"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_font_sizes/font_size = 11
-visible = false
-
 [node name="InventoryButton" type="Button" parent="TopBar"]
 layout_mode = 2
-size_flags_vertical = 4
-custom_minimum_size = Vector2(120, 32)
-text = "📦 Inventory"
+size_flags_vertical = 0
+custom_minimum_size = Vector2(48, 48)
+theme_override_font_sizes/font_size = 20
+text = "📦"
+

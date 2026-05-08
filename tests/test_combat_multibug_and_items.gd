@@ -190,11 +190,14 @@ func _test_combat_console_quick_inventory() -> void:
 		"bugs": [{"line": 0, "accepted_fixes": ["print(name)"]}]
 	}
 	console.call("show_console", {"name": "Syntax Slime"}, code_bug)
-	var hp_label := console.get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPLabel") as Label
-	var hp_bar := console.get_node_or_null("CombatRoot/Panel/VBox/HPRow/CombatHPBar") as ProgressBar
+	var hp_label := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPLabel") as Label
+	var hp_bar := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar") as Range
+	
+	await get_tree().create_timer(1.0).timeout # Wait for HP tween
+	
 	_assert_true(hp_label != null and hp_bar != null, "Combat UI shows HP widgets")
 	if hp_label != null:
-		_assert_true(hp_label.text.find("70/100") != -1, "Combat UI updates player HP text")
+		_assert_true(hp_label.text == "", "Combat UI numerical HP is removed")
 	if hp_bar != null:
 		_assert_eq(int(hp_bar.value), 70, "Combat UI updates player HP bar value")
 	var hint_result: Dictionary = console.call("use_hint_or_snap", "hint_chip")

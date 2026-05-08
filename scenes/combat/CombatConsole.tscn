@@ -1,8 +1,16 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/combat/CombatConsole.gd" id="1_console"]
 [ext_resource type="PackedScene" path="res://scenes/combat/CodeFixUI.tscn" id="2_code_fix"]
 [ext_resource type="PackedScene" path="res://scenes/combat/BlockAssemblyUI.tscn" id="3_block_ui"]
+[ext_resource type="Texture2D" path="res://assets_4/hp_heart.png" id="4_hp_heart"]
+[ext_resource type="Texture2D" path="res://assets_4/bg.png" id="5_hp_bg"]
+[ext_resource type="Texture2D" path="res://assets_4/green.png" id="6_hp_fill"]
+
+
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2"]
 
 [node name="CombatConsole" type="CanvasLayer"]
 layer = 120
@@ -17,32 +25,91 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Backdrop" type="ColorRect" parent="CombatRoot"]
+[node name="Backdrop" type="TextureRect" parent="CombatRoot"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.054902, 0.0666667, 0.105882, 0.972549)
+expand_mode = 1
+stretch_mode = 6
 
-[node name="BackdropStripe" type="ColorRect" parent="CombatRoot"]
+
+[node name="TopInfo" type="PanelContainer" parent="CombatRoot"]
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 10
 anchor_right = 1.0
-anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 20.0
+offset_right = -40.0
+offset_bottom = 70.0
 grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.133333, 0.180392, 0.25098, 0.0823529)
+theme_override_styles/panel = SubResource("StyleBoxEmpty_1")
+
+[node name="MarginContainer" type="MarginContainer" parent="CombatRoot/TopInfo"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CombatRoot/TopInfo/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="HPRow" type="HBoxContainer" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 4
+
+[node name="HPHeart" type="TextureRect" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_hp_heart")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CombatHPLabel" type="Label" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow"]
+visible = false
+layout_mode = 2
+text = ""
+
+[node name="CombatHPBar" type="TextureProgressBar" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow"]
+custom_minimum_size = Vector2(260, 14)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+value = 100.0
+nine_patch_stretch = true
+texture_under = ExtResource("5_hp_bg")
+texture_progress = ExtResource("6_hp_fill")
+
+[node name="TurnLabel" type="Label" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer"]
+visible = false
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+
+[node name="EnemyLabel" type="Label" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+text = "Enemy Name"
+horizontal_alignment = 2
 
 [node name="Panel" type="PanelContainer" parent="CombatRoot"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 80.0
 grow_horizontal = 2
 grow_vertical = 2
 clip_contents = true
+theme_override_styles/panel = SubResource("StyleBoxEmpty_2")
+
 
 [node name="VBox" type="VBoxContainer" parent="CombatRoot/Panel"]
 layout_mode = 2
@@ -50,57 +117,33 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 10
 
-[node name="EnemyLabel" type="Label" parent="CombatRoot/Panel/VBox"]
-visible = false
-layout_mode = 2
-text = ""
-
-[node name="TurnLabel" type="Label" parent="CombatRoot/Panel/VBox"]
-visible = false
-layout_mode = 2
-text = ""
-
-[node name="HPRow" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="CombatHPLabel" type="Label" parent="CombatRoot/Panel/VBox/HPRow"]
-layout_mode = 2
-custom_minimum_size = Vector2(110, 0)
-text = "HP: --/--"
-theme_override_colors/font_color = Color(0.95, 0.85, 0.55, 1)
-
-[node name="CombatHPBar" type="ProgressBar" parent="CombatRoot/Panel/VBox/HPRow"]
-custom_minimum_size = Vector2(180, 16)
-layout_mode = 2
-size_flags_horizontal = 3
-show_percentage = false
 
 [node name="BattleView" type="VBoxContainer" parent="CombatRoot/Panel/VBox"]
-custom_minimum_size = Vector2(0, 250)
+custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 size_flags_vertical = 1
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="Portraits" type="HBoxContainer" parent="CombatRoot/Panel/VBox/BattleView"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 200
+theme_override_constants/separation = 190
 
 [node name="PlayerPortrait" type="TextureRect" parent="CombatRoot/Panel/VBox/BattleView/Portraits"]
-custom_minimum_size = Vector2(170, 170)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
 [node name="EnemyPortrait" type="TextureRect" parent="CombatRoot/Panel/VBox/BattleView/Portraits"]
-custom_minimum_size = Vector2(170, 170)
+custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 flip_h = false
 expand_mode = 1
 stretch_mode = 5
 
 [node name="BattleLineLabel" type="Label" parent="CombatRoot/Panel/VBox/BattleView"]
+visible = false
 layout_mode = 2
 text = ""
 horizontal_alignment = 1
@@ -108,11 +151,13 @@ autowrap_mode = 3
 
 [node name="QuickInventory" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
 layout_mode = 2
+size_flags_vertical = 1
 theme_override_constants/separation = 6
 
 [node name="CodeFixUI" parent="CombatRoot/Panel/VBox" instance=ExtResource("2_code_fix")]
+custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
-size_flags_vertical = 3
+size_flags_vertical = 1
 
 [node name="BlockAssemblyUI" parent="CombatRoot/Panel/VBox" instance=ExtResource("3_block_ui")]
 visible = false
@@ -127,10 +172,12 @@ autowrap_mode = 3
 [node name="SubmitButton" type="Button" parent="CombatRoot/Panel/VBox"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
+size_flags_vertical = 1
 text = "Submit"
 
 [node name="SkipButton" type="Button" parent="CombatRoot/Panel/VBox"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
+size_flags_vertical = 1
 tooltip_text = "Dev shortcut: end combat instantly."
 text = "Skip (Dev)"

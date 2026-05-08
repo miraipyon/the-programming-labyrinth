@@ -150,30 +150,25 @@ func _test_scene_contracts() -> void:
 		"Camera2D"
 	])
 	await _assert_scene_contract("res://scenes/combat/CombatConsole.tscn", "CombatConsole", [
-		"CombatRoot/Panel/VBox",
-		"CombatRoot/Panel/VBox/EnemyLabel",
-		"CombatRoot/Panel/VBox/TurnLabel",
-		"CombatRoot/Panel/VBox/HPRow",
-		"CombatRoot/Panel/VBox/HPRow/CombatHPLabel",
-		"CombatRoot/Panel/VBox/HPRow/CombatHPBar",
-		"CombatRoot/Panel/VBox/QuickInventory",
-		"CombatRoot/Panel/VBox/CodeFixUI",
-		"CombatRoot/Panel/VBox/BlockAssemblyUI",
-		"CombatRoot/Panel/VBox/StatusLabel",
-		"CombatRoot/Panel/VBox/SubmitButton"
+		"CombatRoot/Backdrop",
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/EnemyLabel",
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/TurnLabel",
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/HPHeart",
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar"
 	])
 	await _assert_scene_contract("res://scenes/combat/CodeFixUI.tscn", "CodeFixUI", [
-		"VBox/CodeLabel",
-		"VBox/AnswerRows"
+		"VBox/MainFrame/CodeMargin/InlineHost/CodeScroll",
+		"VBox/MainFrame/CodeMargin/InlineHost/AnswerRows",
+		"VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0"
 	])
 	await _assert_scene_contract("res://scenes/combat/BlockAssemblyUI.tscn", "BlockAssemblyUI", [
 		"VBox/GoalLabel",
 		"VBox/BlockRows"
 	])
 	await _assert_scene_contract("res://scenes/ui/GameHUD.tscn", "GameHUD", [
-		"TopBar/HPBarContainer/HPBar",
-		"TopBar/TimeIconContainer/TimeIcon",
-		"TopBar/TimeLabel",
+		"TopBar/LeftStats/HPGroup/HPBarContainer/HPBar",
+		"TopBar/LeftStats/TimeGroup/TimeIconContainer/TimeIcon",
+		"TopBar/LeftStats/TimeGroup/TimeLabel",
 		"TopBar/StatusLabel"
 	])
 	await _assert_scene_contract("res://scenes/ui/LootPopup.tscn", "LootPopup", [

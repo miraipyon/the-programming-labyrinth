@@ -16,6 +16,7 @@ var _inv_visible: bool = false
 var _artifact_bar: Label = null
 # Pending consumable indicator
 var _pending_label: Label = null
+var _hp_tween: Tween = null
 
 const ITEM_ICON_PATHS := {
 	"green_tea": "res://assets/items/green_tea.png",
@@ -37,8 +38,8 @@ const TIME_ICON_PATH := "res://assets_2/png/Counter/Icon/Time.png"
 
 func _ready() -> void:
 	# hp_label = _find_label(["TopBar/HPLabel"]) # Removed per request
-	time_label = _find_label(["TopBar/TimeLabel", "TopBar/TimeIconContainer/TimeLabel"])
-	hp_bar = _find_range(["TopBar/HPBarContainer/HPBar", "TopBar/HPBar"])
+	time_label = _find_label(["TopBar/LeftStats/TimeGroup/TimeLabel", "TopBar/TimeGroup/TimeLabel"])
+	hp_bar = _find_range(["TopBar/LeftStats/HPGroup/HPBarContainer/HPBar", "TopBar/HPBarContainer/HPBar"])
 	status_label = _find_label(["TopBar/StatusLabel"])
 	_update_chapter_display()
 
@@ -82,9 +83,24 @@ func update_hp(hp: int, max_hp: int) -> void:
 	# hp_label removed per request
 
 	if hp_bar != null:
-		hp_bar.min_value = 0
 		hp_bar.max_value = safe_max
-		hp_bar.value = safe_hp
+		
+		# Cancel previous tween if active
+		if _hp_tween != null and _hp_tween.is_running():
+			_hp_tween.kill()
+		
+		_hp_tween = create_tween()
+		_hp_tween.set_trans(Tween.TRANS_SINE)
+		_hp_tween.set_ease(Tween.EASE_OUT)
+		_hp_tween.tween_property(hp_bar, "value", float(safe_hp), 0.5)
+		
+		# Optional: change color based on HP percentage if it's a TextureProgressBar
+		if hp_bar is TextureProgressBar:
+			var ratio := float(safe_hp) / float(safe_max)
+			if ratio < 0.25:
+				hp_bar.texture_progress = load("res://assets_4/red.png")
+			else:
+				hp_bar.texture_progress = load("res://assets_4/green.png")
 
 
 func update_time(time_left: float) -> void:
@@ -92,7 +108,7 @@ func update_time(time_left: float) -> void:
 	var total_seconds := int(ceil(safe_time))
 	var minutes := total_seconds / 60
 	var seconds := total_seconds % 60
-	var text := "Time: %02d:%02d" % [minutes, seconds]
+	var text := "%02d:%02d" % [minutes, seconds]
 
 	if time_label != null:
 		time_label.text = text
