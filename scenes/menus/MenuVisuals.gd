@@ -20,6 +20,7 @@ static func style_menu_button(button: Button, icon_path: String = "") -> void:
 	button.add_theme_color_override("font_color", Color(0.96, 1.0, 0.78))
 	button.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 0.88))
 	button.add_theme_color_override("font_disabled_color", Color(0.55, 0.55, 0.48))
+	apply_hover_effect(button)
 
 
 static func style_rect_button(button: Button, icon_path: String = "", minimum_size: Vector2 = Vector2(160.0, 85.0), use_textured_style: bool = true) -> void:
@@ -36,6 +37,7 @@ static func style_rect_button(button: Button, icon_path: String = "", minimum_si
 	if not icon_path.is_empty():
 		button.icon = load_texture(icon_path)
 		button.expand_icon = true
+	apply_hover_effect(button)
 
 
 static func style_square_button(button: Button, icon_path: String = "", minimum_size: Vector2 = Vector2(88.0, 88.0), use_textured_style: bool = true) -> void:
@@ -52,6 +54,7 @@ static func style_square_button(button: Button, icon_path: String = "", minimum_
 	if not icon_path.is_empty():
 		button.icon = load_texture(icon_path)
 		button.expand_icon = true
+	apply_hover_effect(button)
 
 
 static func _apply_texture_button_style(button: Button, normal_path: String, hover_path: String, pressed_path: String, disabled_path: String) -> void:
@@ -122,3 +125,35 @@ static func load_texture(path: String) -> Texture2D:
 	if texture is Texture2D:
 		return texture
 	return null
+
+
+static func apply_hover_effect(button: Button) -> void:
+	if button == null: return
+	
+	# Set pivot to center for scaling
+	button.pivot_offset = button.size * 0.5
+	if not button.resized.is_connected(func(): button.pivot_offset = button.size * 0.5):
+		button.resized.connect(func(): button.pivot_offset = button.size * 0.5)
+
+	if not button.mouse_entered.is_connected(_on_generic_button_hovered.bind(button)):
+		button.mouse_entered.connect(_on_generic_button_hovered.bind(button))
+	if not button.mouse_exited.is_connected(_on_generic_button_unhovered.bind(button)):
+		button.mouse_exited.connect(_on_generic_button_unhovered.bind(button))
+
+
+static func _on_generic_button_hovered(button: Button) -> void:
+	if button == null or not is_instance_valid(button) or button.disabled: 
+		return
+	var tween := button.create_tween().set_parallel(true)
+	tween.tween_property(button, "scale", Vector2(1.05, 1.05), 0.12).set_trans(Tween.TRANS_QUAD)
+	tween.tween_property(button, "modulate", Color(1.15, 1.15, 1.15), 0.12)
+
+
+static func _on_generic_button_unhovered(button: Button) -> void:
+	if button == null or not is_instance_valid(button) or button.disabled:
+		return
+	var tween := button.create_tween().set_parallel(true)
+	tween.tween_property(button, "scale", Vector2(1.0, 1.0), 0.12).set_trans(Tween.TRANS_QUAD)
+	# Only reset modulate if it was likely changed by our hover effect
+	# Actually, better to check if it's near our hover color or just reset if not disabled
+	tween.tween_property(button, "modulate", Color.WHITE, 0.12)

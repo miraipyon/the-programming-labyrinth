@@ -77,6 +77,8 @@ func _connect_buttons() -> void:
 		var callback := _on_stage_pressed.bind(stage_number)
 		if not button.pressed.is_connected(callback):
 			button.pressed.connect(callback)
+		
+		MenuVisuals.apply_hover_effect(button)
 
 
 func _refresh() -> void:

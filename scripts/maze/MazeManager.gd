@@ -41,6 +41,7 @@ var _maze_room_height: int = 0
 var _maze_start_room: Vector2i = Vector2i.ZERO
 var _maze_exit_room: Vector2i = Vector2i.ZERO
 var _maze_main_path: Array[Vector2i] = []
+var _cursor_highlight: ColorRect = null
 
 
 # --- Lifecycle ---
@@ -49,6 +50,22 @@ func _ready() -> void:
 	if encounter_manager != null and encounter_manager.has_signal("encounter_completed"):
 		if not encounter_manager.is_connected("encounter_completed", _on_encounter_completed):
 			encounter_manager.connect("encounter_completed", _on_encounter_completed)
+
+
+func _process(_delta: float) -> void:
+	if _cursor_highlight == null or not is_instance_valid(_cursor_highlight):
+		return
+	
+	var m_pos := get_local_mouse_position()
+	var grid_pos := (m_pos / MAZE_TILE_SIZE).floor()
+	_cursor_highlight.position = grid_pos * MAZE_TILE_SIZE
+	
+	var bounds := _get_stage_bounds()
+	# Check if inside maze bounds and if maze UI is not blocked by something else
+	if bounds.has_point(m_pos):
+		_cursor_highlight.visible = true
+	else:
+		_cursor_highlight.visible = false
 
 
 # --- Level Setup ---
@@ -959,6 +976,15 @@ func _spawn_maze_visuals() -> void:
 	if not has_custom_obstacles:
 		_add_obstacle(Vector2(bounds.size.x - 96, 128), Vector2(56, 56))
 		_add_obstacle(Vector2(128, bounds.size.y - 96), Vector2(56, 56))
+
+	_cursor_highlight = ColorRect.new()
+	_cursor_highlight.name = "CursorHighlight"
+	_cursor_highlight.size = Vector2(MAZE_TILE_SIZE, MAZE_TILE_SIZE)
+	_cursor_highlight.color = Color(1, 1, 1, 0.15)
+	_cursor_highlight.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_cursor_highlight.visible = false
+	visual_root.add_child(_cursor_highlight)
+	visual_root.move_child(_cursor_highlight, visual_root.get_child_count() - 1)
 
 
 func _spawn_generated_maze_walls() -> bool:
