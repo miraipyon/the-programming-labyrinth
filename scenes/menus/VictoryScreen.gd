@@ -6,6 +6,7 @@ var _stage_clear_result: Dictionary = {}
 var _cleared_chapter := 1
 var _cleared_stage_id := "ch1_stage1"
 var _stage_stars := 0
+var _star_bonus_name := ""
 
 const MenuVisuals := preload("res://scenes/menus/MenuVisuals.gd")
 const ICON_PLAY_PATH := "res://assets_2/png/Button/Icon/Play.png"
@@ -47,10 +48,14 @@ func _award_star_rewards(stars: int) -> void:
 		var item_id := str(data_manager.call("roll_loot", "rare"))
 		if not item_id.is_empty():
 			inventory_manager.call("add_item_temporary", item_id)
+			var item_data: Dictionary = data_manager.call("get_item_data", item_id)
+			_star_bonus_name = str(item_data.get("name", item_id))
 	elif stars >= 2:
 		var item_id := str(data_manager.call("roll_loot", "normal"))
 		if not item_id.is_empty():
 			inventory_manager.call("add_item_temporary", item_id)
+			var item_data: Dictionary = data_manager.call("get_item_data", item_id)
+			_star_bonus_name = str(item_data.get("name", item_id))
 
 func _on_retry_pressed() -> void:
 	_commit_stage_clear()
@@ -255,6 +260,9 @@ func _render_temporary_loot() -> void:
 
 			if not lines.is_empty():
 				loot_text = "Loot Collected:\n" + "\n".join(lines)
+			
+			if not _star_bonus_name.is_empty():
+				loot_text = "STAR BONUS: " + _star_bonus_name + "\n\n" + loot_text
 
 	_set_loot_text(loot_text)
 

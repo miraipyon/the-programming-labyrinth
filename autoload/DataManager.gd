@@ -87,11 +87,27 @@ func get_enemy_data(enemy_id: String) -> Dictionary:
 	return {}
 
 func get_bug_by_id(bug_id: String) -> Dictionary:
-	for bug in bugs_data:
-		if typeof(bug) == TYPE_DICTIONARY and str(bug.get("id", "")) == str(bug_id):
-			return bug
+	var base_id := bug_id.strip_edges()
+	if base_id.is_empty():
+		return {}
 
-	return {}
+	# Tìm các biến thể (variants) của câu hỏi này (ví dụ: bug_id_v1, bug_id_v2...)
+	var variants: Array = []
+	var exact_match: Dictionary = {}
+
+	for bug in bugs_data:
+		if typeof(bug) != TYPE_DICTIONARY:
+			continue
+		var current_id: String = str(bug.get("id", ""))
+		if current_id == base_id:
+			exact_match = bug
+		elif current_id.begins_with(base_id + "_v"):
+			variants.append(bug)
+
+	if not variants.is_empty():
+		return variants[randi() % variants.size()]
+	
+	return exact_match
 
 func get_bugs_by_chapter(chapter: int) -> Array:
 	var results = []
