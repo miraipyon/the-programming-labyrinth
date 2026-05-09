@@ -33,8 +33,24 @@ func _ready() -> void:
 	_connect_button("MainMenuButton", _on_main_menu_pressed)
 	_stage_stars = _calculate_stage_stars(false)
 	_render_stage_stars(_stage_stars)
+	_award_star_rewards(_stage_stars)
 	_render_temporary_loot()
 	_update_next_button_state()
+
+func _award_star_rewards(stars: int) -> void:
+	var inventory_manager: Node = _get_inventory_manager()
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if inventory_manager == null or data_manager == null or not data_manager.has_method("roll_loot"):
+		return
+
+	if stars >= 3:
+		var item_id := str(data_manager.call("roll_loot", "rare"))
+		if not item_id.is_empty():
+			inventory_manager.call("add_item_temporary", item_id)
+	elif stars >= 2:
+		var item_id := str(data_manager.call("roll_loot", "normal"))
+		if not item_id.is_empty():
+			inventory_manager.call("add_item_temporary", item_id)
 
 func _on_retry_pressed() -> void:
 	_commit_stage_clear()

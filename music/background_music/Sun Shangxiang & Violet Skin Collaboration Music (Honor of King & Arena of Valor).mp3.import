@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://m3qvapna211p"
+path="res://.godot/imported/Sun Shangxiang & Violet Skin Collaboration Music (Honor of King & Arena of Valor).mp3-f2e56c784661c49bb25aeb70d377f51a.mp3str"
+
+[deps]
+
+source_file="res://music/background_music/Sun Shangxiang & Violet Skin Collaboration Music (Honor of King & Arena of Valor).mp3"
+dest_files=["res://.godot/imported/Sun Shangxiang & Violet Skin Collaboration Music (Honor of King & Arena of Valor).mp3-f2e56c784661c49bb25aeb70d377f51a.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
