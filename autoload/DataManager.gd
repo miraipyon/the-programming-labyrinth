@@ -7,6 +7,7 @@ var bugs_data: Array = []         # Từ data/bugs.json
 var stages_data: Array = []       # Từ data/stages.json
 var game_rules: Dictionary = {}   # Từ data/game_rules.json
 var loot_tables: Dictionary = {}  # Từ data/loot_tables.json
+var randomize_bugs: bool = true   # Cho phép test tắt ngẫu nhiên hóa câu hỏi
 
 func _ready() -> void:
 	_load_all_data()
@@ -104,7 +105,7 @@ func get_bug_by_id(bug_id: String) -> Dictionary:
 		elif current_id.begins_with(base_id + "_v"):
 			variants.append(bug)
 
-	if not variants.is_empty():
+	if randomize_bugs and not variants.is_empty():
 		return variants[randi() % variants.size()]
 	
 	return exact_match

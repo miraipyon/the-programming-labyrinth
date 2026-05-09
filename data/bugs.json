@@ -18048,5 +18048,3615 @@
       8
     ],
     "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
+  },
+  {
+    "id": "ch1_syntax_001",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "easy",
+    "goal": "Initialize character info and print it.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Missing comma between key-value pairs in the dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Dictionary assignment must use a colon (:), not an equals sign (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "In a Python dictionary, key-value pairs use colons (:) and are separated by commas (,)."
+  },
+  {
+    "id": "ch1_syntax_002",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "medium",
+    "goal": "Check the condition and print the first item in the list.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python booleans must start with uppercase letters (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Missing comma between list elements.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python is case-sensitive: booleans are `True` and `False`. Lists require commas between elements."
+  },
+  {
+    "id": "ch1_syntax_003",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "hard",
+    "goal": "Concatenate strings to display class and level information.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing single quote for the static string.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Missing closing single quote for the static string part before concatenating with a variable.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string must be wrapped with matching quotes (' or \") so its boundaries are clear."
+  },
+  {
+    "id": "ch1_syntax_004",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "very_hard",
+    "goal": "Write a function to calculate damage based on attack and defense.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python function definitions use 'def' instead of 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "The 'return' keyword must be fully lowercase.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python defines functions with `def`. Standard keywords (`return`, `if`, `for`, etc.) must be lowercase."
+  },
+  {
+    "id": "ch1_syntax_005",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "boss",
+    "goal": "Check whether the first element of a nested list (2D list) is positive.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing bracket for the first nested list before the comma.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "if (or for, while, def) statements in Python must end with a colon (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Nested lists must have matching `[]` brackets. An `if` statement must end with `:` to start a block."
+  },
+  {
+    "id": "ch2_logic_001",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "easy",
+    "goal": "Evaluate the character's HP status.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'hpy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "'=' is assignment. Use '==' for equality comparison.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic error: hp must be < 50 to be considered 'critical'. Using '>' violates the requirement.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Python equality uses `==`. Reversing logic (`>` instead of `<`) is a common critical trap."
+  },
+  {
+    "id": "ch2_logic_002",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "medium",
+    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Wrong logical operator: requirement is (VIP AND level >= 10); using 'or' lets level < 10 pass.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+  },
+  {
+    "id": "ch2_logic_003",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "hard",
+    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg is a string (str); adding it directly to an integer raises TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string is not auto-cast to an integer. Use `int()` to convert a string into a valid number."
+  },
+  {
+    "id": "ch2_logic_004",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "very_hard",
+    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "snippet": [
+      "value = 85",
+      "level = ''",
+      "if value >= 90:",
+      "    level = 'S'",
+      "if value >= 70:",
+      "    level = 'A'",
+      "else:",
+      "    level = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Using separate `if` blocks causes logic leaks. If score = 95, rank gets overwritten from 'S' to 'A'.",
+        "wrong_code": "if value >= 70:",
+        "accepted_fixes": [
+          "elif value >= 70:"
+        ],
+        "distractors": [
+          "elif value <= 70:",
+          "else if value >= 70:",
+          "if value > 70:"
+        ]
+      }
+    ],
+    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+  },
+  {
+    "id": "ch2_logic_005",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "boss",
+    "goal": "Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The ternary operator (inline if) is reversed: poisoned should lose HP, not gain it.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Python inline-if syntax is `Value_If_True if Condition else Value_If_False`. Swapping true/false values reverses behavior."
+  },
+  {
+    "id": "ch3_runtime_001",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "easy",
+    "goal": "Use a while loop to print each items item (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Starting from index 1 permanently skips the first element (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Looping with <= len(items) causes an out-of-range error (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "Python lists are zero-indexed: first element is `[0]`, last is `[len - 1]`. Looping from 1 to `<= len` is a severe off-by-one bug."
+  },
+  {
+    "id": "ch3_runtime_002",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "medium",
+    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "snippet": [
+      "enemies = ['enemy', 'enemy', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'enemy':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Forward iteration with pop() shrinks the list and throws IndexError (out of range) near the end.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Never delete array elements by index while iterating forward (`for i`), because the array shrinks. The safe pattern is reverse iteration: `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_runtime_003",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "hard",
+    "goal": "Simulate walking energy consumption and print distance when energy is depleted.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "The energy variable increases instead of decreasing, so `energy > 0` stays true and causes an infinite loop.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Increasing energy while the stop condition is energy depletion creates an infinite loop and can freeze the program."
+  },
+  {
+    "id": "ch3_runtime_004",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "very_hard",
+    "goal": "Iterate through a rectangular (non-square) matrix and sum all elements.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The column loop (j) incorrectly uses len(grid), the row count (3), overflowing the real column count (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "When iterating an arbitrary 2D array (M x N), the inner column loop must use the current row length: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_runtime_005",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "boss",
+    "goal": "Reverse the password string by traversing indices backward in a loop.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "range(len, 0, -1) iterates from index 4 to 1. Index 4 is invalid because the max valid index is 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "In Python, `range(start, stop, step)` includes `start` and stops right before `stop`. To iterate backward down to `index = 0`, `stop` must be `-1`, and `start` must be `len - 1`."
+  },
+  {
+    "id": "ch4_flow_001",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "easy",
+    "type": "block_assembly",
+    "goal": "Use Binary Search to find `target` in sorted array `arr`. Return index or -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Binary search computes integer midpoint `mid` using `// 2`. If value is smaller than target, shrink from the left (`left = mid + 1`); if larger, shrink from the right (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_flow_002",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "medium",
+    "type": "block_assembly",
+    "goal": "Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Compare pointer elements `a[i]` and `b[j]`. Push the smaller one to `result` and advance that pointer. The final two while loops drain leftovers not covered by the earlier `and` condition."
+  },
+  {
+    "id": "ch4_flow_003",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "hard",
+    "type": "block_assembly",
+    "goal": "Check whether the text string `s` is a palindrome.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
+  },
+  {
+    "id": "ch4_flow_004",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Sort numeric array `nums` in ascending order using Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Selection Sort always finds the smallest element in the unsorted range `[i+1, n]`. After each pass, swap `nums[i]` with that minimum element."
+  },
+  {
+    "id": "ch4_flow_005",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "boss",
+    "type": "block_assembly",
+    "goal": "Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Efficient memoization with a DP array: initialize an array of `n+1` zeros, set base cases to 0 and 1, then compute forward using stored previous states to reduce Fibonacci computation time."
+  },
+  {
+    "id": "ch1_stage1_q01",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "easy",
+    "goal": "Initialize character info and print it.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Missing comma between key-value pairs in the dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Dictionary assignment must use a colon (:), not an equals sign (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "In a Python dictionary, key-value pairs use colons (:) and are separated by commas (,)."
+  },
+  {
+    "id": "ch1_stage1_q02",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "easy",
+    "goal": "Check the condition and print the first item in the list.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python booleans must start with uppercase letters (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Missing comma between list elements.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python is case-sensitive: booleans are `True` and `False`. Lists require commas between elements."
+  },
+  {
+    "id": "ch1_stage1_q03",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "easy",
+    "goal": "Concatenate strings to display class and level information.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing single quote for the static string.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Missing closing single quote for the static string part before concatenating with a variable.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string must be wrapped with matching quotes (' or \") so its boundaries are clear."
+  },
+  {
+    "id": "ch1_stage1_q04",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "easy",
+    "goal": "Write a function to calculate damage based on attack and defense.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python function definitions use 'def' instead of 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "The 'return' keyword must be fully lowercase.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python defines functions with `def`. Standard keywords (`return`, `if`, `for`, etc.) must be lowercase."
+  },
+  {
+    "id": "ch1_stage2_q01",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "medium",
+    "goal": "Check the condition and print the first item in the list.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python booleans must start with uppercase letters (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Missing comma between list elements.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python is case-sensitive: booleans are `True` and `False`. Lists require commas between elements."
+  },
+  {
+    "id": "ch1_stage2_q02",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "medium",
+    "goal": "Concatenate strings to display class and level information.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing single quote for the static string.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Missing closing single quote for the static string part before concatenating with a variable.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string must be wrapped with matching quotes (' or \") so its boundaries are clear."
+  },
+  {
+    "id": "ch1_stage2_q03",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "medium",
+    "goal": "Write a function to calculate damage based on attack and defense.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python function definitions use 'def' instead of 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "The 'return' keyword must be fully lowercase.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python defines functions with `def`. Standard keywords (`return`, `if`, `for`, etc.) must be lowercase."
+  },
+  {
+    "id": "ch1_stage2_q04",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "medium",
+    "goal": "Check whether the first element of a nested list (2D list) is positive.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing bracket for the first nested list before the comma.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "if (or for, while, def) statements in Python must end with a colon (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Nested lists must have matching `[]` brackets. An `if` statement must end with `:` to start a block."
+  },
+  {
+    "id": "ch1_stage3_q01",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "hard",
+    "goal": "Concatenate strings to display class and level information.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing single quote for the static string.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Missing closing single quote for the static string part before concatenating with a variable.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string must be wrapped with matching quotes (' or \") so its boundaries are clear."
+  },
+  {
+    "id": "ch1_stage3_q02",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "hard",
+    "goal": "Write a function to calculate damage based on attack and defense.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python function definitions use 'def' instead of 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "The 'return' keyword must be fully lowercase.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python defines functions with `def`. Standard keywords (`return`, `if`, `for`, etc.) must be lowercase."
+  },
+  {
+    "id": "ch1_stage3_q03",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "hard",
+    "goal": "Check whether the first element of a nested list (2D list) is positive.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing bracket for the first nested list before the comma.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "if (or for, while, def) statements in Python must end with a colon (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Nested lists must have matching `[]` brackets. An `if` statement must end with `:` to start a block."
+  },
+  {
+    "id": "ch1_stage3_q04",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "hard",
+    "goal": "Initialize character info and print it.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Missing comma between key-value pairs in the dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Dictionary assignment must use a colon (:), not an equals sign (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "In a Python dictionary, key-value pairs use colons (:) and are separated by commas (,)."
+  },
+  {
+    "id": "ch1_stage4_q01",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_function",
+    "difficulty": "very_hard",
+    "goal": "Write a function to calculate damage based on attack and defense.",
+    "snippet": [
+      "function calc_damage(atk, defense):",
+      "    dmg = atk - defense",
+      "    Return dmg"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python function definitions use 'def' instead of 'function'.",
+        "wrong_code": "function calc_damage(atk, defense):",
+        "accepted_fixes": [
+          "def calc_damage(atk, defense):"
+        ],
+        "distractors": [
+          "func calc_damage(atk, defense):",
+          "fn calc_damage(atk, defense):",
+          "define calc_damage(atk, defense):"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "The 'return' keyword must be fully lowercase.",
+        "wrong_code": "    Return dmg",
+        "accepted_fixes": [
+          "    return dmg"
+        ],
+        "distractors": [
+          "    return (dmg)",
+          "    => dmg",
+          "    yield dmg"
+        ]
+      }
+    ],
+    "explanation": "Python defines functions with `def`. Standard keywords (`return`, `if`, `for`, etc.) must be lowercase."
+  },
+  {
+    "id": "ch1_stage4_q02",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "very_hard",
+    "goal": "Check whether the first element of a nested list (2D list) is positive.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing bracket for the first nested list before the comma.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "if (or for, while, def) statements in Python must end with a colon (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Nested lists must have matching `[]` brackets. An `if` statement must end with `:` to start a block."
+  },
+  {
+    "id": "ch1_stage4_q03",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "very_hard",
+    "goal": "Initialize character info and print it.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Missing comma between key-value pairs in the dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Dictionary assignment must use a colon (:), not an equals sign (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "In a Python dictionary, key-value pairs use colons (:) and are separated by commas (,)."
+  },
+  {
+    "id": "ch1_stage4_q04",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "very_hard",
+    "goal": "Check the condition and print the first item in the list.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python booleans must start with uppercase letters (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Missing comma between list elements.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python is case-sensitive: booleans are `True` and `False`. Lists require commas between elements."
+  },
+  {
+    "id": "ch1_stage5_q01",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_brackets",
+    "difficulty": "boss",
+    "goal": "Check whether the first element of a nested list (2D list) is positive.",
+    "snippet": [
+      "matrix = [[1, 2, [3, 4]]",
+      "if matrix[0][0] > 0",
+      "    print('Positive')"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing bracket for the first nested list before the comma.",
+        "wrong_code": "matrix = [[1, 2, [3, 4]]",
+        "accepted_fixes": [
+          "matrix = [[1, 2], [3, 4]]"
+        ],
+        "distractors": [
+          "matrix = [[1, 2] [3, 4]]",
+          "matrix = ({1, 2}, {3, 4})",
+          "matrix = [1, 2], [3, 4]"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "if (or for, while, def) statements in Python must end with a colon (:).",
+        "wrong_code": "if matrix[0][0] > 0",
+        "accepted_fixes": [
+          "if matrix[0][0] > 0:"
+        ],
+        "distractors": [
+          "if matrix[0][0] > 0 {",
+          "if (matrix[0][0] > 0)",
+          "if matrix[0][0] > 0;"
+        ]
+      }
+    ],
+    "explanation": "Nested lists must have matching `[]` brackets. An `if` statement must end with `:` to start a block."
+  },
+  {
+    "id": "ch1_stage5_q02",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "boss",
+    "goal": "Initialize character info and print it.",
+    "snippet": [
+      "player = {",
+      "  'name': 'Hero'",
+      "  'hp' = 100",
+      "}",
+      "print(player['name'])"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Missing comma between key-value pairs in the dictionary.",
+        "wrong_code": "  'name': 'Hero'",
+        "accepted_fixes": [
+          "  'name': 'Hero',",
+          "  'name': 'Hero', "
+        ],
+        "distractors": [
+          "  'name' = 'Hero',",
+          "  'name': 'Hero';",
+          "  name: 'Hero',"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Dictionary assignment must use a colon (:), not an equals sign (=).",
+        "wrong_code": "  'hp' = 100",
+        "accepted_fixes": [
+          "  'hp': 100",
+          "  'hp': 100,"
+        ],
+        "distractors": [
+          "  'hp' == 100",
+          "  hp = 100",
+          "  'hp' -> 100"
+        ]
+      }
+    ],
+    "explanation": "In a Python dictionary, key-value pairs use colons (:) and are separated by commas (,)."
+  },
+  {
+    "id": "ch1_stage5_q03",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_basic",
+    "difficulty": "boss",
+    "goal": "Check the condition and print the first item in the list.",
+    "snippet": [
+      "is_ready = true",
+      "items = ['potion' 'sword']",
+      "if is_ready:",
+      "    print(items[0])"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Python booleans must start with uppercase letters (True/False).",
+        "wrong_code": "is_ready = true",
+        "accepted_fixes": [
+          "is_ready = True"
+        ],
+        "distractors": [
+          "is_ready == true",
+          "let is_ready = True",
+          "is_ready = TRUE"
+        ]
+      },
+      {
+        "line": 1,
+        "description": "Missing comma between list elements.",
+        "wrong_code": "items = ['potion' 'sword']",
+        "accepted_fixes": [
+          "items = ['potion', 'sword']"
+        ],
+        "distractors": [
+          "items = ['potion'; 'sword']",
+          "items = ['potion' + 'sword']",
+          "items = {'potion', 'sword'}"
+        ]
+      }
+    ],
+    "explanation": "Python is case-sensitive: booleans are `True` and `False`. Lists require commas between elements."
+  },
+  {
+    "id": "ch1_stage5_q04",
+    "chapter": 1,
+    "language": "python",
+    "topic": "syntax_string",
+    "difficulty": "boss",
+    "goal": "Concatenate strings to display class and level information.",
+    "snippet": [
+      "job = 'Mage",
+      "level = 10",
+      "print('Class: ' + job + ', Level:  + str(level))"
+    ],
+    "bugs": [
+      {
+        "line": 0,
+        "description": "Missing closing single quote for the static string.",
+        "wrong_code": "job = 'Mage",
+        "accepted_fixes": [
+          "job = 'Mage'"
+        ],
+        "distractors": [
+          "job = Mage'",
+          "job = \"Mage",
+          "job == 'Mage'"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Missing closing single quote for the static string part before concatenating with a variable.",
+        "wrong_code": "print('Class: ' + job + ', Level:  + str(level))",
+        "accepted_fixes": [
+          "print('Class: ' + job + ', Level: ' + str(level))"
+        ],
+        "distractors": [
+          "print('Class: ' + job + , Level: ' + str(level))",
+          "print('Class: ' + job + ', Level: ' + 'str(level)')",
+          "print('Class: ' + job + ', Level:  + str(level)')"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string must be wrapped with matching quotes (' or \") so its boundaries are clear."
+  },
+  {
+    "id": "ch2_stage1_q01",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "easy",
+    "goal": "Evaluate the character's HP status.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'hpy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "'=' is assignment. Use '==' for equality comparison.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic error: hp must be < 50 to be considered 'critical'. Using '>' violates the requirement.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Python equality uses `==`. Reversing logic (`>` instead of `<`) is a common critical trap."
+  },
+  {
+    "id": "ch2_stage1_q02",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "easy",
+    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Wrong logical operator: requirement is (VIP AND level >= 10); using 'or' lets level < 10 pass.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+  },
+  {
+    "id": "ch2_stage1_q03",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "easy",
+    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg is a string (str); adding it directly to an integer raises TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string is not auto-cast to an integer. Use `int()` to convert a string into a valid number."
+  },
+  {
+    "id": "ch2_stage1_q04",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "easy",
+    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "snippet": [
+      "value = 85",
+      "level = ''",
+      "if value >= 90:",
+      "    level = 'S'",
+      "if value >= 70:",
+      "    level = 'A'",
+      "else:",
+      "    level = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Using separate `if` blocks causes logic leaks. If score = 95, rank gets overwritten from 'S' to 'A'.",
+        "wrong_code": "if value >= 70:",
+        "accepted_fixes": [
+          "elif value >= 70:"
+        ],
+        "distractors": [
+          "elif value <= 70:",
+          "else if value >= 70:",
+          "if value > 70:"
+        ]
+      }
+    ],
+    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+  },
+  {
+    "id": "ch2_stage2_q01",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "medium",
+    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Wrong logical operator: requirement is (VIP AND level >= 10); using 'or' lets level < 10 pass.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+  },
+  {
+    "id": "ch2_stage2_q02",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "medium",
+    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg is a string (str); adding it directly to an integer raises TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string is not auto-cast to an integer. Use `int()` to convert a string into a valid number."
+  },
+  {
+    "id": "ch2_stage2_q03",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "medium",
+    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "snippet": [
+      "value = 85",
+      "level = ''",
+      "if value >= 90:",
+      "    level = 'S'",
+      "if value >= 70:",
+      "    level = 'A'",
+      "else:",
+      "    level = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Using separate `if` blocks causes logic leaks. If score = 95, rank gets overwritten from 'S' to 'A'.",
+        "wrong_code": "if value >= 70:",
+        "accepted_fixes": [
+          "elif value >= 70:"
+        ],
+        "distractors": [
+          "elif value <= 70:",
+          "else if value >= 70:",
+          "if value > 70:"
+        ]
+      }
+    ],
+    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+  },
+  {
+    "id": "ch2_stage2_q04",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "medium",
+    "goal": "Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The ternary operator (inline if) is reversed: poisoned should lose HP, not gain it.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Python inline-if syntax is `Value_If_True if Condition else Value_If_False`. Swapping true/false values reverses behavior."
+  },
+  {
+    "id": "ch2_stage3_q01",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "hard",
+    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg is a string (str); adding it directly to an integer raises TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string is not auto-cast to an integer. Use `int()` to convert a string into a valid number."
+  },
+  {
+    "id": "ch2_stage3_q02",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "hard",
+    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "snippet": [
+      "value = 85",
+      "level = ''",
+      "if value >= 90:",
+      "    level = 'S'",
+      "if value >= 70:",
+      "    level = 'A'",
+      "else:",
+      "    level = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Using separate `if` blocks causes logic leaks. If score = 95, rank gets overwritten from 'S' to 'A'.",
+        "wrong_code": "if value >= 70:",
+        "accepted_fixes": [
+          "elif value >= 70:"
+        ],
+        "distractors": [
+          "elif value <= 70:",
+          "else if value >= 70:",
+          "if value > 70:"
+        ]
+      }
+    ],
+    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+  },
+  {
+    "id": "ch2_stage3_q03",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "hard",
+    "goal": "Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The ternary operator (inline if) is reversed: poisoned should lose HP, not gain it.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Python inline-if syntax is `Value_If_True if Condition else Value_If_False`. Swapping true/false values reverses behavior."
+  },
+  {
+    "id": "ch2_stage3_q04",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "hard",
+    "goal": "Evaluate the character's HP status.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'hpy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "'=' is assignment. Use '==' for equality comparison.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic error: hp must be < 50 to be considered 'critical'. Using '>' violates the requirement.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Python equality uses `==`. Reversing logic (`>` instead of `<`) is a common critical trap."
+  },
+  {
+    "id": "ch2_stage4_q01",
+    "chapter": 2,
+    "language": "python",
+    "topic": "branching_logic",
+    "difficulty": "very_hard",
+    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "snippet": [
+      "value = 85",
+      "level = ''",
+      "if value >= 90:",
+      "    level = 'S'",
+      "if value >= 70:",
+      "    level = 'A'",
+      "else:",
+      "    level = 'B'"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Using separate `if` blocks causes logic leaks. If score = 95, rank gets overwritten from 'S' to 'A'.",
+        "wrong_code": "if value >= 70:",
+        "accepted_fixes": [
+          "elif value >= 70:"
+        ],
+        "distractors": [
+          "elif value <= 70:",
+          "else if value >= 70:",
+          "if value > 70:"
+        ]
+      }
+    ],
+    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+  },
+  {
+    "id": "ch2_stage4_q02",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "very_hard",
+    "goal": "Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The ternary operator (inline if) is reversed: poisoned should lose HP, not gain it.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Python inline-if syntax is `Value_If_True if Condition else Value_If_False`. Swapping true/false values reverses behavior."
+  },
+  {
+    "id": "ch2_stage4_q03",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "very_hard",
+    "goal": "Evaluate the character's HP status.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'hpy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "'=' is assignment. Use '==' for equality comparison.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic error: hp must be < 50 to be considered 'critical'. Using '>' violates the requirement.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Python equality uses `==`. Reversing logic (`>` instead of `<`) is a common critical trap."
+  },
+  {
+    "id": "ch2_stage4_q04",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "very_hard",
+    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Wrong logical operator: requirement is (VIP AND level >= 10); using 'or' lets level < 10 pass.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+  },
+  {
+    "id": "ch2_stage5_q01",
+    "chapter": 2,
+    "language": "python",
+    "topic": "ternary_logic",
+    "difficulty": "boss",
+    "goal": "Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.",
+    "snippet": [
+      "state = 'poisoned'",
+      "hp = 10",
+      "",
+      "hp = hp + 5 if state == 'poisoned' else hp - 5",
+      "hp = max(0, hp)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The ternary operator (inline if) is reversed: poisoned should lose HP, not gain it.",
+        "wrong_code": "hp = hp + 5 if state == 'poisoned' else hp - 5",
+        "accepted_fixes": [
+          "hp = hp - 5 if state == 'poisoned' else hp + 5"
+        ],
+        "distractors": [
+          "hp = hp + 5 if state != 'poisoned' else hp - 5",
+          "hp = (hp + 5) if state == 'poisoned' else (hp - 5)",
+          "hp = hp - 5 if state == 'poison' else hp + 5"
+        ]
+      }
+    ],
+    "explanation": "Python inline-if syntax is `Value_If_True if Condition else Value_If_False`. Swapping true/false values reverses behavior."
+  },
+  {
+    "id": "ch2_stage5_q02",
+    "chapter": 2,
+    "language": "python",
+    "topic": "wrong_branch",
+    "difficulty": "boss",
+    "goal": "Evaluate the character's HP status.",
+    "snippet": [
+      "hp = 40",
+      "state = ''",
+      "if hp = 0:",
+      "    state = 'dead'",
+      "elif hp > 50:",
+      "    state = 'critical'",
+      "else:",
+      "    state = 'hpy'"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "'=' is assignment. Use '==' for equality comparison.",
+        "wrong_code": "if hp = 0:",
+        "accepted_fixes": [
+          "if hp == 0:",
+          "if hp <= 0:"
+        ],
+        "distractors": [
+          "if hp === 0:",
+          "if (hp = 0):",
+          "if hp != 0:"
+        ]
+      },
+      {
+        "line": 4,
+        "description": "Logic error: hp must be < 50 to be considered 'critical'. Using '>' violates the requirement.",
+        "wrong_code": "elif hp > 50:",
+        "accepted_fixes": [
+          "elif hp < 50:"
+        ],
+        "distractors": [
+          "elif hp >= 50:",
+          "elif hp == 50:",
+          "elif hp != 50:"
+        ]
+      }
+    ],
+    "explanation": "Python equality uses `==`. Reversing logic (`>` instead of `<`) is a common critical trap."
+  },
+  {
+    "id": "ch2_stage5_q03",
+    "chapter": 2,
+    "language": "python",
+    "topic": "boolean_logic",
+    "difficulty": "boss",
+    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "snippet": [
+      "has_key = False",
+      "is_vip = True",
+      "level = 5",
+      "",
+      "if has_key or is_vip or level >= 10:",
+      "    print('Access Granted')"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "Wrong logical operator: requirement is (VIP AND level >= 10); using 'or' lets level < 10 pass.",
+        "wrong_code": "if has_key or is_vip or level >= 10:",
+        "accepted_fixes": [
+          "if has_key or (is_vip and level >= 10):",
+          "if has_key or is_vip and level >= 10:"
+        ],
+        "distractors": [
+          "if has_key and is_vip or level >= 10:",
+          "if has_key and is_vip and level >= 10:",
+          "if has_key or is_vip == level >= 10:"
+        ]
+      }
+    ],
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+  },
+  {
+    "id": "ch2_stage5_q04",
+    "chapter": 2,
+    "language": "python",
+    "topic": "type_mismatch",
+    "difficulty": "boss",
+    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "snippet": [
+      "base_dmg = '50'",
+      "bonus = 20",
+      "multiplier = 2",
+      "",
+      "total = base_dmg + bonus * multiplier",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "base_dmg is a string (str); adding it directly to an integer raises TypeError.",
+        "wrong_code": "total = base_dmg + bonus * multiplier",
+        "accepted_fixes": [
+          "total = int(base_dmg) + bonus * multiplier"
+        ],
+        "distractors": [
+          "total = int(base_dmg + bonus) * multiplier",
+          "total = str(base_dmg) + bonus * multiplier",
+          "total = base_dmg + int(bonus * multiplier)"
+        ]
+      }
+    ],
+    "explanation": "In Python, a string is not auto-cast to an integer. Use `int()` to convert a string into a valid number."
+  },
+  {
+    "id": "ch3_stage1_q01",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "easy",
+    "goal": "Use a while loop to print each items item (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Starting from index 1 permanently skips the first element (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Looping with <= len(items) causes an out-of-range error (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "Python lists are zero-indexed: first element is `[0]`, last is `[len - 1]`. Looping from 1 to `<= len` is a severe off-by-one bug."
+  },
+  {
+    "id": "ch3_stage1_q02",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "easy",
+    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "snippet": [
+      "enemies = ['enemy', 'enemy', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'enemy':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Forward iteration with pop() shrinks the list and throws IndexError (out of range) near the end.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Never delete array elements by index while iterating forward (`for i`), because the array shrinks. The safe pattern is reverse iteration: `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_stage1_q03",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "easy",
+    "goal": "Simulate walking energy consumption and print distance when energy is depleted.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "The energy variable increases instead of decreasing, so `energy > 0` stays true and causes an infinite loop.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Increasing energy while the stop condition is energy depletion creates an infinite loop and can freeze the program."
+  },
+  {
+    "id": "ch3_stage1_q04",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "easy",
+    "goal": "Iterate through a rectangular (non-square) matrix and sum all elements.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The column loop (j) incorrectly uses len(grid), the row count (3), overflowing the real column count (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "When iterating an arbitrary 2D array (M x N), the inner column loop must use the current row length: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_stage2_q01",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "medium",
+    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "snippet": [
+      "enemies = ['enemy', 'enemy', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'enemy':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Forward iteration with pop() shrinks the list and throws IndexError (out of range) near the end.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Never delete array elements by index while iterating forward (`for i`), because the array shrinks. The safe pattern is reverse iteration: `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_stage2_q02",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "medium",
+    "goal": "Simulate walking energy consumption and print distance when energy is depleted.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "The energy variable increases instead of decreasing, so `energy > 0` stays true and causes an infinite loop.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Increasing energy while the stop condition is energy depletion creates an infinite loop and can freeze the program."
+  },
+  {
+    "id": "ch3_stage2_q03",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "medium",
+    "goal": "Iterate through a rectangular (non-square) matrix and sum all elements.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The column loop (j) incorrectly uses len(grid), the row count (3), overflowing the real column count (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "When iterating an arbitrary 2D array (M x N), the inner column loop must use the current row length: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_stage2_q04",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "medium",
+    "goal": "Reverse the password string by traversing indices backward in a loop.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "range(len, 0, -1) iterates from index 4 to 1. Index 4 is invalid because the max valid index is 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "In Python, `range(start, stop, step)` includes `start` and stops right before `stop`. To iterate backward down to `index = 0`, `stop` must be `-1`, and `start` must be `len - 1`."
+  },
+  {
+    "id": "ch3_stage3_q01",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "hard",
+    "goal": "Simulate walking energy consumption and print distance when energy is depleted.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "The energy variable increases instead of decreasing, so `energy > 0` stays true and causes an infinite loop.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Increasing energy while the stop condition is energy depletion creates an infinite loop and can freeze the program."
+  },
+  {
+    "id": "ch3_stage3_q02",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "hard",
+    "goal": "Iterate through a rectangular (non-square) matrix and sum all elements.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The column loop (j) incorrectly uses len(grid), the row count (3), overflowing the real column count (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "When iterating an arbitrary 2D array (M x N), the inner column loop must use the current row length: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_stage3_q03",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "hard",
+    "goal": "Reverse the password string by traversing indices backward in a loop.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "range(len, 0, -1) iterates from index 4 to 1. Index 4 is invalid because the max valid index is 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "In Python, `range(start, stop, step)` includes `start` and stops right before `stop`. To iterate backward down to `index = 0`, `stop` must be `-1`, and `start` must be `len - 1`."
+  },
+  {
+    "id": "ch3_stage3_q04",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "hard",
+    "goal": "Use a while loop to print each items item (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Starting from index 1 permanently skips the first element (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Looping with <= len(items) causes an out-of-range error (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "Python lists are zero-indexed: first element is `[0]`, last is `[len - 1]`. Looping from 1 to `<= len` is a severe off-by-one bug."
+  },
+  {
+    "id": "ch3_stage4_q01",
+    "chapter": 3,
+    "language": "python",
+    "topic": "nested_loop",
+    "difficulty": "very_hard",
+    "goal": "Iterate through a rectangular (non-square) matrix and sum all elements.",
+    "snippet": [
+      "grid = [[1, 2], [3, 4], [5, 6]]",
+      "total = 0",
+      "for i in range(len(grid)):",
+      "    for j in range(len(grid)):",
+      "        total += grid[i][j]",
+      "print(total)"
+    ],
+    "bugs": [
+      {
+        "line": 3,
+        "description": "The column loop (j) incorrectly uses len(grid), the row count (3), overflowing the real column count (2).",
+        "wrong_code": "    for j in range(len(grid)):",
+        "accepted_fixes": [
+          "    for j in range(len(grid[i])):"
+        ],
+        "distractors": [
+          "    for j in range(len(grid[0])):",
+          "    for j in range(len(grid[j])):",
+          "    for i in range(len(grid)):"
+        ]
+      }
+    ],
+    "explanation": "When iterating an arbitrary 2D array (M x N), the inner column loop must use the current row length: `len(grid[i])`."
+  },
+  {
+    "id": "ch3_stage4_q02",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "very_hard",
+    "goal": "Reverse the password string by traversing indices backward in a loop.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "range(len, 0, -1) iterates from index 4 to 1. Index 4 is invalid because the max valid index is 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "In Python, `range(start, stop, step)` includes `start` and stops right before `stop`. To iterate backward down to `index = 0`, `stop` must be `-1`, and `start` must be `len - 1`."
+  },
+  {
+    "id": "ch3_stage4_q03",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "very_hard",
+    "goal": "Use a while loop to print each items item (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Starting from index 1 permanently skips the first element (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Looping with <= len(items) causes an out-of-range error (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "Python lists are zero-indexed: first element is `[0]`, last is `[len - 1]`. Looping from 1 to `<= len` is a severe off-by-one bug."
+  },
+  {
+    "id": "ch3_stage4_q04",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "very_hard",
+    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "snippet": [
+      "enemies = ['enemy', 'enemy', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'enemy':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Forward iteration with pop() shrinks the list and throws IndexError (out of range) near the end.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Never delete array elements by index while iterating forward (`for i`), because the array shrinks. The safe pattern is reverse iteration: `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_stage5_q01",
+    "chapter": 3,
+    "language": "python",
+    "topic": "loop_logic",
+    "difficulty": "boss",
+    "goal": "Reverse the password string by traversing indices backward in a loop.",
+    "snippet": [
+      "password = ''",
+      "chars = ['a', 'b', 'c', 'd']",
+      "for i in range(len(chars), 0, -1):",
+      "    password += chars[i]",
+      "print(password)"
+    ],
+    "bugs": [
+      {
+        "line": 2,
+        "description": "range(len, 0, -1) iterates from index 4 to 1. Index 4 is invalid because the max valid index is 3.",
+        "wrong_code": "for i in range(len(chars), 0, -1):",
+        "accepted_fixes": [
+          "for i in range(len(chars) - 1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(chars), -1, -1):",
+          "for i in range(len(chars) - 1, 0, -1):",
+          "for i in range(0, len(chars), -1):"
+        ]
+      }
+    ],
+    "explanation": "In Python, `range(start, stop, step)` includes `start` and stops right before `stop`. To iterate backward down to `index = 0`, `stop` must be `-1`, and `start` must be `len - 1`."
+  },
+  {
+    "id": "ch3_stage5_q02",
+    "chapter": 3,
+    "language": "python",
+    "topic": "off_by_one",
+    "difficulty": "boss",
+    "goal": "Use a while loop to print each items item (items).",
+    "snippet": [
+      "items = ['map', 'compass', 'key']",
+      "i = 1",
+      "while i <= len(items):",
+      "    print(items[i])",
+      "    i += 1"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Starting from index 1 permanently skips the first element (index 0).",
+        "wrong_code": "i = 1",
+        "accepted_fixes": [
+          "i = 0"
+        ],
+        "distractors": [
+          "i = -1",
+          "i = 2",
+          "i = len(items)"
+        ]
+      },
+      {
+        "line": 2,
+        "description": "Looping with <= len(items) causes an out-of-range error (IndexError: list index out of range).",
+        "wrong_code": "while i <= len(items):",
+        "accepted_fixes": [
+          "while i < len(items):"
+        ],
+        "distractors": [
+          "while i == len(items):",
+          "while i > len(items):",
+          "while i != len(items):"
+        ]
+      }
+    ],
+    "explanation": "Python lists are zero-indexed: first element is `[0]`, last is `[len - 1]`. Looping from 1 to `<= len` is a severe off-by-one bug."
+  },
+  {
+    "id": "ch3_stage5_q03",
+    "chapter": 3,
+    "language": "python",
+    "topic": "array_mutation",
+    "difficulty": "boss",
+    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "snippet": [
+      "enemies = ['enemy', 'enemy', 'bat']",
+      "for i in range(len(enemies)):",
+      "    if enemies[i] == 'enemy':",
+      "        enemies.pop(i)"
+    ],
+    "bugs": [
+      {
+        "line": 1,
+        "description": "Forward iteration with pop() shrinks the list and throws IndexError (out of range) near the end.",
+        "wrong_code": "for i in range(len(enemies)):",
+        "accepted_fixes": [
+          "for i in range(len(enemies)-1, -1, -1):"
+        ],
+        "distractors": [
+          "for i in range(len(enemies)-1):",
+          "for i in reversed(enemies):",
+          "while i < len(enemies):"
+        ]
+      }
+    ],
+    "explanation": "Never delete array elements by index while iterating forward (`for i`), because the array shrinks. The safe pattern is reverse iteration: `range(len-1, -1, -1)`."
+  },
+  {
+    "id": "ch3_stage5_q04",
+    "chapter": 3,
+    "language": "python",
+    "topic": "infinite_loop",
+    "difficulty": "boss",
+    "goal": "Simulate walking energy consumption and print distance when energy is depleted.",
+    "snippet": [
+      "energy = 50",
+      "distance = 0",
+      "while energy > 0:",
+      "    distance += 10",
+      "    energy += 10",
+      "print(distance)"
+    ],
+    "bugs": [
+      {
+        "line": 4,
+        "description": "The energy variable increases instead of decreasing, so `energy > 0` stays true and causes an infinite loop.",
+        "wrong_code": "    energy += 10",
+        "accepted_fixes": [
+          "    energy -= 10"
+        ],
+        "distractors": [
+          "    distance -= 10",
+          "    energy = 0",
+          "    break"
+        ]
+      }
+    ],
+    "explanation": "Increasing energy while the stop condition is energy depletion creates an infinite loop and can freeze the program."
+  },
+  {
+    "id": "ch4_stage1_q01",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "easy",
+    "type": "block_assembly",
+    "goal": "Use Binary Search to find `target` in sorted array `arr`. Return index or -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Binary search computes integer midpoint `mid` using `// 2`. If value is smaller than target, shrink from the left (`left = mid + 1`); if larger, shrink from the right (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_stage1_q02",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "easy",
+    "type": "block_assembly",
+    "goal": "Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Compare pointer elements `a[i]` and `b[j]`. Push the smaller one to `result` and advance that pointer. The final two while loops drain leftovers not covered by the earlier `and` condition."
+  },
+  {
+    "id": "ch4_stage1_q03",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "easy",
+    "type": "block_assembly",
+    "goal": "Check whether the text string `s` is a palindrome.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
+  },
+  {
+    "id": "ch4_stage1_q04",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "easy",
+    "type": "block_assembly",
+    "goal": "Sort numeric array `nums` in ascending order using Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Selection Sort always finds the smallest element in the unsorted range `[i+1, n]`. After each pass, swap `nums[i]` with that minimum element."
+  },
+  {
+    "id": "ch4_stage2_q01",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "medium",
+    "type": "block_assembly",
+    "goal": "Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Compare pointer elements `a[i]` and `b[j]`. Push the smaller one to `result` and advance that pointer. The final two while loops drain leftovers not covered by the earlier `and` condition."
+  },
+  {
+    "id": "ch4_stage2_q02",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "medium",
+    "type": "block_assembly",
+    "goal": "Check whether the text string `s` is a palindrome.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
+  },
+  {
+    "id": "ch4_stage2_q03",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "medium",
+    "type": "block_assembly",
+    "goal": "Sort numeric array `nums` in ascending order using Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Selection Sort always finds the smallest element in the unsorted range `[i+1, n]`. After each pass, swap `nums[i]` with that minimum element."
+  },
+  {
+    "id": "ch4_stage2_q04",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "medium",
+    "type": "block_assembly",
+    "goal": "Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Efficient memoization with a DP array: initialize an array of `n+1` zeros, set base cases to 0 and 1, then compute forward using stored previous states to reduce Fibonacci computation time."
+  },
+  {
+    "id": "ch4_stage3_q01",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "hard",
+    "type": "block_assembly",
+    "goal": "Check whether the text string `s` is a palindrome.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
+  },
+  {
+    "id": "ch4_stage3_q02",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "hard",
+    "type": "block_assembly",
+    "goal": "Sort numeric array `nums` in ascending order using Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Selection Sort always finds the smallest element in the unsorted range `[i+1, n]`. After each pass, swap `nums[i]` with that minimum element."
+  },
+  {
+    "id": "ch4_stage3_q03",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "hard",
+    "type": "block_assembly",
+    "goal": "Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Efficient memoization with a DP array: initialize an array of `n+1` zeros, set base cases to 0 and 1, then compute forward using stored previous states to reduce Fibonacci computation time."
+  },
+  {
+    "id": "ch4_stage3_q04",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "hard",
+    "type": "block_assembly",
+    "goal": "Use Binary Search to find `target` in sorted array `arr`. Return index or -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Binary search computes integer midpoint `mid` using `// 2`. If value is smaller than target, shrink from the left (`left = mid + 1`); if larger, shrink from the right (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_stage4_q01",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Sort numeric array `nums` in ascending order using Selection Sort.",
+    "blocks": [
+      "n = len(nums)",
+      "for i in range(n - 1):",
+      "    min_idx = i",
+      "    for j in range(i + 1, n):",
+      "        if nums[j] < nums[min_idx]:",
+      "            min_idx = j",
+      "    nums[i], nums[min_idx] = nums[min_idx], nums[i]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Selection Sort always finds the smallest element in the unsorted range `[i+1, n]`. After each pass, swap `nums[i]` with that minimum element."
+  },
+  {
+    "id": "ch4_stage4_q02",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Efficient memoization with a DP array: initialize an array of `n+1` zeros, set base cases to 0 and 1, then compute forward using stored previous states to reduce Fibonacci computation time."
+  },
+  {
+    "id": "ch4_stage4_q03",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Use Binary Search to find `target` in sorted array `arr`. Return index or -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Binary search computes integer midpoint `mid` using `// 2`. If value is smaller than target, shrink from the left (`left = mid + 1`); if larger, shrink from the right (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_stage4_q04",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "very_hard",
+    "type": "block_assembly",
+    "goal": "Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Compare pointer elements `a[i]` and `b[j]`. Push the smaller one to `result` and advance that pointer. The final two while loops drain leftovers not covered by the earlier `and` condition."
+  },
+  {
+    "id": "ch4_stage5_q01",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "boss",
+    "type": "block_assembly",
+    "goal": "Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).",
+    "blocks": [
+      "if n <= 1:",
+      "    return n",
+      "dp = [0] * (n + 1)",
+      "dp[0], dp[1] = 0, 1",
+      "for i in range(2, n + 1):",
+      "    dp[i] = dp[i - 1] + dp[i - 2]",
+      "return dp[n]"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explanation": "Efficient memoization with a DP array: initialize an array of `n+1` zeros, set base cases to 0 and 1, then compute forward using stored previous states to reduce Fibonacci computation time."
+  },
+  {
+    "id": "ch4_stage5_q02",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "boss",
+    "type": "block_assembly",
+    "goal": "Use Binary Search to find `target` in sorted array `arr`. Return index or -1.",
+    "blocks": [
+      "left = 0",
+      "right = len(arr) - 1",
+      "while left <= right:",
+      "    mid = (left + right) // 2",
+      "    if arr[mid] == target:",
+      "        return mid",
+      "    elif arr[mid] < target:",
+      "        left = mid + 1",
+      "    else:",
+      "        right = mid - 1",
+      "return -1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Binary search computes integer midpoint `mid` using `// 2`. If value is smaller than target, shrink from the left (`left = mid + 1`); if larger, shrink from the right (`right = mid - 1`)."
+  },
+  {
+    "id": "ch4_stage5_q03",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "boss",
+    "type": "block_assembly",
+    "goal": "Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.",
+    "blocks": [
+      "result = []",
+      "i, j = 0, 0",
+      "while i < len(a) and j < len(b):",
+      "    if a[i] < b[j]:",
+      "        result.append(a[i]); i += 1",
+      "    else:",
+      "        result.append(b[j]); j += 1",
+      "while i < len(a):",
+      "    result.append(a[i]); i += 1",
+      "while j < len(b):",
+      "    result.append(b[j]); j += 1"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "explanation": "Compare pointer elements `a[i]` and `b[j]`. Push the smaller one to `result` and advance that pointer. The final two while loops drain leftovers not covered by the earlier `and` condition."
+  },
+  {
+    "id": "ch4_stage5_q04",
+    "chapter": 4,
+    "language": "python",
+    "topic": "algorithm_flow",
+    "difficulty": "boss",
+    "type": "block_assembly",
+    "goal": "Check whether the text string `s` is a palindrome.",
+    "blocks": [
+      "is_palin = True",
+      "left, right = 0, len(s) - 1",
+      "while left < right:",
+      "    if s[left] != s[right]:",
+      "        is_palin = False",
+      "        break",
+      "    left += 1",
+      "    right -= 1",
+      "return is_palin"
+    ],
+    "correct_order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "explanation": "Use two pointers: one from the start (0), one from the end (len-1), moving toward the center. If any pair mismatches, immediately `break`."
   }
 ]

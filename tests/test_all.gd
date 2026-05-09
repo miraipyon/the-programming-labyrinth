@@ -430,6 +430,7 @@ func _test_ui_components() -> void:
 
 
 func _test_entities_and_combat() -> void:
+	get_root().get_node("DataManager").randomize_bugs = false
 	# Player
 	var player_scene: PackedScene = load("res://scenes/entities/Player.tscn")
 	var player: CharacterBody2D = player_scene.instantiate()
