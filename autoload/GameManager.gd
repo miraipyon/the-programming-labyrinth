@@ -21,6 +21,7 @@ enum GameState {
 # --- Constants ---
 const SAVE_PATH := "user://savegame.json"
 const TOTAL_CHAPTERS := 4
+const CAMPAIGN_COMPLETE_SCENE_PATH := "res://scenes/menus/CampaignCompleteScreen.tscn"
 
 # --- State ---
 var current_state: GameState = GameState.MENU
@@ -43,6 +44,24 @@ func _unhandled_input(event: InputEvent) -> void:
 			pause_game()
 		elif current_state == GameState.PAUSED:
 			resume_game()
+
+	if not OS.is_debug_build():
+		return
+
+	if event is InputEventKey:
+		var key_event := event as InputEventKey
+		if not key_event.pressed or key_event.echo:
+			return
+		if not key_event.ctrl_pressed or not key_event.shift_pressed:
+			return
+
+		match key_event.keycode:
+			KEY_F6:
+				dev_skip_stage(true)
+				get_viewport().set_input_as_handled()
+			KEY_F7:
+				dev_skip_chapter(true)
+				get_viewport().set_input_as_handled()
 
 # --- State Management ---
 func set_state(new_state: GameState) -> void:
@@ -74,6 +93,15 @@ func go_to_main_menu() -> void:
 	_change_scene("res://scenes/menus/MainMenu.tscn")
 
 
+func go_to_campaign_complete() -> void:
+	if not FileAccess.file_exists(CAMPAIGN_COMPLETE_SCENE_PATH):
+		push_warning("[GameManager] Missing campaign-complete scene. Falling back to Main Menu.")
+		go_to_main_menu()
+		return
+	set_state(GameState.MENU)
+	_change_scene(CAMPAIGN_COMPLETE_SCENE_PATH)
+
+
 func reset_campaign_progress() -> void:
 	current_chapter = 1
 	current_stage_id = _default_stage_for_chapter(1)
@@ -100,6 +128,62 @@ func start_stage(chapter: int, stage_id: String) -> void:
 
 	set_state(GameState.PLAYING)
 	_change_scene(scene_path)
+
+
+func dev_skip_stage(transition: bool = true) -> Dictionary:
+	if current_state != GameState.PLAYING and current_state != GameState.PAUSED and current_state != GameState.VICTORY:
+		return {}
+
+	if current_stage_id.strip_edges().is_empty():
+		current_stage_id = _default_stage_for_chapter(current_chapter)
+
+	var result := save_on_stage_clear()
+	print("[GameManager] DEV skip stage -> %s" % [str(result)])
+	if transition:
+		_apply_dev_transition_from_result(result)
+	return result
+
+
+func dev_skip_chapter(transition: bool = true) -> Dictionary:
+	current_chapter = clampi(current_chapter, 1, TOTAL_CHAPTERS)
+	if current_stage_id.strip_edges().is_empty():
+		current_stage_id = _default_stage_for_chapter(current_chapter)
+
+	var final_stage_number := _stage_count_for_chapter(current_chapter)
+	_unlock_stage_number(current_chapter, final_stage_number)
+
+	var result := {
+		"chapter": current_chapter,
+		"stage_id": current_stage_id,
+		"has_next_stage": false,
+		"campaign_complete": false
+	}
+
+	if current_chapter >= TOTAL_CHAPTERS:
+		campaign_complete = true
+		result["campaign_complete"] = true
+		_save_game()
+		print("[GameManager] DEV skip chapter -> campaign completed")
+	else:
+		var next_chapter := current_chapter + 1
+		if not chapters_unlocked.has(next_chapter):
+			chapters_unlocked.append(next_chapter)
+			chapters_unlocked.sort()
+			chapter_unlocked.emit(next_chapter)
+		_unlock_stage_number(next_chapter, 1)
+		current_chapter = next_chapter
+		current_stage_id = _default_stage_for_chapter(next_chapter)
+		campaign_complete = false
+		result["chapter"] = current_chapter
+		result["stage_id"] = current_stage_id
+		result["has_next_stage"] = true
+		_save_game()
+		print("[GameManager] DEV skip chapter -> %s" % current_stage_id)
+
+	if transition:
+		_apply_dev_transition_from_result(result)
+
+	return result
 
 func trigger_game_over(reason: String) -> void:
 	set_state(GameState.GAME_OVER)
@@ -383,6 +467,21 @@ func save_on_stage_clear() -> Dictionary:
 		"has_next_stage": has_next_stage,
 		"campaign_complete": campaign_complete
 	}
+
+
+func _apply_dev_transition_from_result(result: Dictionary) -> void:
+	var has_next_stage := bool(result.get("has_next_stage", false))
+	var is_campaign_complete := bool(result.get("campaign_complete", false))
+	var next_chapter := clampi(int(result.get("chapter", current_chapter)), 1, TOTAL_CHAPTERS)
+	var next_stage_id := str(result.get("stage_id", current_stage_id)).strip_edges()
+
+	if is_campaign_complete:
+		go_to_campaign_complete()
+		return
+	if has_next_stage and not next_stage_id.is_empty():
+		start_stage(next_chapter, next_stage_id)
+		return
+	go_to_main_menu()
 
 # --- Internal ---
 func _change_scene(scene_path: String) -> void:

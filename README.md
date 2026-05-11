@@ -72,6 +72,9 @@ godot --headless --path . --quit-after 3
 - Pause: `Esc`
 - Combat: select/fix, then `Submit`
 - Home screen: **Quit** button is at the **bottom-left corner**
+- Dev skip shortcuts (debug builds only):
+  - `Ctrl + Shift + F6`: skip current stage
+  - `Ctrl + Shift + F7`: skip current chapter
 
 ## Test
 

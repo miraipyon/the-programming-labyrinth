@@ -198,6 +198,12 @@ func _test_scene_contracts() -> void:
 		"VBox/ContinueButton",
 		"VBox/MainMenuButton"
 	])
+	await _assert_scene_contract("res://scenes/menus/CampaignCompleteScreen.tscn", "CampaignCompleteScreen", [
+		"VBox/TitleLabel",
+		"VBox/MessageLabel",
+		"VBox/ButtonsRow/ReplayCampaignButton",
+		"VBox/ButtonsRow/MainMenuButton"
+	])
 
 
 func _test_generated_maze_quality() -> void:

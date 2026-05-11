@@ -43,6 +43,23 @@ func test_player():
 	var p = PlayerScript.new()
 	assert_true(p.can_move == true, "Player starts able to move")
 
+	p._load_walking_textures()
+	var down_frames: Array = p._walking_textures.get("down", [])
+	var up_frames: Array = p._walking_textures.get("up", [])
+	var left_frames: Array = p._walking_textures.get("left", [])
+	var right_frames: Array = p._walking_textures.get("right", [])
+	assert_eq(down_frames.size(), 10, "Player walking-down loads 10 frames")
+	assert_eq(up_frames.size(), 8, "Player walking-up loads 8 frames")
+	assert_eq(left_frames.size(), 13, "Player walking-left loads 13 frames")
+	assert_eq(right_frames.size(), 13, "Player walking-right loads 13 frames")
+
+	p.walk_animation_fps = 10.0
+	p._walk_elapsed = 0.19
+	assert_eq(p._walking_frame_index(10), 1, "Walking frame index advances by elapsed time")
+	p._walk_elapsed = 1.02
+	assert_eq(p._walking_frame_index(10), 0, "Walking frame index wraps at end of cycle")
+	assert_true(absf(p._walking_target_px() - 34.56) < 0.001, "Walking target size is reduced to match idle visual scale")
+
 	p.disable_movement()
 	assert_true(p.can_move == false, "Player disable_movement works")
 	assert_eq(p.velocity, Vector2.ZERO, "Player velocity drops to 0 when disabled")

@@ -79,7 +79,12 @@ func _on_continue_pressed() -> void:
 
 	get_tree().paused = false
 	var is_headless := DisplayServer.get_name() == "headless"
-	if campaign_complete or not has_next_stage:
+	if campaign_complete:
+		if game_manager != null and game_manager.has_method("go_to_campaign_complete") and not is_headless:
+			game_manager.call("go_to_campaign_complete")
+		else:
+			_go_to_main_menu()
+	elif not has_next_stage:
 		_go_to_main_menu()
 	elif not is_headless and game_manager != null and game_manager.has_method("start_stage") and not next_stage_id.is_empty():
 		game_manager.call("start_stage", next_chapter, next_stage_id)
@@ -171,6 +176,10 @@ func _update_next_button_state() -> void:
 		button.text = ""
 		button.tooltip_text = "Continue to next stage"
 		button.disabled = false
+	elif _is_current_stage_final_stage():
+		button.text = ""
+		button.tooltip_text = "Finish campaign"
+		button.disabled = false
 	else:
 		button.text = ""
 		button.tooltip_text = "No more stages"
@@ -202,6 +211,36 @@ func _has_next_stage_after_current() -> bool:
 		if number > current_stage_number:
 			return true
 	return chapter < 4
+
+
+func _is_current_stage_final_stage() -> bool:
+	var game_manager: Node = _get_game_manager()
+	if game_manager == null:
+		return false
+
+	var chapter := int(game_manager.get("current_chapter"))
+	if chapter < 4:
+		return false
+
+	var stage_id := str(game_manager.get("current_stage_id")).strip_edges()
+	var current_stage_number := _extract_stage_number(stage_id)
+	if current_stage_number <= 0:
+		return false
+
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	if data_manager != null and data_manager.has_method("get_stages_by_chapter"):
+		var stages_variant: Variant = data_manager.call("get_stages_by_chapter", chapter)
+		if typeof(stages_variant) == TYPE_ARRAY:
+			var max_stage_number := 0
+			for stage_variant in Array(stages_variant):
+				if typeof(stage_variant) != TYPE_DICTIONARY:
+					continue
+				var stage: Dictionary = stage_variant
+				max_stage_number = maxi(max_stage_number, _extract_stage_number(str(stage.get("id", ""))))
+			if max_stage_number > 0:
+				return current_stage_number >= max_stage_number
+
+	return current_stage_number >= 5
 
 
 func _extract_stage_number(stage_id: String) -> int:

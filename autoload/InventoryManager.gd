@@ -82,9 +82,8 @@ func discard_loot() -> void:
 	temporary_inventory.clear()
 	_used_artifacts_in_stage.clear()
 
-	# Emit inventory_changed
+	# Emit inventory_changeds
 	inventory_changed.emit()
-
 
 # --- Queries ---
 func get_all_permanent() -> Dictionary:

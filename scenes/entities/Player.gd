@@ -13,15 +13,31 @@ const PLAYER_IDLE_FRAMES := [
 	"res://assets/MC/idle3.png",
 	"res://assets/MC/idle4.png"
 ]
+const PLAYER_WALKING_BASE_PATHS := {
+	"down": "assets/MC/MC_animation/walking-downward/walking",
+	"up": "assets/MC/MC_animation/walking-upward/walking",
+	"right": "assets/MC/MC_animation/walking-right/walking",
+	"left": "assets/MC/MC_animation/walking-left/walking"
+}
+const PLAYER_WALKING_FRAME_COUNTS := {
+	"down": 10,
+	"up": 8,
+	"right": 13,
+	"left": 13
+}
 const PLAYER_TARGET_PX: float = 48.0
 const MIN_RENDER_SCALE: float = 0.01
 @export var move_speed: float = 200.0
+@export var walk_animation_fps: float = 12.0
+@export_range(0.2, 1.0, 0.01) var walk_scale_multiplier: float = 0.72
 
 # --- State ---
 var can_move: bool = true
 var interactable_nearby: Node2D = null  # Chest gần nhất để interact
 var _idle_textures: Array[Texture2D] = []
+var _walking_textures: Dictionary = {}
 var _facing: String = "down"
+var _walk_elapsed: float = 0.0
 
 
 # --- Lifecycle ---
@@ -32,16 +48,18 @@ func _ready() -> void:
 
 	if has_node("Sprite"):
 		_load_idle_textures()
-		_apply_facing_texture("down")
+		_load_walking_textures()
+		_apply_facing_texture("down", false)
 
 	if GameManager:
 		GameManager.game_state_changed.connect(_on_game_state_changed)
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if not can_move:
 		velocity = Vector2.ZERO
-		_apply_facing_texture(_facing)
+		_walk_elapsed = 0.0
+		_apply_facing_texture(_facing, false)
 		return
 
 	var input_dir := Vector2.ZERO
@@ -51,9 +69,17 @@ func _physics_process(_delta: float) -> void:
 	if input_dir.length() > 1.0:
 		input_dir = input_dir.normalized()
 
-	if input_dir != Vector2.ZERO:
-		_facing = _determine_facing(input_dir)
-	_apply_facing_texture(_facing)
+	var is_moving := input_dir != Vector2.ZERO
+	if is_moving:
+		var new_facing := _determine_facing(input_dir)
+		if new_facing != _facing:
+			_walk_elapsed = 0.0
+		_facing = new_facing
+		_walk_elapsed += delta
+	else:
+		_walk_elapsed = 0.0
+
+	_apply_facing_texture(_facing, is_moving)
 
 	velocity = input_dir * move_speed
 	move_and_slide()
@@ -69,7 +95,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func disable_movement() -> void:
 	can_move = false
 	velocity = Vector2.ZERO
-	_apply_facing_texture(_facing)
+	_walk_elapsed = 0.0
+	_apply_facing_texture(_facing, false)
 
 
 func enable_movement() -> void:
@@ -125,18 +152,48 @@ func _load_idle_textures() -> void:
 				_idle_textures.append(texture)
 
 
+func _load_walking_textures() -> void:
+	_walking_textures.clear()
+	for facing in PLAYER_WALKING_BASE_PATHS.keys():
+		var base_path := str(PLAYER_WALKING_BASE_PATHS[facing])
+		var frame_count := int(PLAYER_WALKING_FRAME_COUNTS.get(facing, 0))
+		var frames: Array[Texture2D] = []
+		for idx in range(1, frame_count + 1):
+			var frame_path := "res://" + base_path + str(idx) + ".png"
+			if not ResourceLoader.exists(frame_path):
+				continue
+			var texture := load(frame_path)
+			if texture is Texture2D:
+				frames.append(texture)
+		_walking_textures[str(facing)] = frames
+
+
 func _determine_facing(direction: Vector2) -> String:
 	if absf(direction.x) > absf(direction.y):
 		return "left" if direction.x < 0.0 else "right"
 	return "up" if direction.y < 0.0 else "down"
 
 
-func _apply_facing_texture(facing: String) -> void:
+func _apply_facing_texture(facing: String, is_moving: bool) -> void:
 	if not has_node("Sprite"):
 		return
 	var sprite := $Sprite as Sprite2D
 	if sprite == null:
 		return
+
+	if is_moving:
+		var walking_frames: Array[Texture2D] = _walking_textures.get(facing, [])
+		if walking_frames.is_empty():
+			_load_walking_textures()
+			walking_frames = _walking_textures.get(facing, [])
+		if not walking_frames.is_empty():
+			var walk_frame_idx := _walking_frame_index(walking_frames.size())
+			if walk_frame_idx >= 0 and walk_frame_idx < walking_frames.size():
+				sprite.texture = walking_frames[walk_frame_idx]
+			_apply_target_scale(sprite, _walking_target_px())
+			sprite.flip_h = false
+			return
+
 	if _idle_textures.is_empty():
 		_load_idle_textures()
 	if _idle_textures.is_empty():
@@ -147,6 +204,17 @@ func _apply_facing_texture(facing: String) -> void:
 		sprite.texture = _idle_textures[frame_idx]
 	_apply_target_scale(sprite, PLAYER_TARGET_PX)
 	sprite.flip_h = false
+
+
+func _walking_frame_index(frame_count: int) -> int:
+	if frame_count <= 0:
+		return 0
+	var fps := maxf(walk_animation_fps, 1.0)
+	return int(floor(_walk_elapsed * fps)) % frame_count
+
+
+func _walking_target_px() -> float:
+	return maxf(PLAYER_TARGET_PX * walk_scale_multiplier, MIN_RENDER_SCALE)
 
 
 func _frame_index_for_facing(facing: String) -> int:

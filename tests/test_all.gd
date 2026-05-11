@@ -826,6 +826,56 @@ func _test_menu_and_stage_flow() -> void:
 	victory_calc.queue_free()
 	await process_frame
 
+	# Dev skip helpers (debug workflow)
+	if game_manager.has_method("set_state"):
+		game_manager.call("set_state", 1) # PLAYING
+
+	game_manager.set("current_chapter", 1)
+	game_manager.set("current_stage_id", "ch1_stage1")
+	game_manager.set("chapters_unlocked", [1])
+	game_manager.set("unlocked_stages_by_chapter", {1: 1})
+	game_manager.set("campaign_complete", false)
+	if game_manager.has_method("dev_skip_stage"):
+		var skip_stage_variant: Variant = game_manager.call("dev_skip_stage", false)
+		var skip_stage: Dictionary = skip_stage_variant if typeof(skip_stage_variant) == TYPE_DICTIONARY else {}
+		_assert_true(bool(skip_stage.get("has_next_stage", false)), "dev_skip_stage reports next stage")
+		_assert_true(not bool(skip_stage.get("campaign_complete", false)), "dev_skip_stage does not finish campaign on chapter 1")
+		_assert_eq(str(skip_stage.get("stage_id", "")).strip_edges(), "ch1_stage2", "dev_skip_stage advances to ch1_stage2")
+		_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage2", "dev_skip_stage updates current_stage_id")
+		_assert_eq(int(game_manager.call("get_unlocked_stage_count", 1)), 2, "dev_skip_stage unlocks stage 2")
+	else:
+		_fail("GameManager missing dev_skip_stage")
+
+	game_manager.set("current_chapter", 1)
+	game_manager.set("current_stage_id", "ch1_stage3")
+	game_manager.set("chapters_unlocked", [1])
+	game_manager.set("unlocked_stages_by_chapter", {1: 3})
+	game_manager.set("campaign_complete", false)
+	if game_manager.has_method("dev_skip_chapter"):
+		var skip_chapter_variant: Variant = game_manager.call("dev_skip_chapter", false)
+		var skip_chapter: Dictionary = skip_chapter_variant if typeof(skip_chapter_variant) == TYPE_DICTIONARY else {}
+		_assert_true(bool(skip_chapter.get("has_next_stage", false)), "dev_skip_chapter reports next chapter stage")
+		_assert_true(not bool(skip_chapter.get("campaign_complete", false)), "dev_skip_chapter does not finish campaign before chapter 4")
+		_assert_eq(int(game_manager.get("current_chapter")), 2, "dev_skip_chapter moves to chapter 2")
+		_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch2_stage1", "dev_skip_chapter moves to ch2_stage1")
+		_assert_true(bool(game_manager.call("is_chapter_unlocked", 2)), "dev_skip_chapter unlocks next chapter")
+		_assert_eq(int(game_manager.call("get_unlocked_stage_count", 1)), 5, "dev_skip_chapter marks source chapter fully unlocked")
+	else:
+		_fail("GameManager missing dev_skip_chapter")
+
+	game_manager.set("current_chapter", 4)
+	game_manager.set("current_stage_id", "ch4_stage3")
+	game_manager.set("chapters_unlocked", [1, 2, 3, 4])
+	game_manager.set("unlocked_stages_by_chapter", {1: 5, 2: 5, 3: 5, 4: 3})
+	game_manager.set("campaign_complete", false)
+	if game_manager.has_method("dev_skip_chapter"):
+		var skip_final_variant: Variant = game_manager.call("dev_skip_chapter", false)
+		var skip_final: Dictionary = skip_final_variant if typeof(skip_final_variant) == TYPE_DICTIONARY else {}
+		_assert_true(bool(skip_final.get("campaign_complete", false)), "dev_skip_chapter marks campaign complete on final chapter")
+		_assert_true(not bool(skip_final.get("has_next_stage", true)), "dev_skip_chapter final chapter has no next stage")
+		_assert_true(bool(game_manager.get("campaign_complete")), "dev_skip_chapter persists campaign_complete state")
+		_assert_eq(int(game_manager.call("get_unlocked_stage_count", 4)), 5, "dev_skip_chapter final chapter remains fully unlocked")
+
 	game_manager.set("current_chapter", 4)
 	game_manager.set("current_stage_id", "ch4_stage5")
 	var all_chapters: Array[int] = [1, 2, 3, 4]
@@ -837,6 +887,58 @@ func _test_menu_and_stage_flow() -> void:
 	_assert_true(bool(final_result.get("campaign_complete", false)), "Final stage clear marks campaign complete")
 	_assert_true(not bool(final_result.get("has_next_stage", true)), "Final stage clear has no next stage")
 	_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch4_stage5", "Final stage clear does not loop to ch4_stage1")
+
+	# Campaign complete menu
+	var campaign_scene: PackedScene = load("res://scenes/menus/CampaignCompleteScreen.tscn")
+	_assert_true(campaign_scene != null, "CampaignCompleteScreen scene loads")
+	if campaign_scene != null:
+		var campaign_screen := campaign_scene.instantiate() as Control
+		root.add_child(campaign_screen)
+		await process_frame
+		var campaign_message_node := campaign_screen.get_node_or_null("VBox/MessageLabel")
+		_assert_true(campaign_message_node is Label, "CampaignCompleteScreen has message label")
+		if campaign_message_node is Label:
+			var campaign_message := (campaign_message_node as Label).text
+			_assert_true(campaign_message.find("Congratulations") != -1 and campaign_message.find("rescued humanity") != -1, "CampaignCompleteScreen shows English completion message")
+		var replay_button := campaign_screen.get_node_or_null("VBox/ButtonsRow/ReplayCampaignButton") as Button
+		var campaign_home_button := campaign_screen.get_node_or_null("VBox/ButtonsRow/MainMenuButton") as Button
+		_assert_true(replay_button != null, "CampaignCompleteScreen has ReplayCampaignButton")
+		_assert_true(campaign_home_button != null, "CampaignCompleteScreen has MainMenuButton")
+		if replay_button != null:
+			_assert_true(replay_button.pressed.is_connected(Callable(campaign_screen, "_on_replay_campaign_pressed")), "CampaignCompleteScreen replay button signal is connected")
+		if campaign_home_button != null:
+			_assert_true(campaign_home_button.pressed.is_connected(Callable(campaign_screen, "_on_main_menu_pressed")), "CampaignCompleteScreen main menu button signal is connected")
+		campaign_screen.queue_free()
+		await process_frame
+
+		var replay_screen := campaign_scene.instantiate() as Control
+		root.add_child(replay_screen)
+		await process_frame
+		game_manager.set("current_chapter", 4)
+		game_manager.set("current_stage_id", "ch4_stage5")
+		game_manager.set("chapters_unlocked", [1, 2, 3, 4])
+		game_manager.set("unlocked_stages_by_chapter", {1: 5, 2: 5, 3: 5, 4: 5})
+		game_manager.set("campaign_complete", true)
+		replay_screen.call("_on_replay_campaign_pressed")
+		await process_frame
+		_assert_eq(int(game_manager.get("current_chapter")), 1, "CampaignComplete replay resets chapter to 1")
+		_assert_eq(str(game_manager.get("current_stage_id")).strip_edges(), "ch1_stage1", "CampaignComplete replay starts from ch1_stage1")
+		_assert_true(not bool(game_manager.get("campaign_complete")), "CampaignComplete replay clears campaign_complete flag")
+		_assert_eq(int(game_manager.get("current_state")), 1, "CampaignComplete replay starts gameplay scene")
+		if is_instance_valid(replay_screen):
+			replay_screen.queue_free()
+			await process_frame
+
+		var menu_screen := campaign_scene.instantiate() as Control
+		root.add_child(menu_screen)
+		await process_frame
+		menu_screen.call("_on_main_menu_pressed")
+		await process_frame
+		_assert_eq(int(game_manager.get("current_state")), 0, "CampaignComplete main menu button returns to MENU state")
+		if is_instance_valid(menu_screen):
+			menu_screen.queue_free()
+			await process_frame
+
 	if game_manager.has_method("set_stage_stars") and game_manager.has_method("get_stage_stars"):
 		game_manager.call("set_stage_stars", "ch2_stage3", 2)
 		game_manager.call("_save_game")
