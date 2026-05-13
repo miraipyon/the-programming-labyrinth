@@ -773,15 +773,23 @@ func _render_answer_rows() -> void:
 		checkbox.button_pressed = false
 		row.add_child(checkbox)
 
+		var tick_slot := Control.new()
+		tick_slot.name = "SolvedTickSlot_%d" % i
+		tick_slot.custom_minimum_size = Vector2(40, 0)
+		tick_slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tick_slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(tick_slot)
+
 		var tick_label := Label.new()
 		tick_label.name = "SolvedTick_%d" % i
-		tick_label.custom_minimum_size = Vector2(26, 0)
+		tick_label.set_anchors_preset(Control.PRESET_FULL_RECT)
 		tick_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tick_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		tick_label.add_theme_font_size_override("font_size", 22)
 		tick_label.add_theme_color_override("font_color", Color(0.23, 1.0, 0.47))
 		tick_label.text = ""
-		row.add_child(tick_label)
+		tick_label.visible = true
+		tick_slot.add_child(tick_label)
 
 		var code_text := RichTextLabel.new()
 		code_text.name = "CodeText_%d" % i
@@ -1161,8 +1169,9 @@ func _update_line_tick(line: int) -> void:
 	var option: OptionButton = row_data.get("option", null)
 	var solved := _resolved_lines.has(line)
 	if tick != null:
+		tick.visible = true
 		tick.text = "✔" if solved else ""
-		tick.visible = solved
+		tick.add_theme_color_override("font_color", Color(0.23, 1.0, 0.47, 1.0) if solved else Color(0.23, 1.0, 0.47, 0.0))
 	if checkbox != null:
 		checkbox.text = ""
 		checkbox.disabled = solved

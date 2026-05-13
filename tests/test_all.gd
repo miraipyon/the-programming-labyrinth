@@ -211,6 +211,7 @@ func _test_ui_components() -> void:
 		"bugs": [{"line": 1, "accepted_fixes": ["print(a)"]}]
 	}
 	code_fix_ui.call("populate_code", bug_data)
+	await process_frame
 	var first_code_line := code_fix_ui.find_child("CodeText_0", true, false) as RichTextLabel
 	var first_code_line_text := first_code_line.get_parsed_text() if first_code_line != null else ""
 	_assert_true(first_code_line != null and first_code_line.bbcode_enabled and first_code_line_text.find("let a = 1") != -1 and first_code_line_text.find("[lb]") == -1, "CodeFixUI highlights code rows with rich text colors")
@@ -219,11 +220,17 @@ func _test_ui_components() -> void:
 	var answer: Dictionary = answer_variant if typeof(answer_variant) == TYPE_DICTIONARY else {}
 	_assert_eq(int(answer.get("line", -1)), 1, "CodeFixUI default answer line")
 	_assert_eq(str(answer.get("fix", "")), "print(a)", "CodeFixUI default answer fix")
+	var solved_tick := code_fix_ui.find_child("SolvedTick_1", true, false) as Label
+	_assert_true(solved_tick != null and solved_tick.visible and solved_tick.text == "", "CodeFixUI reserves solved tick column before marking correct")
+	var line_one_code := code_fix_ui.find_child("CodeText_1", true, false) as Control
+	var line_one_x := line_one_code.position.x if line_one_code != null else -1.0
 	code_fix_ui.call("_on_line_toggled", 1, true)
 	var selected_option := code_fix_ui.find_child("FixOption_1", true, false) as OptionButton
 	_assert_true(selected_option != null and selected_option.selected == -1, "CodeFixUI does not auto-select answer A")
 	code_fix_ui.call("mark_correct_lines", [1])
 	await process_frame
+	_assert_true(solved_tick != null and solved_tick.visible and solved_tick.text == "✔", "CodeFixUI marks solved lines with a tick")
+	_assert_true(line_one_code != null and int(round(line_one_code.position.x)) == int(round(line_one_x)), "CodeFixUI keeps solved line code aligned when tick appears")
 	var solved_checkbox := code_fix_ui.find_child("LineCheck_1", true, false) as CheckBox
 	var solved_option := code_fix_ui.find_child("FixOption_1", true, false) as OptionButton
 	_assert_true(solved_checkbox != null and solved_checkbox.disabled, "CodeFixUI locks solved line checkbox")
