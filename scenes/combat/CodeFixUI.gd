@@ -728,7 +728,7 @@ func _render_snippet() -> void:
 		return
 
 	if _snippet_rich != null:
-		_snippet_rich.text = _format_snippet_as_python_bbcode(snippet_lines)
+		_render_python_code_block(_snippet_rich, snippet_lines)
 	else:
 		_snippet_label.text = ""
 
@@ -795,7 +795,7 @@ func _render_answer_rows() -> void:
 		code_text.add_theme_color_override("default_color", VS_CODE_TEXT_COLOR)
 		code_text.add_theme_color_override("font_outline_color", Color(0.03, 0.05, 0.09, 0.85))
 		code_text.add_theme_constant_override("outline_size", 1)
-		code_text.text = _format_single_python_line_bbcode(snippet_lines, i)
+		_render_python_code_line(code_text, snippet_lines, i)
 		row.add_child(code_text)
 
 		var selected_fix_preview := Label.new()
@@ -836,6 +836,100 @@ func _render_answer_rows() -> void:
 		}
 		_update_line_tick(i)
 		_update_selected_fix_preview(i)
+
+
+func _render_python_code_block(label: RichTextLabel, snippet_lines: Array) -> void:
+	if label == null:
+		return
+	label.clear()
+	label.bbcode_enabled = true
+
+	var formatted_lines := _collect_formatted_snippet_lines(snippet_lines)
+	for idx in range(formatted_lines.size()):
+		if idx > 0:
+			label.add_text("\n")
+		_append_python_code_line(label, formatted_lines[idx])
+
+
+func _render_python_code_line(label: RichTextLabel, snippet_lines: Array, line_index: int) -> void:
+	if label == null:
+		return
+	label.clear()
+	label.bbcode_enabled = true
+
+	for line_data in _collect_formatted_snippet_lines(snippet_lines):
+		if int(line_data.get("line", -1)) != line_index:
+			continue
+		_append_python_code_line(label, line_data)
+		return
+
+
+func _append_python_code_line(label: RichTextLabel, line_data: Dictionary) -> void:
+	var line_no := int(line_data.get("line", -1))
+	if line_no >= 0:
+		_append_colored_text(label, "%02d" % line_no, VS_CODE_LINE_NUMBER_COLOR)
+		label.add_text(" ")
+		_append_colored_text(label, "|", VS_CODE_PIPE_COLOR)
+		label.add_text(" ")
+
+	var indent_prefix := "    ".repeat(int(line_data.get("indent", 0)))
+	if not indent_prefix.is_empty():
+		label.add_text(indent_prefix)
+	_append_highlighted_python_text(label, str(line_data.get("text", "")))
+
+
+func _append_highlighted_python_text(label: RichTextLabel, source: String) -> void:
+	var text := source.replace("\t", "    ")
+	var i := 0
+	var expect_definition_name := false
+
+	while i < text.length():
+		var ch := text[i]
+		if ch == "#" or (ch == "/" and i + 1 < text.length() and text[i + 1] == "/"):
+			_append_colored_text(label, text.substr(i, text.length() - i), VS_CODE_COMMENT_COLOR)
+			break
+		if ch == "/" and i + 1 < text.length() and text[i + 1] == "*":
+			_append_colored_text(label, text.substr(i, text.length() - i), VS_CODE_COMMENT_COLOR)
+			break
+		if ch == "'" or ch == "\"":
+			var string_end := _scan_string_end(text, i, ch)
+			_append_colored_text(label, text.substr(i, string_end - i), VS_CODE_STRING_COLOR)
+			i = string_end
+			continue
+		if _is_identifier_start(ch):
+			var ident_end := i + 1
+			while ident_end < text.length() and _is_identifier_char(text[ident_end]):
+				ident_end += 1
+			var ident := text.substr(i, ident_end - i)
+			if expect_definition_name:
+				_append_colored_text(label, ident, VS_CODE_TYPE_COLOR)
+				expect_definition_name = false
+			elif SYNTAX_KEYWORDS.has(ident):
+				_append_colored_text(label, ident, VS_CODE_KEYWORD_COLOR)
+				if ident == "def" or ident == "class":
+					expect_definition_name = true
+			elif SYNTAX_BUILTINS.has(ident):
+				_append_colored_text(label, ident, VS_CODE_BUILTIN_COLOR)
+			else:
+				label.add_text(ident)
+			i = ident_end
+			continue
+		if _is_number_start(text, i):
+			var number_end := _scan_number_end(text, i)
+			_append_colored_text(label, text.substr(i, number_end - i), VS_CODE_NUMBER_COLOR)
+			i = number_end
+			continue
+
+		label.add_text(ch)
+		i += 1
+
+
+func _append_colored_text(label: RichTextLabel, text: String, color: Color) -> void:
+	if label == null or text.is_empty():
+		return
+	label.push_color(color)
+	label.add_text(text)
+	label.pop()
 
 
 func _seed_default_answer() -> void:

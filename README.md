@@ -53,7 +53,7 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
 
 ## Requirements
 
-- Godot `4.6.1` (desktop/editor + headless for CI tests)
+- Godot `4.6.2` (desktop/editor + headless for CI tests)
 - Python `3.x`
 
 ## Run
@@ -73,11 +73,8 @@ godot --headless --path . --quit-after 3
 - Move: `WASD` or arrow keys
 - Interact: `E` / `Enter`
 - Pause: `Esc`
-- Combat: select/fix, then `Submit`
+- Combat: select/fix, then `SUBMIT`
 - Home screen: **Quit** button is at the **bottom-left corner**
-- Dev skip shortcuts (debug builds only):
-  - `Ctrl + Shift + F6`: skip current stage
-  - `Ctrl + Shift + F7`: skip current chapter
 
 ## Test
 

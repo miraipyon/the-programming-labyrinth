@@ -264,8 +264,10 @@ func _test_scene_contracts() -> void:
 	var answer_card := code_fix.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0") as Button
 	_assert_true(answer_card != null, "CodeFixUI scene keeps answer card available")
 	_assert_true(answer_card.modulate.a < 0.1, "CodeFixUI scene keeps answer cards hidden until line selection")
-	_assert_true(snippet_rich != null and snippet_rich.bbcode_enabled and snippet_rich.text.find("[color=") != -1, "CodeFixUI scene highlights snippet text with rich colors")
-	_assert_true(row_code != null and row_code.bbcode_enabled and row_code.text.find("[color=") != -1, "CodeFixUI scene highlights code rows with rich colors")
+	var snippet_text := snippet_rich.get_parsed_text() if snippet_rich != null else ""
+	var row_code_text := row_code.get_parsed_text() if row_code != null else ""
+	_assert_true(snippet_rich != null and snippet_rich.bbcode_enabled and snippet_text.find("if ready:") != -1 and snippet_text.find("[lb]") == -1, "CodeFixUI scene highlights snippet text with rich colors")
+	_assert_true(row_code != null and row_code.bbcode_enabled and row_code_text.find("if ready:") != -1 and row_code_text.find("[lb]") == -1, "CodeFixUI scene highlights code rows with rich colors")
 	_assert_true(str(code_fix.call("get_rendered_snippet_plain_text")).find("if ready:") != -1, "CodeFixUI scene keeps plain snippet text literal")
 	_assert_true(str(code_fix.call("get_rendered_code_line_plain_text", 0)).find("if ready:") != -1, "CodeFixUI scene keeps plain code row literal")
 	code_fix.call("_on_line_toggled", 0, true)

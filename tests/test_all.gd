@@ -212,7 +212,8 @@ func _test_ui_components() -> void:
 	}
 	code_fix_ui.call("populate_code", bug_data)
 	var first_code_line := code_fix_ui.find_child("CodeText_0", true, false) as RichTextLabel
-	_assert_true(first_code_line != null and first_code_line.bbcode_enabled and first_code_line.text.find("[color=") != -1, "CodeFixUI highlights code rows with rich text colors")
+	var first_code_line_text := first_code_line.get_parsed_text() if first_code_line != null else ""
+	_assert_true(first_code_line != null and first_code_line.bbcode_enabled and first_code_line_text.find("let a = 1") != -1 and first_code_line_text.find("[lb]") == -1, "CodeFixUI highlights code rows with rich text colors")
 	_assert_true(first_code_line != null and str(code_fix_ui.call("get_rendered_code_line_plain_text", 0)).find("let a = 1") != -1, "CodeFixUI keeps code row plain text literal")
 	var answer_variant: Variant = code_fix_ui.call("get_user_answer")
 	var answer: Dictionary = answer_variant if typeof(answer_variant) == TYPE_DICTIONARY else {}
@@ -236,9 +237,11 @@ func _test_ui_components() -> void:
 	await process_frame
 	var bracket_snippet := code_fix_ui.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/CodeScroll/SnippetText") as RichTextLabel
 	var bracket_code_line := code_fix_ui.find_child("CodeText_4", true, false) as RichTextLabel
-	_assert_true(bracket_snippet != null and bracket_snippet.bbcode_enabled and bracket_snippet.text.find("[color=") != -1, "CodeFixUI highlights snippet text with VS Code-like colors")
+	var bracket_snippet_text := bracket_snippet.get_parsed_text() if bracket_snippet != null else ""
+	_assert_true(bracket_snippet != null and bracket_snippet.bbcode_enabled and bracket_snippet_text.find("print(archer['name'])") != -1 and bracket_snippet_text.find("[lb]") == -1, "CodeFixUI highlights snippet text with VS Code-like colors")
 	_assert_true(str(code_fix_ui.call("get_rendered_snippet_plain_text")).find("print(archer['name'])") != -1, "CodeFixUI keeps bracket-heavy snippet literal")
-	_assert_true(bracket_code_line != null and bracket_code_line.bbcode_enabled and bracket_code_line.text.find("[color=") != -1, "CodeFixUI highlights code rows with VS Code-like colors")
+	var bracket_code_line_text := bracket_code_line.get_parsed_text() if bracket_code_line != null else ""
+	_assert_true(bracket_code_line != null and bracket_code_line.bbcode_enabled and bracket_code_line_text.find("print(archer['name'])") != -1 and bracket_code_line_text.find("[lb]") == -1, "CodeFixUI highlights code rows with VS Code-like colors")
 	_assert_true(str(code_fix_ui.call("get_rendered_code_line_plain_text", 4)).find("print(archer['name'])") != -1, "CodeFixUI keeps bracket-heavy code row literal")
 	code_fix_ui.queue_free()
 
@@ -255,8 +258,12 @@ func _test_ui_components() -> void:
 	var requirement_label := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/RequirementLabel") as Label
 	var rows_vbox := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerRows/RowsVBox") as VBoxContainer
 	var card0 := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0") as Button
+	var scene_snippet := code_fix_scene_node.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/CodeScroll/SnippetText") as RichTextLabel
+	var scene_row_code := code_fix_scene_node.find_child("CodeText_0", true, false) as RichTextLabel
 	_assert_true(requirement_label != null and requirement_label.visible and requirement_label.text.find("Objective:") != -1, "CodeFixUI scene shows objective text")
 	_assert_true(rows_vbox != null and rows_vbox.get_child_count() > 0, "CodeFixUI scene renders code line rows")
+	_assert_true(scene_snippet != null and scene_snippet.bbcode_enabled and scene_snippet.get_parsed_text().find("player = {") != -1 and scene_snippet.get_parsed_text().find("[lb]") == -1, "CodeFixUI scene keeps snippet rendered text literal")
+	_assert_true(scene_row_code != null and scene_row_code.bbcode_enabled and scene_row_code.get_parsed_text().find("player = {") != -1 and scene_row_code.get_parsed_text().find("[lb]") == -1, "CodeFixUI scene keeps code row rendered text literal")
 	_assert_true(card0 != null, "CodeFixUI scene keeps answer cards visible")
 	_assert_true(card0.modulate.a < 0.1, "CodeFixUI scene hides answer cards when no line selected")
 	code_fix_scene_node.call("set_answer", 0, "player = {")
