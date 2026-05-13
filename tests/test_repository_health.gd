@@ -230,11 +230,57 @@ func _test_scene_contracts() -> void:
 		"CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait",
 		"CombatRoot/Panel/VBox/BattleView/Portraits/EnemyPortrait"
 	])
+	var combat_console_scene: PackedScene = load("res://scenes/combat/CombatConsole.tscn")
+	var combat_console := combat_console_scene.instantiate()
+	get_tree().root.add_child(combat_console)
+	await get_tree().process_frame
+	var combat_submit := combat_console.get_node_or_null("CombatRoot/Panel/VBox/SubmitButton") as Button
+	_assert_true(combat_submit != null and combat_submit.text.strip_edges().to_upper() == "SUBMIT", "CombatConsole scene labels submit button as SUBMIT")
+	if combat_submit != null:
+		var combat_submit_normal := combat_submit.get_theme_stylebox("normal")
+		var combat_submit_hover := combat_submit.get_theme_stylebox("hover")
+		_assert_true(combat_submit_normal != null and combat_submit_hover != null, "CombatConsole scene assigns hover skin to submit button")
+		if combat_submit_normal is StyleBoxTexture and combat_submit_hover is StyleBoxTexture:
+			_assert_true((combat_submit_normal as StyleBoxTexture).modulate_color != (combat_submit_hover as StyleBoxTexture).modulate_color, "CombatConsole submit hover differs from normal")
+	_assert_true(combat_console.get_node_or_null("CombatRoot/Panel/VBox/SkipButton") == null, "CombatConsole scene omits SkipButton")
+	combat_console.queue_free()
+	await get_tree().process_frame
 	await _assert_scene_contract("res://scenes/combat/CodeFixUI.tscn", "CodeFixUI", [
 		"VBox/MainFrame/CodeMargin/InlineHost/CodeScroll",
 		"VBox/MainFrame/CodeMargin/InlineHost/AnswerRows",
 		"VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0"
 	])
+	var code_fix_scene: PackedScene = load("res://scenes/combat/CodeFixUI.tscn")
+	var code_fix := code_fix_scene.instantiate()
+	get_tree().root.add_child(code_fix)
+	await get_tree().process_frame
+	code_fix.call("populate_code", {
+		"goal": "Initialize character info and print it.",
+		"snippet": ["if ready:", "    print('Hero')"],
+		"bugs": [{"line": 0, "accepted_fixes": ["if ready:"]}]
+	})
+	var snippet_rich := code_fix.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/CodeScroll/SnippetText") as RichTextLabel
+	var row_code := code_fix.find_child("CodeText_0", true, false) as RichTextLabel
+	var answer_card := code_fix.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/AnswerPanel/AnswerGrid/OptionCard_0") as Button
+	_assert_true(answer_card != null, "CodeFixUI scene keeps answer card available")
+	_assert_true(answer_card.modulate.a < 0.1, "CodeFixUI scene keeps answer cards hidden until line selection")
+	_assert_true(snippet_rich != null and snippet_rich.bbcode_enabled and snippet_rich.text.find("[color=") != -1, "CodeFixUI scene highlights snippet text with rich colors")
+	_assert_true(row_code != null and row_code.bbcode_enabled and row_code.text.find("[color=") != -1, "CodeFixUI scene highlights code rows with rich colors")
+	_assert_true(str(code_fix.call("get_rendered_snippet_plain_text")).find("if ready:") != -1, "CodeFixUI scene keeps plain snippet text literal")
+	_assert_true(str(code_fix.call("get_rendered_code_line_plain_text", 0)).find("if ready:") != -1, "CodeFixUI scene keeps plain code row literal")
+	code_fix.call("_on_line_toggled", 0, true)
+	var option0 := code_fix.find_child("FixOption_0", true, false) as OptionButton
+	_assert_true(option0 != null and option0.selected == -1, "CodeFixUI scene does not auto-select answer A")
+	code_fix.call("set_answer", 0, "player = {")
+	await get_tree().process_frame
+	if answer_card != null:
+		var answer_normal := answer_card.get_theme_stylebox("normal")
+		var answer_hover := answer_card.get_theme_stylebox("hover")
+		_assert_true(answer_normal != null and answer_hover != null, "CodeFixUI scene assigns hover skin to answer cards")
+		if answer_normal is StyleBoxTexture and answer_hover is StyleBoxTexture:
+			_assert_true((answer_normal as StyleBoxTexture).modulate_color != (answer_hover as StyleBoxTexture).modulate_color, "CodeFixUI answer hover differs from normal")
+	code_fix.queue_free()
+	await get_tree().process_frame
 	await _assert_scene_contract("res://scenes/combat/BlockAssemblyUI.tscn", "BlockAssemblyUI", [
 		"VBox/GoalLabel",
 		"VBox/BlockRows"

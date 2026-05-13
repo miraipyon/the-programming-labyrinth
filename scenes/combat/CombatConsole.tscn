@@ -172,11 +172,6 @@ text = ""
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="QuickInventory" type="HBoxContainer" parent="CombatRoot/Panel/VBox"]
-layout_mode = 2
-size_flags_vertical = 1
-theme_override_constants/separation = 6
-
 [node name="CodeFixUI" parent="CombatRoot/Panel/VBox" instance=ExtResource("2_code_fix")]
 custom_minimum_size = Vector2(0, 320)
 layout_mode = 2
@@ -193,14 +188,7 @@ text = ""
 autowrap_mode = 3
 
 [node name="SubmitButton" type="Button" parent="CombatRoot/Panel/VBox"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(240, 54)
 layout_mode = 2
 size_flags_vertical = 1
-text = "Submit"
-
-[node name="SkipButton" type="Button" parent="CombatRoot/Panel/VBox"]
-custom_minimum_size = Vector2(0, 34)
-layout_mode = 2
-size_flags_vertical = 1
-tooltip_text = "Dev shortcut: end combat instantly."
-text = "Skip (Dev)"
+text = "SUBMIT"

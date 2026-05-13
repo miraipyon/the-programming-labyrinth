@@ -1,4 +1,4 @@
-## Combat console: điều phối UI sửa code/block và quick inventory trong encounter.
+## Combat console: điều phối UI sửa code/block trong encounter.
 extends CanvasLayer
 
 const CODE_FIX_UI_SCRIPT := preload("res://scenes/combat/CodeFixUI.gd")
@@ -7,6 +7,7 @@ const PORTRAIT_ANIM_FPS: float = 10.0
 const PLAYER_HIT_ANIM_FPS: float = 16.0
 const LOW_TIME_THRESHOLD: float = 30.0
 const COMBAT_TIME_ICON_PATH := "res://assets_2/png/Counter/Icon/Time.png"
+const SUBMIT_FRAME_PATH := "res://assets_4/submit_frame.png"
 # Fallback static sprites (dùng khi không có animated frames)
 const PLAYER_BATTLE_SPRITE := "res://assets/MC/attack_right.png"
 const PLAYER_COMBAT_IDLE_ANIM := {
@@ -38,9 +39,8 @@ var _time_group: HBoxContainer = null
 var _time_label: Label = null
 var _hp_tween: Tween = null
 var _status_label: Label = null
-var _quick_inventory: HBoxContainer = null
 var _submit_button: Button = null
-var _skip_button: Button = null
+var _submit_frame_texture: Texture2D = null
 var _player_portrait: TextureRect = null
 var _enemy_portrait: TextureRect = null
 var _battle_line_label: Label = null
@@ -111,12 +111,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 			block_ui.show()
 			block_ui.call("populate_blocks", current_bug_data)
 	if _submit_button != null:
-		_submit_button.text = "Submit"
-	if _skip_button != null:
-		_skip_button.text = "Skip (Dev)"
-		_skip_button.visible = true
-
-	_refresh_quick_inventory()
+		_apply_submit_button_skin(_submit_button)
 
 
 func hide_console() -> void:
@@ -154,62 +149,6 @@ func refresh_turn(turn_number: int) -> void:
 				if block_ui != null:
 					block_ui.call("populate_blocks", current_bug_data)
 	_update_battle_view(current_enemy_data, current_bug_data)
-
-	_refresh_quick_inventory()
-
-
-func use_hint_or_snap(item_id: String) -> Dictionary:
-	var inventory_manager: Node = get_node_or_null("/root/InventoryManager")
-	if inventory_manager == null or not inventory_manager.has_method("use_item"):
-		return _status_result(false, "InventoryManager is not ready.")
-
-	var item_data: Dictionary = {}
-	var data_manager: Node = get_node_or_null("/root/DataManager")
-	if data_manager != null and data_manager.has_method("get_item_data"):
-		var item_variant: Variant = data_manager.call("get_item_data", item_id)
-		if typeof(item_variant) == TYPE_DICTIONARY:
-			item_data = item_variant
-
-	var effect := str(item_data.get("effect", ""))
-	if effect == "hint" and current_mode != "code_fix":
-		return _status_result(false, "Hint Chip can only be used in Code Fix mode.")
-	if effect == "auto_snap" and current_mode != "block_assembly":
-		return _status_result(false, "Block Snap Chip can only be used in Chapter 4.")
-
-	var use_result_variant: Variant = inventory_manager.call("use_item", item_id)
-	var use_result: Dictionary = use_result_variant if typeof(use_result_variant) == TYPE_DICTIONARY else {}
-	if not bool(use_result.get("success", false)):
-		return _status_result(false, str(use_result.get("message", "Cannot use item.")))
-
-	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
-	match str(use_result.get("effect", "")):
-		"heal":
-			if hp_time_manager != null and hp_time_manager.has_method("heal"):
-				hp_time_manager.call("heal", int(use_result.get("value", 0)))
-		"restore_time":
-			if hp_time_manager != null and hp_time_manager.has_method("restore_time"):
-				hp_time_manager.call("restore_time", float(use_result.get("value", 0)))
-		"hint":
-			var code_ui := _get_code_fix_ui()
-			if code_ui != null and code_ui.has_method("reveal_hint"):
-				code_ui.call("reveal_hint")
-		"auto_snap":
-			var block_ui := _get_block_assembly_ui()
-			if block_ui != null and block_ui.has_method("snap_next_correct"):
-				block_ui.call("snap_next_correct")
-		"revive", "damage_reduction", "skip_hit":
-			if hp_time_manager != null and hp_time_manager.has_method("activate_artifact"):
-				var activate_result_variant: Variant = hp_time_manager.call("activate_artifact", item_id)
-				if typeof(activate_result_variant) == TYPE_DICTIONARY:
-					var activate_result: Dictionary = activate_result_variant
-					if not bool(activate_result.get("success", false)):
-						_refresh_quick_inventory()
-						return _status_result(false, str(activate_result.get("message", "Cannot activate artifact.")))
-					if inventory_manager.has_method("register_artifact_use"):
-						inventory_manager.call("register_artifact_use", item_id)
-
-	_refresh_quick_inventory()
-	return _status_result(true, str(use_result.get("message", "Item used.")))
 
 
 func _on_completed(_success: bool) -> void:
@@ -270,29 +209,6 @@ func _on_submit_pressed() -> void:
 	if answer != null:
 		_sfx("combat_submit")
 		encounter_manager.call("submit_turn", answer)
-
-
-func _on_skip_pressed() -> void:
-	if not encounter_manager:
-		encounter_manager = _find_encounter_manager()
-	if encounter_manager == null:
-		_status_result(false, "EncounterManager is not ready.")
-		return
-
-	if encounter_manager.has_method("dev_skip_current_encounter"):
-		var skip_result_variant: Variant = encounter_manager.call("dev_skip_current_encounter")
-		if typeof(skip_result_variant) == TYPE_DICTIONARY:
-			var skip_result: Dictionary = skip_result_variant
-			_status_result(bool(skip_result.get("success", false)), str(skip_result.get("message", "Dev skip executed.")))
-		else:
-			_status_result(true, "Dev skip executed.")
-		return
-
-	if encounter_manager.has_method("end_encounter"):
-		encounter_manager.call("end_encounter", true)
-		_status_result(true, "Dev skip executed.")
-	else:
-		_status_result(false, "Skip combat API not found.")
 
 
 func _ensure_layout() -> void:
@@ -428,12 +344,6 @@ func _ensure_layout() -> void:
 	_battle_line_label.visible = false
 	battle_view.add_child(_battle_line_label)
 
-	_quick_inventory = HBoxContainer.new()
-	_quick_inventory.name = "QuickInventory"
-	_quick_inventory.alignment = BoxContainer.ALIGNMENT_CENTER
-	_quick_inventory.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	vbox.add_child(_quick_inventory)
-
 	var code_ui := _take_or_create_ui("CodeFixUI", CODE_FIX_UI_SCRIPT)
 	code_ui.custom_minimum_size = Vector2(0, 320)
 	code_ui.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -457,24 +367,10 @@ func _ensure_layout() -> void:
 
 	_submit_button = Button.new()
 	_submit_button.name = "SubmitButton"
-	_submit_button.text = "Submit"
-	_submit_button.custom_minimum_size = Vector2(200, 40)
-	_submit_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_submit_button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	_apply_submit_button_skin(_submit_button)
 	if not _submit_button.pressed.is_connected(_on_submit_pressed):
 		_submit_button.pressed.connect(_on_submit_pressed)
 	btn_vbox.add_child(_submit_button)
-
-	_skip_button = Button.new()
-	_skip_button.name = "SkipButton"
-	_skip_button.text = "Skip (Dev)"
-	_skip_button.custom_minimum_size = Vector2(200, 32)
-	_skip_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	_skip_button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_skip_button.tooltip_text = "Dev shortcut: end combat instantly."
-	if not _skip_button.pressed.is_connected(_on_skip_pressed):
-		_skip_button.pressed.connect(_on_skip_pressed)
-	btn_vbox.add_child(_skip_button)
 
 
 func _bind_existing_layout() -> bool:
@@ -513,7 +409,6 @@ func _bind_existing_layout() -> bool:
 	
 	var vbox_node := get_node_or_null("CombatRoot/Panel/VBox")
 	if vbox_node is VBoxContainer:
-		_bind_or_create_skip_button(vbox_node)
 		var existing_code_ui := vbox_node.get_node_or_null("CodeFixUI") as Control
 		if existing_code_ui != null:
 			existing_code_ui.custom_minimum_size = Vector2(0, 320)
@@ -527,14 +422,11 @@ func _bind_existing_layout() -> bool:
 	if _enemy_portrait: _configure_portrait(_enemy_portrait, true)
 	_normalize_battle_layout()
 	
-	_quick_inventory = get_node_or_null("CombatRoot/Panel/VBox/QuickInventory")
 	_submit_button = get_node_or_null("CombatRoot/Panel/VBox/SubmitButton")
-	_skip_button = get_node_or_null("CombatRoot/Panel/VBox/SkipButton")
+	_apply_submit_button_skin(_submit_button)
 	
 	if _submit_button and not _submit_button.pressed.is_connected(_on_submit_pressed):
 		_submit_button.pressed.connect(_on_submit_pressed)
-	if _skip_button and not _skip_button.pressed.is_connected(_on_skip_pressed):
-		_skip_button.pressed.connect(_on_skip_pressed)
 
 	return _root_control != null and _hp_bar != null
 
@@ -720,63 +612,51 @@ func _normalize_battle_layout() -> void:
 		_battle_line_label.visible = false
 
 
-func _bind_or_create_skip_button(vbox: VBoxContainer) -> void:
-	_skip_button = get_node_or_null("CombatRoot/Panel/VBox/SkipButton") as Button
-	if _skip_button == null:
-		_skip_button = Button.new()
-		_skip_button.name = "SkipButton"
-		_skip_button.text = "Skip (Dev)"
-		_skip_button.tooltip_text = "Dev shortcut: end combat instantly."
-		if _submit_button != null and _submit_button.get_parent() == vbox:
-			var submit_index := _submit_button.get_index()
-			vbox.add_child(_skip_button)
-			vbox.move_child(_skip_button, submit_index + 1)
-		else:
-			vbox.add_child(_skip_button)
-	if not _skip_button.pressed.is_connected(_on_skip_pressed):
-		_skip_button.pressed.connect(_on_skip_pressed)
-
-
-func _refresh_quick_inventory() -> void:
-	if _quick_inventory == null:
+func _apply_submit_button_skin(button: Button) -> void:
+	if button == null:
 		return
 
-	for child in _quick_inventory.get_children():
-		child.queue_free()
+	if _submit_frame_texture == null:
+		_submit_frame_texture = _load_safe_texture(SUBMIT_FRAME_PATH)
 
-	var inventory_manager: Node = get_node_or_null("/root/InventoryManager")
-	var data_manager: Node = get_node_or_null("/root/DataManager")
-	var items: Dictionary = {}
-	if inventory_manager != null and inventory_manager.has_method("get_all_permanent"):
-		var items_variant: Variant = inventory_manager.call("get_all_permanent")
-		if typeof(items_variant) == TYPE_DICTIONARY:
-			items = items_variant
+	button.text = "SUBMIT"
+	button.custom_minimum_size = Vector2(maxf(button.custom_minimum_size.x, 240.0), maxf(button.custom_minimum_size.y, 54.0))
+	button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.flat = false
+	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_color_override("font_color", Color(0.98, 0.95, 0.72))
+	button.add_theme_color_override("font_hover_color", Color(1.0, 0.99, 0.9))
+	button.add_theme_color_override("font_pressed_color", Color(1.0, 0.92, 0.68))
+	button.add_theme_color_override("font_disabled_color", Color(0.62, 0.62, 0.58))
 
-	if items.is_empty():
-		_quick_inventory.visible = false
-		return
-	_quick_inventory.visible = true
+	if _submit_frame_texture != null:
+		button.add_theme_stylebox_override("normal", _make_submit_button_style(_submit_frame_texture, Color(1, 1, 1, 1)))
+		button.add_theme_stylebox_override("hover", _make_submit_button_style(_submit_frame_texture, Color(1.12, 1.08, 0.95, 1)))
+		button.add_theme_stylebox_override("pressed", _make_submit_button_style(_submit_frame_texture, Color(0.92, 0.9, 0.82, 1)))
+		button.add_theme_stylebox_override("disabled", _make_submit_button_style(_submit_frame_texture, Color(0.55, 0.55, 0.55, 0.88)))
+	else:
+		button.add_theme_stylebox_override("normal", MenuVisuals.make_button_style(Color(0.28, 0.24, 0.15, 0.96)))
+		button.add_theme_stylebox_override("hover", MenuVisuals.make_button_style(Color(0.4, 0.35, 0.22, 1.0)))
+		button.add_theme_stylebox_override("pressed", MenuVisuals.make_button_style(Color(0.2, 0.18, 0.11, 1.0)))
+		button.add_theme_stylebox_override("disabled", MenuVisuals.make_button_style(Color(0.14, 0.14, 0.12, 0.76)))
 
-	var keys: Array = items.keys()
-	keys.sort()
-	for key_variant in keys:
-		var item_id := str(key_variant)
-		var count := int(items.get(key_variant, 0))
-		if count <= 0:
-			continue
 
-		var item_name := item_id
-		if data_manager != null and data_manager.has_method("get_item_data"):
-			var item_variant: Variant = data_manager.call("get_item_data", item_id)
-			if typeof(item_variant) == TYPE_DICTIONARY:
-				var item_data: Dictionary = item_variant
-				item_name = str(item_data.get("name", item_id))
-
-		var button := Button.new()
-		button.text = "%s x%d" % [item_name, count]
-		var captured_id := item_id
-		button.pressed.connect(func(): use_hint_or_snap(captured_id))
-		_quick_inventory.add_child(button)
+func _make_submit_button_style(texture: Texture2D, tint: Color) -> StyleBoxTexture:
+	var style := StyleBoxTexture.new()
+	style.texture = texture
+	style.modulate_color = tint
+	style.draw_center = true
+	style.texture_margin_left = 12
+	style.texture_margin_top = 12
+	style.texture_margin_right = 12
+	style.texture_margin_bottom = 12
+	style.content_margin_left = 22
+	style.content_margin_top = 8
+	style.content_margin_right = 22
+	style.content_margin_bottom = 8
+	return style
 
 
 func _get_code_fix_ui() -> Control:

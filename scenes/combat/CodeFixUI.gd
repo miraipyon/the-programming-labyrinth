@@ -3,6 +3,88 @@ extends Control
 
 const ANSWER_FRAME_PATH := "res://assets_4/answer_frame.png"
 const CODE_FRAME_PATH := "res://assets_4/code_frame.png"
+const VS_CODE_TEXT_COLOR := Color(0.87, 0.91, 0.96, 1.0)
+const VS_CODE_KEYWORD_COLOR := Color(0.34, 0.62, 0.92, 1.0)
+const VS_CODE_STRING_COLOR := Color(0.82, 0.58, 0.47, 1.0)
+const VS_CODE_COMMENT_COLOR := Color(0.40, 0.62, 0.35, 1.0)
+const VS_CODE_NUMBER_COLOR := Color(0.72, 0.83, 0.65, 1.0)
+const VS_CODE_BUILTIN_COLOR := Color(0.74, 0.57, 0.88, 1.0)
+const VS_CODE_TYPE_COLOR := Color(0.52, 0.82, 0.79, 1.0)
+const VS_CODE_LINE_NUMBER_COLOR := Color(0.49, 0.54, 0.59, 1.0)
+const VS_CODE_PIPE_COLOR := Color(0.31, 0.35, 0.39, 1.0)
+const VS_CODE_TEXT_FAINT_COLOR := Color(0.96, 0.97, 0.99, 1.0)
+
+const SYNTAX_KEYWORDS := {
+	"and": true,
+	"as": true,
+	"assert": true,
+	"break": true,
+	"case": true,
+	"class": true,
+	"continue": true,
+	"def": true,
+	"default": true,
+	"del": true,
+	"elif": true,
+	"else": true,
+	"except": true,
+	"false": true,
+	"finally": true,
+	"for": true,
+	"from": true,
+	"function": true,
+	"if": true,
+	"import": true,
+	"in": true,
+	"is": true,
+	"lambda": true,
+	"let": true,
+	"match": true,
+	"new": true,
+	"nonlocal": true,
+	"null": true,
+	"not": true,
+	"or": true,
+	"pass": true,
+	"raise": true,
+	"return": true,
+	"self": true,
+	"switch": true,
+	"true": true,
+	"try": true,
+	"var": true,
+	"while": true,
+	"with": true,
+	"yield": true,
+}
+
+const SYNTAX_BUILTINS := {
+	"all": true,
+	"append": true,
+	"bool": true,
+	"dict": true,
+	"enumerate": true,
+	"filter": true,
+	"float": true,
+	"int": true,
+	"len": true,
+	"list": true,
+	"map": true,
+	"max": true,
+	"min": true,
+	"open": true,
+	"pop": true,
+	"print": true,
+	"range": true,
+	"remove": true,
+	"round": true,
+	"set": true,
+	"sorted": true,
+	"str": true,
+	"sum": true,
+	"tuple": true,
+	"zip": true,
+}
 
 var _mock_answer := {"line": -1, "fix": ""}
 var _current_bug_data: Dictionary = {}
@@ -101,6 +183,14 @@ func set_answer(line: int, fix: String) -> void:
 	_set_active_line(line)
 	_update_selected_fix_preview(line)
 	_refresh_answer_cards()
+
+
+func get_rendered_snippet_plain_text() -> String:
+	return _format_snippet_as_python(_current_bug_data.get("snippet", []))
+
+
+func get_rendered_code_line_plain_text(line_index: int) -> String:
+	return _format_single_python_line_plain(_current_bug_data.get("snippet", []), line_index)
 
 
 func reveal_hint() -> Dictionary:
@@ -347,6 +437,7 @@ func _ensure_answer_slot(root: VBoxContainer) -> void:
 		card.custom_minimum_size = Vector2(0, 68)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		card.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		card.flat = false
 		card.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		card.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		card.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -398,25 +489,176 @@ func _apply_visual_skin() -> void:
 		_snippet_label.add_theme_color_override("font_color", Color(0.91, 0.95, 1.0))
 	if _snippet_rich != null:
 		_snippet_rich.add_theme_font_size_override("normal_font_size", 17)
-		_snippet_rich.add_theme_color_override("default_color", Color(0.86, 0.91, 0.99))
+		_snippet_rich.add_theme_color_override("default_color", VS_CODE_TEXT_COLOR)
 		_snippet_rich.add_theme_color_override("font_outline_color", Color(0.03, 0.05, 0.09, 0.85))
 		_snippet_rich.add_theme_constant_override("outline_size", 1)
 
 	for card in _answer_cards:
 		if card == null:
 			continue
-		card.add_theme_font_size_override("font_size", 14)
-		card.add_theme_color_override("font_color", Color(0.92, 0.97, 1.0))
+		_apply_answer_card_skin(card, false, true)
+
+
+func _apply_answer_card_skin(card: Button, selected: bool, has_choice: bool) -> void:
+	if card == null:
+		return
+
+	card.add_theme_font_size_override("font_size", 14)
+	card.add_theme_color_override("font_color", Color(1.0, 1.0, 0.95) if selected else Color(0.92, 0.97, 1.0))
+	card.add_theme_color_override("font_hover_color", Color(1.0, 1.0, 0.97) if selected else Color(0.98, 1.0, 1.0))
+	card.add_theme_color_override("font_pressed_color", Color(1.0, 0.97, 0.86) if selected else Color(0.9, 0.96, 1.0))
+	card.add_theme_color_override("font_disabled_color", Color(0.66, 0.68, 0.72, 0.78))
+
+	if not has_choice:
 		if _answer_frame_texture != null:
-			card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(1, 1, 1, 1.0)))
-			card.add_theme_stylebox_override("hover", _make_texture_style(_answer_frame_texture, Color(1, 1, 1, 1.0)))
-			card.add_theme_stylebox_override("pressed", _make_texture_style(_answer_frame_texture, Color(0.88, 0.97, 0.95, 1.0)))
+			card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(0.46, 0.46, 0.46, 0.84)))
+			card.add_theme_stylebox_override("hover", _make_texture_style(_answer_frame_texture, Color(0.46, 0.46, 0.46, 0.84)))
+			card.add_theme_stylebox_override("pressed", _make_texture_style(_answer_frame_texture, Color(0.4, 0.4, 0.4, 0.8)))
+			card.add_theme_stylebox_override("disabled", _make_texture_style(_answer_frame_texture, Color(0.34, 0.34, 0.34, 0.76)))
+		else:
+			card.add_theme_stylebox_override("normal", _make_fallback_button_style(Color(0.15, 0.17, 0.22, 0.74)))
+			card.add_theme_stylebox_override("hover", _make_fallback_button_style(Color(0.15, 0.17, 0.22, 0.74)))
+			card.add_theme_stylebox_override("pressed", _make_fallback_button_style(Color(0.12, 0.13, 0.17, 0.72)))
+			card.add_theme_stylebox_override("disabled", _make_fallback_button_style(Color(0.11, 0.12, 0.15, 0.72)))
+		return
+
+	if _answer_frame_texture != null:
+		if selected:
+			card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(0.18, 0.68, 1.0, 1.0)))
+			card.add_theme_stylebox_override("hover", _make_texture_style(_answer_frame_texture, Color(0.26, 0.78, 1.0, 1.0)))
+			card.add_theme_stylebox_override("pressed", _make_texture_style(_answer_frame_texture, Color(0.14, 0.58, 0.92, 1.0)))
 			card.add_theme_stylebox_override("disabled", _make_texture_style(_answer_frame_texture, Color(0.52, 0.52, 0.52, 0.88)))
 		else:
+			card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(1.0, 1.0, 1.0, 1.0)))
+			card.add_theme_stylebox_override("hover", _make_texture_style(_answer_frame_texture, Color(1.12, 1.12, 1.03, 1.0)))
+			card.add_theme_stylebox_override("pressed", _make_texture_style(_answer_frame_texture, Color(0.88, 0.97, 0.95, 1.0)))
+			card.add_theme_stylebox_override("disabled", _make_texture_style(_answer_frame_texture, Color(0.52, 0.52, 0.52, 0.88)))
+	else:
+		if selected:
+			card.add_theme_stylebox_override("normal", _make_fallback_button_style(Color(0.18, 0.42, 0.58, 0.97)))
+			card.add_theme_stylebox_override("hover", _make_fallback_button_style(Color(0.24, 0.52, 0.7, 0.99)))
+			card.add_theme_stylebox_override("pressed", _make_fallback_button_style(Color(0.14, 0.34, 0.5, 1.0)))
+			card.add_theme_stylebox_override("disabled", _make_fallback_button_style(Color(0.11, 0.13, 0.18, 0.8)))
+		else:
 			card.add_theme_stylebox_override("normal", _make_fallback_button_style(Color(0.19, 0.24, 0.32, 0.96)))
-			card.add_theme_stylebox_override("hover", _make_fallback_button_style(Color(0.27, 0.33, 0.44, 0.98)))
+			card.add_theme_stylebox_override("hover", _make_fallback_button_style(Color(0.28, 0.34, 0.46, 0.98)))
 			card.add_theme_stylebox_override("pressed", _make_fallback_button_style(Color(0.16, 0.41, 0.36, 0.98)))
 			card.add_theme_stylebox_override("disabled", _make_fallback_button_style(Color(0.11, 0.13, 0.18, 0.8)))
+
+
+func _format_snippet_as_python_bbcode(snippet_lines: Array) -> String:
+	var formatted: Array[String] = []
+	for line_data in _collect_formatted_snippet_lines(snippet_lines):
+		var line_no := int(line_data.get("line", -1))
+		var indent_prefix := "    ".repeat(int(line_data.get("indent", 0)))
+		var code_text := str(line_data.get("text", ""))
+		formatted.append(_format_code_line_bbcode(indent_prefix + code_text, line_no))
+	return "\n".join(formatted)
+
+
+func _format_single_python_line_bbcode(snippet_lines: Array, line_index: int) -> String:
+	for line_data in _collect_formatted_snippet_lines(snippet_lines):
+		if int(line_data.get("line", -1)) != line_index:
+			continue
+		var indent_prefix := "    ".repeat(int(line_data.get("indent", 0)))
+		return _format_code_line_bbcode(indent_prefix + str(line_data.get("text", "")))
+	return ""
+
+
+func _format_code_line_bbcode(code_line: String, line_no: int = -1) -> String:
+	var result := ""
+	if line_no >= 0:
+		result += "[color=#%s]%02d[/color] [color=#%s]|[/color] " % [_color_to_hex(VS_CODE_LINE_NUMBER_COLOR), line_no, _color_to_hex(VS_CODE_PIPE_COLOR)]
+	result += _highlight_code_text(code_line)
+	return result
+
+
+func _highlight_code_text(source: String) -> String:
+	var text := source.replace("\t", "    ")
+	var result := ""
+	var i := 0
+	var expect_definition_name := false
+
+	while i < text.length():
+		var ch := text[i]
+		if ch == "#" or (ch == "/" and i + 1 < text.length() and text[i + 1] == "/"):
+			result += _bbcode_color(_escape_bbcode_text(text.substr(i, text.length() - i)), VS_CODE_COMMENT_COLOR)
+			break
+		if ch == "/" and i + 1 < text.length() and text[i + 1] == "*":
+			result += _bbcode_color(_escape_bbcode_text(text.substr(i, text.length() - i)), VS_CODE_COMMENT_COLOR)
+			break
+		if ch == "'" or ch == "\"":
+			var string_end := _scan_string_end(text, i, ch)
+			result += _bbcode_color(_escape_bbcode_text(text.substr(i, string_end - i)), VS_CODE_STRING_COLOR)
+			i = string_end
+			continue
+		if _is_identifier_start(ch):
+			var ident_end := i + 1
+			while ident_end < text.length() and _is_identifier_char(text[ident_end]):
+				ident_end += 1
+			var ident := text.substr(i, ident_end - i)
+			if expect_definition_name:
+				result += _bbcode_color(_escape_bbcode_text(ident), VS_CODE_TYPE_COLOR)
+				expect_definition_name = false
+			elif SYNTAX_KEYWORDS.has(ident):
+				result += _bbcode_color(_escape_bbcode_text(ident), VS_CODE_KEYWORD_COLOR)
+				if ident == "def" or ident == "class":
+					expect_definition_name = true
+			elif SYNTAX_BUILTINS.has(ident):
+				result += _bbcode_color(_escape_bbcode_text(ident), VS_CODE_BUILTIN_COLOR)
+			else:
+				result += _escape_bbcode_text(ident)
+			i = ident_end
+			continue
+		if _is_number_start(text, i):
+			var number_end := _scan_number_end(text, i)
+			result += _bbcode_color(_escape_bbcode_text(text.substr(i, number_end - i)), VS_CODE_NUMBER_COLOR)
+			i = number_end
+			continue
+
+		result += _escape_bbcode_text(ch)
+		i += 1
+
+	return result
+
+
+func _scan_string_end(text: String, start: int, quote_char: String) -> int:
+	var i := start + 1
+	while i < text.length():
+		var ch := text[i]
+		if ch == "\\":
+			i += 2
+			continue
+		if ch == quote_char:
+			return i + 1
+		i += 1
+	return text.length()
+
+
+func _scan_number_end(text: String, start: int) -> int:
+	var i := start
+	while i < text.length():
+		var ch := text[i]
+		if (ch >= "0" and ch <= "9") or (ch >= "a" and ch <= "f") or (ch >= "A" and ch <= "F") or ch == "_" or ch == "." or ch == "x" or ch == "X" or ch == "b" or ch == "B" or ch == "o" or ch == "O" or ch == "e" or ch == "E":
+			i += 1
+			continue
+		break
+	return i
+
+
+func _bbcode_color(text: String, color: Color) -> String:
+	return "[color=#%s]%s[/color]" % [_color_to_hex(color), text]
+
+
+func _escape_bbcode_text(text: String) -> String:
+	return text.replace("[", "[lb]").replace("]", "[rb]")
+
+
+func _color_to_hex(color: Color) -> String:
+	var red := clampi(int(round(color.r * 255.0)), 0, 255)
+	var green := clampi(int(round(color.g * 255.0)), 0, 255)
+	var blue := clampi(int(round(color.b * 255.0)), 0, 255)
+	return "%02X%02X%02X" % [red, green, blue]
 
 
 func _load_frame_texture(path: String) -> Texture2D:
@@ -486,10 +728,7 @@ func _render_snippet() -> void:
 		return
 
 	if _snippet_rich != null:
-		var text := ""
-		for i in range(snippet_lines.size()):
-			text += "[center]%s[/center]\n" % _format_single_python_line_bbcode(snippet_lines, i)
-		_snippet_rich.text = text
+		_snippet_rich.text = _format_snippet_as_python_bbcode(snippet_lines)
 	else:
 		_snippet_label.text = ""
 
@@ -553,7 +792,9 @@ func _render_answer_rows() -> void:
 		code_text.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		code_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		code_text.add_theme_font_size_override("normal_font_size", 16)
-		code_text.add_theme_color_override("default_color", Color(0.86, 0.91, 0.99))
+		code_text.add_theme_color_override("default_color", VS_CODE_TEXT_COLOR)
+		code_text.add_theme_color_override("font_outline_color", Color(0.03, 0.05, 0.09, 0.85))
+		code_text.add_theme_constant_override("outline_size", 1)
 		code_text.text = _format_single_python_line_bbcode(snippet_lines, i)
 		row.add_child(code_text)
 
@@ -573,7 +814,7 @@ func _render_answer_rows() -> void:
 		for choice in _build_choices(i, bug_by_line, snippet_lines):
 			option.add_item(choice)
 		if option.item_count > 0:
-			option.select(0)
+			option.selected = -1
 		row.add_child(option)
 
 		var right_spacer := Control.new()
@@ -667,8 +908,8 @@ func _mark_line_selected(line: int, is_selected: bool) -> void:
 	if option != null:
 		option.disabled = not is_selected
 		option.visible = false
-		if is_selected and option.selected < 0 and option.item_count > 0:
-			option.select(0)
+		if is_selected:
+			option.selected = -1
 	if is_selected:
 		_selected_lines[line] = true
 		_set_active_line(line)
@@ -733,18 +974,10 @@ func _refresh_answer_cards() -> void:
 		var is_selected := (option.selected == i)
 		if has_choice:
 			card.text = option.get_item_text(i)
-			if is_selected:
-				card.add_theme_color_override("font_color", Color(1.0, 1.0, 0.95)) # Bright highlight
-				if _answer_frame_texture != null:
-					card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(0.15, 0.65, 1.0, 1.0)))
-			else:
-				card.add_theme_color_override("font_color", Color(0.91, 0.97, 1.0))
-				if _answer_frame_texture != null:
-					card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(1, 1, 1, 1.0)))
+			_apply_answer_card_skin(card, is_selected, true)
 		else:
 			card.text = "N/A"
-			if _answer_frame_texture != null:
-				card.add_theme_stylebox_override("normal", _make_texture_style(_answer_frame_texture, Color(1, 1, 1, 1.0)))
+			_apply_answer_card_skin(card, false, false)
 
 	_update_selected_fix_preview(_selected_line)
 
@@ -1089,23 +1322,12 @@ func _format_snippet_as_python(snippet_lines: Array) -> String:
 	return "\n".join(formatted)
 
 
-func _format_snippet_as_python_bbcode(snippet_lines: Array) -> String:
-	var lines: Array[String] = []
-	for line_data in _collect_formatted_snippet_lines(snippet_lines):
-		var line_no := int(line_data.get("line", -1))
-		var indent_prefix := "    ".repeat(int(line_data.get("indent", 0)))
-		var code_text := str(line_data.get("text", ""))
-		var highlighted := _highlight_python_code_bbcode(code_text)
-		lines.append("[color=#7AA2F7]%02d[/color] [color=#4B526D]|[/color] %s%s" % [line_no, indent_prefix, highlighted])
-	return "\n".join(lines)
-
-
-func _format_single_python_line_bbcode(snippet_lines: Array, line_index: int) -> String:
+func _format_single_python_line_plain(snippet_lines: Array, line_index: int) -> String:
 	for line_data in _collect_formatted_snippet_lines(snippet_lines):
 		if int(line_data.get("line", -1)) != line_index:
 			continue
 		var indent_prefix := "    ".repeat(int(line_data.get("indent", 0)))
-		return "%s%s" % [indent_prefix, _highlight_python_code_bbcode(str(line_data.get("text", "")))]
+		return "%s%s" % [indent_prefix, str(line_data.get("text", ""))]
 	return ""
 
 
@@ -1132,79 +1354,6 @@ func _collect_formatted_snippet_lines(snippet_lines: Array) -> Array[Dictionary]
 		else:
 			inferred_indent = effective_indent
 	return result
-
-
-func _highlight_python_code_bbcode(line: String) -> String:
-	var keywords := {
-		"def": true, "class": true, "if": true, "elif": true, "else": true,
-		"for": true, "while": true, "return": true, "in": true, "and": true,
-		"or": true, "not": true, "from": true, "import": true, "as": true,
-		"try": true, "except": true, "finally": true, "with": true, "pass": true,
-		"break": true, "continue": true, "lambda": true, "yield": true, "is": true
-	}
-	var constants := {"True": true, "False": true, "None": true}
-	var out := ""
-	var i := 0
-	while i < line.length():
-		var ch := line[i]
-		if ch == "#" and i >= 0:
-			out += "[color=#6A9955]%s[/color]" % _bb_escape(line.substr(i))
-			break
-
-		if ch == "\"" or ch == "'":
-			var quote := ch
-			var j := i + 1
-			while j < line.length():
-				var c := line[j]
-				if c == "\\" and j + 1 < line.length():
-					j += 2
-					continue
-				if c == quote:
-					j += 1
-					break
-				j += 1
-			var token := line.substr(i, j - i)
-			out += "[color=#CE9178]%s[/color]" % _bb_escape(token)
-			i = j
-			continue
-
-		if _is_identifier_start(ch):
-			var j_id := i + 1
-			while j_id < line.length() and _is_identifier_char(line[j_id]):
-				j_id += 1
-			var ident := line.substr(i, j_id - i)
-			if keywords.has(ident):
-				out += "[color=#C586C0]%s[/color]" % _bb_escape(ident)
-			elif constants.has(ident):
-				out += "[color=#569CD6]%s[/color]" % _bb_escape(ident)
-			else:
-				out += _bb_escape(ident)
-			i = j_id
-			continue
-
-		if _is_number_start(line, i):
-			var j_num := i + 1
-			var has_dot := false
-			while j_num < line.length():
-				var c_num := line[j_num]
-				if c_num == "." and not has_dot:
-					has_dot = true
-					j_num += 1
-					continue
-				if c_num < "0" or c_num > "9":
-					break
-				j_num += 1
-			out += "[color=#B5CEA8]%s[/color]" % _bb_escape(line.substr(i, j_num - i))
-			i = j_num
-			continue
-
-		out += _bb_escape(ch)
-		i += 1
-	return out
-
-
-func _bb_escape(text: String) -> String:
-	return text.replace("[", "[lb]").replace("]", "[rb]")
 
 
 func _is_identifier_start(ch: String) -> bool:

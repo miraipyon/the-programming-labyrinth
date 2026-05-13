@@ -27,7 +27,7 @@ func _run_suite() -> void:
 	_test_partial_fix_updates_snippet_and_remaining_bugs()
 	_test_wrong_line_penalty_damage()
 	await _test_block_snap_ui()
-	await _test_combat_console_quick_inventory()
+	await _test_combat_console_no_quick_inventory()
 	_restore_state()
 
 
@@ -163,20 +163,9 @@ func _test_block_snap_ui() -> void:
 	await get_tree().process_frame
 
 
-func _test_combat_console_quick_inventory() -> void:
-	var inventory := _inventory_manager()
-	var hp_time := _hp_time_manager()
-	_assert_true(inventory != null and hp_time != null, "Managers exist for quick inventory test")
-	if inventory == null or hp_time == null:
-		return
-
-	inventory.call("init_for_stage")
-	inventory.set("permanent_inventory", {"green_tea": 1, "hint_chip": 1, "block_snap_chip": 1, "runtime_patch": 1})
-	hp_time.call("init_for_stage", 1)
-	hp_time.call("take_damage", 30)
-
+func _test_combat_console_no_quick_inventory() -> void:
 	var wrapper := Node.new()
-	wrapper.name = "CombatQuickInventoryWrapper"
+	wrapper.name = "CombatNoQuickInventoryWrapper"
 	get_tree().root.add_child(wrapper)
 
 	var encounter: Node = load("res://scripts/combat/EncounterManager.gd").new()
@@ -188,53 +177,24 @@ func _test_combat_console_quick_inventory() -> void:
 	wrapper.add_child(console)
 	await get_tree().process_frame
 
-	var code_bug := {
+	console.call("show_console", {"name": "Syntax Slime"}, {
 		"type": "code_fix",
 		"snippet": ["print(name"],
 		"bugs": [{"line": 0, "accepted_fixes": ["print(name)"]}]
-	}
-	console.call("show_console", {"name": "Syntax Slime"}, code_bug)
-	var hp_label := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPLabel") as Label
-	var hp_bar := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar") as Range
-	var time_label := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeLabel") as Label
-	
-	await get_tree().create_timer(1.0).timeout # Wait for HP tween
-	
-	_assert_true(hp_label != null and hp_bar != null, "Combat UI shows HP widgets")
-	_assert_true(time_label != null and time_label.text == "06:00", "Combat UI shows real timer from HPTimeManager")
-	if hp_label != null:
-		_assert_true(hp_label.text == "", "Combat UI numerical HP is removed")
-	if hp_bar != null:
-		_assert_eq(int(hp_bar.value), 70, "Combat UI updates player HP bar value")
-	if time_label != null:
-		hp_time.call("restore_time", 30.0)
-		console.call("_process", 0.016)
-		_assert_true(time_label.text == "06:30", "Combat UI timer updates when time changes")
-	var hint_result: Dictionary = console.call("use_hint_or_snap", "hint_chip")
-	_assert_true(bool(hint_result.get("success", false)), "Quick inventory uses Hint Chip in code-fix combat")
-	var permanent: Dictionary = inventory.get("permanent_inventory")
-	_assert_true(not permanent.has("hint_chip"), "Hint Chip is consumed by quick inventory")
+	})
+	await get_tree().process_frame
 
-	var tea_result: Dictionary = console.call("use_hint_or_snap", "green_tea")
-	_assert_true(bool(tea_result.get("success", false)), "Quick inventory uses Green Tea")
-	_assert_eq(int(hp_time.get("current_hp")), 95, "Green Tea heals through quick inventory")
-	var patch_result: Dictionary = console.call("use_hint_or_snap", "runtime_patch")
-	_assert_true(bool(patch_result.get("success", false)), "Quick inventory activates Runtime Patch")
-	var patch_reactivate_result: Dictionary = console.call("use_hint_or_snap", "runtime_patch")
-	_assert_true(not bool(patch_reactivate_result.get("success", true)), "Quick inventory cannot reactivate Runtime Patch in same stage")
-
-	var block_bug := {
-		"type": "block_assembly",
-		"goal": "Order blocks",
-		"blocks": ["a", "b", "c"],
-		"correct_order": [0, 1, 2]
-	}
-	console.call("show_console", {"name": "Infinite Golem"}, block_bug)
-	var snap_result: Dictionary = console.call("use_hint_or_snap", "block_snap_chip")
-	_assert_true(bool(snap_result.get("success", false)), "Quick inventory uses Block Snap Chip in block combat")
-	var block_ui := console.find_child("BlockAssemblyUI", true, false)
-	var order_after_snap: Array = block_ui.call("get_user_answer") if block_ui != null else []
-	_assert_true(not order_after_snap.is_empty() and int(order_after_snap[0]) == 0, "Block Snap Chip changes the visible block order")
+	var quick_inventory := console.get_node_or_null("CombatRoot/Panel/VBox/QuickInventory")
+	var submit_button := console.get_node_or_null("CombatRoot/Panel/VBox/SubmitButton") as Button
+	_assert_true(quick_inventory == null, "CombatConsole no longer shows quick inventory in combat UI")
+	_assert_true(submit_button != null and submit_button.text.strip_edges().to_upper() == "SUBMIT", "CombatConsole keeps submit button labeled SUBMIT")
+	if submit_button != null:
+		var submit_normal := submit_button.get_theme_stylebox("normal")
+		var submit_hover := submit_button.get_theme_stylebox("hover")
+		_assert_true(submit_normal != null and submit_hover != null, "CombatConsole submit button has hover skin")
+		if submit_normal is StyleBoxTexture and submit_hover is StyleBoxTexture:
+			_assert_true((submit_normal as StyleBoxTexture).modulate_color != (submit_hover as StyleBoxTexture).modulate_color, "CombatConsole submit hover differs from normal")
+	_assert_true(not console.has_method("use_hint_or_snap"), "CombatConsole no longer exposes combat item-use helper")
 
 	wrapper.queue_free()
 	await get_tree().process_frame

@@ -212,11 +212,15 @@ func _test_ui_components() -> void:
 	}
 	code_fix_ui.call("populate_code", bug_data)
 	var first_code_line := code_fix_ui.find_child("CodeText_0", true, false) as RichTextLabel
-	_assert_true(first_code_line != null and first_code_line.text.find("00") == -1 and first_code_line.text.find("01") == -1, "CodeFixUI hides numeric line prefixes")
+	_assert_true(first_code_line != null and first_code_line.bbcode_enabled and first_code_line.text.find("[color=") != -1, "CodeFixUI highlights code rows with rich text colors")
+	_assert_true(first_code_line != null and str(code_fix_ui.call("get_rendered_code_line_plain_text", 0)).find("let a = 1") != -1, "CodeFixUI keeps code row plain text literal")
 	var answer_variant: Variant = code_fix_ui.call("get_user_answer")
 	var answer: Dictionary = answer_variant if typeof(answer_variant) == TYPE_DICTIONARY else {}
 	_assert_eq(int(answer.get("line", -1)), 1, "CodeFixUI default answer line")
 	_assert_eq(str(answer.get("fix", "")), "print(a)", "CodeFixUI default answer fix")
+	code_fix_ui.call("_on_line_toggled", 1, true)
+	var selected_option := code_fix_ui.find_child("FixOption_1", true, false) as OptionButton
+	_assert_true(selected_option != null and selected_option.selected == -1, "CodeFixUI does not auto-select answer A")
 	code_fix_ui.call("mark_correct_lines", [1])
 	await process_frame
 	var solved_checkbox := code_fix_ui.find_child("LineCheck_1", true, false) as CheckBox
@@ -225,6 +229,17 @@ func _test_ui_components() -> void:
 	_assert_true(solved_option != null and solved_option.disabled and not solved_option.visible, "CodeFixUI hides and locks solved line options")
 	code_fix_ui.call("_on_line_toggled", 1, true)
 	_assert_true(not bool(code_fix_ui.call("has_line_selection")), "CodeFixUI ignores selection on solved line")
+	code_fix_ui.call("populate_code", {
+		"snippet": ["archer = {", "    'name': 'Hero'", "    'health': 100", "}", "print(archer['name'])"],
+		"bugs": [{"line": 4, "accepted_fixes": ["print(archer['name'])"]}]
+	})
+	await process_frame
+	var bracket_snippet := code_fix_ui.get_node_or_null("VBox/MainFrame/CodeMargin/InlineHost/CodeScroll/SnippetText") as RichTextLabel
+	var bracket_code_line := code_fix_ui.find_child("CodeText_4", true, false) as RichTextLabel
+	_assert_true(bracket_snippet != null and bracket_snippet.bbcode_enabled and bracket_snippet.text.find("[color=") != -1, "CodeFixUI highlights snippet text with VS Code-like colors")
+	_assert_true(str(code_fix_ui.call("get_rendered_snippet_plain_text")).find("print(archer['name'])") != -1, "CodeFixUI keeps bracket-heavy snippet literal")
+	_assert_true(bracket_code_line != null and bracket_code_line.bbcode_enabled and bracket_code_line.text.find("[color=") != -1, "CodeFixUI highlights code rows with VS Code-like colors")
+	_assert_true(str(code_fix_ui.call("get_rendered_code_line_plain_text", 4)).find("print(archer['name'])") != -1, "CodeFixUI keeps bracket-heavy code row literal")
 	code_fix_ui.queue_free()
 
 	# CodeFixUI scene runtime (regression): objective, rows, and answer cards must render
@@ -244,6 +259,13 @@ func _test_ui_components() -> void:
 	_assert_true(rows_vbox != null and rows_vbox.get_child_count() > 0, "CodeFixUI scene renders code line rows")
 	_assert_true(card0 != null, "CodeFixUI scene keeps answer cards visible")
 	_assert_true(card0.modulate.a < 0.1, "CodeFixUI scene hides answer cards when no line selected")
+	code_fix_scene_node.call("set_answer", 0, "player = {")
+	await process_frame
+	var card0_normal := card0.get_theme_stylebox("normal")
+	var card0_hover := card0.get_theme_stylebox("hover")
+	_assert_true(card0_normal != null and card0_hover != null, "CodeFixUI scene assigns hover skin to answer cards")
+	if card0_normal is StyleBoxTexture and card0_hover is StyleBoxTexture:
+		_assert_true((card0_normal as StyleBoxTexture).modulate_color != (card0_hover as StyleBoxTexture).modulate_color, "CodeFixUI answer card hover differs from normal")
 	code_fix_scene_node.queue_free()
 
 	# BlockAssemblyUI
@@ -359,15 +381,25 @@ func _test_ui_components() -> void:
 	var combat_enemy_label := console.find_child("EnemyLabel", true, false) as Label
 	var combat_turn_label := console.find_child("TurnLabel", true, false) as Label
 	var combat_time_label := console.find_child("TimeLabel", true, false) as Label
+	var combat_submit_button := console.find_child("SubmitButton", true, false) as Button
 	_assert_true(top_hbox != null and combat_hp_row != null and combat_hp_row.get_index() == 0, "CombatConsole places HP on the left")
 	_assert_true(top_hbox != null and combat_enemy_label != null and combat_enemy_label.get_index() == top_hbox.get_child_count() - 1 and combat_enemy_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_RIGHT, "CombatConsole places enemy name on the right")
 	_assert_true(combat_turn_label != null and not combat_turn_label.visible, "CombatConsole hides turn label from combat HUD")
 	_assert_true(combat_time_label != null and combat_time_label.text.find(":") != -1, "CombatConsole shows live timer label in combat HUD")
+	_assert_true(combat_submit_button != null and combat_submit_button.text.strip_edges().to_upper() == "SUBMIT", "CombatConsole labels submit button as SUBMIT")
+	if combat_submit_button != null:
+		var combat_submit_normal := combat_submit_button.get_theme_stylebox("normal")
+		var combat_submit_hover := combat_submit_button.get_theme_stylebox("hover")
+		_assert_true(combat_submit_normal != null and combat_submit_hover != null, "CombatConsole submit button has hover skin")
+		if combat_submit_normal is StyleBoxTexture and combat_submit_hover is StyleBoxTexture:
+			_assert_true((combat_submit_normal as StyleBoxTexture).modulate_color != (combat_submit_hover as StyleBoxTexture).modulate_color, "CombatConsole submit hover differs from normal")
+	_assert_true(console.find_child("QuickInventory", true, false) == null, "CombatConsole does not expose quick inventory in combat HUD")
+	_assert_true(console.find_child("SkipButton", true, false) == null, "CombatConsole does not expose skip button in combat HUD")
 	console.call("hide_console")
 	_assert_true(not console.visible, "CombatConsole hides correctly")
 	wrapper.queue_free()
 
-	# CombatConsole scene runtime (regression): code UI + skip button must be visible/populated
+	# CombatConsole scene runtime (regression): code UI + submit button must be visible/populated
 	var wrapper_scene := Node.new()
 	wrapper_scene.name = "WrapperScene"
 	root.add_child(wrapper_scene)
@@ -388,15 +420,25 @@ func _test_ui_components() -> void:
 		"bugs": [{"line": 1, "accepted_fixes": ["    'name': 'Hero',"]}]
 	})
 	await process_frame
-	var real_skip := console_real.get_node_or_null("CombatRoot/Panel/VBox/SkipButton") as Button
+	var real_submit := console_real.get_node_or_null("CombatRoot/Panel/VBox/SubmitButton") as Button
 	var real_rows := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/AnswerRows/RowsVBox") as VBoxContainer
 	var real_req := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/RequirementLabel") as Label
+	var real_quick_inventory := console_real.get_node_or_null("CombatRoot/Panel/VBox/QuickInventory")
+	var real_skip := console_real.get_node_or_null("CombatRoot/Panel/VBox/SkipButton")
 	var real_player_portrait := console_real.get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait") as TextureRect
 	var real_enemy_portrait := console_real.get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/EnemyPortrait") as TextureRect
 	var real_time_label := console_real.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeLabel") as Label
-	_assert_true(real_skip != null and real_skip.visible, "CombatConsole scene keeps Skip button visible")
+	_assert_true(real_submit != null and real_submit.visible and real_submit.text.strip_edges().to_upper() == "SUBMIT", "CombatConsole scene labels submit button as SUBMIT")
+	if real_submit != null:
+		var real_submit_normal := real_submit.get_theme_stylebox("normal")
+		var real_submit_hover := real_submit.get_theme_stylebox("hover")
+		_assert_true(real_submit_normal != null and real_submit_hover != null, "CombatConsole scene assigns hover skin to submit button")
+		if real_submit_normal is StyleBoxTexture and real_submit_hover is StyleBoxTexture:
+			_assert_true((real_submit_normal as StyleBoxTexture).modulate_color != (real_submit_hover as StyleBoxTexture).modulate_color, "CombatConsole scene submit hover differs from normal")
 	_assert_true(real_rows != null and real_rows.get_child_count() > 0, "CombatConsole scene renders code rows in combat")
 	_assert_true(real_req != null and real_req.visible and real_req.text.find("Objective:") != -1, "CombatConsole scene shows combat objective")
+	_assert_true(real_quick_inventory == null, "CombatConsole scene does not show quick inventory in combat")
+	_assert_true(real_skip == null, "CombatConsole scene does not show skip button")
 	_assert_true(real_time_label != null and real_time_label.text == "02:05", "CombatConsole scene renders current real timer")
 	var real_player_frames: Array = console_real.get("_player_anim_frames")
 	var real_player_hit_frames: Array = console_real.get("_player_hit_frames")
