@@ -138,6 +138,10 @@ func _test_block_snap_ui() -> void:
 		"correct_order": [0, 1, 2]
 	}
 	block_ui.call("populate_blocks", bug_data)
+	var goal_label := block_ui.get_node_or_null("VBox/GoalLabel") as Label
+	_assert_true(goal_label != null and goal_label.text.find("How to play") == -1, "BlockAssemblyUI no longer shows How to play helper line")
+	if goal_label != null:
+		_assert_eq(goal_label.horizontal_alignment, HORIZONTAL_ALIGNMENT_CENTER, "BlockAssemblyUI objective is centered")
 	var initial_order: Array = block_ui.call("get_user_answer")
 	_assert_eq(initial_order, [2, 1, 0], "BlockAssemblyUI seeds a shuffled order for testing")
 
@@ -192,14 +196,20 @@ func _test_combat_console_quick_inventory() -> void:
 	console.call("show_console", {"name": "Syntax Slime"}, code_bug)
 	var hp_label := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPLabel") as Label
 	var hp_bar := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar") as Range
+	var time_label := console.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeLabel") as Label
 	
 	await get_tree().create_timer(1.0).timeout # Wait for HP tween
 	
 	_assert_true(hp_label != null and hp_bar != null, "Combat UI shows HP widgets")
+	_assert_true(time_label != null and time_label.text == "06:00", "Combat UI shows real timer from HPTimeManager")
 	if hp_label != null:
 		_assert_true(hp_label.text == "", "Combat UI numerical HP is removed")
 	if hp_bar != null:
 		_assert_eq(int(hp_bar.value), 70, "Combat UI updates player HP bar value")
+	if time_label != null:
+		hp_time.call("restore_time", 30.0)
+		console.call("_process", 0.016)
+		_assert_true(time_label.text == "06:30", "Combat UI timer updates when time changes")
 	var hint_result: Dictionary = console.call("use_hint_or_snap", "hint_chip")
 	_assert_true(bool(hint_result.get("success", false)), "Quick inventory uses Hint Chip in code-fix combat")
 	var permanent: Dictionary = inventory.get("permanent_inventory")

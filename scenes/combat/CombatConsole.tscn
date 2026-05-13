@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets_4/hp_heart.png" id="4_hp_heart"]
 [ext_resource type="Texture2D" path="res://assets_4/bg.png" id="5_hp_bg"]
 [ext_resource type="Texture2D" path="res://assets_4/green.png" id="6_hp_fill"]
+[ext_resource type="Texture2D" path="res://assets_2/png/Counter/Icon/Time.png" id="7_time_icon"]
 
 
 
@@ -85,6 +86,28 @@ value = 100.0
 nine_patch_stretch = true
 texture_under = ExtResource("5_hp_bg")
 texture_progress = ExtResource("6_hp_fill")
+
+[node name="TimeGroup" type="HBoxContainer" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 4
+
+[node name="TimeIconContainer" type="MarginContainer" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup"]
+layout_mode = 2
+theme_override_constants/margin_right = 2
+
+[node name="TimeIcon" type="TextureRect" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeIconContainer"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("7_time_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TimeLabel" type="Label" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "--:--"
 
 [node name="TurnLabel" type="Label" parent="CombatRoot/TopInfo/MarginContainer/HBoxContainer"]
 visible = false

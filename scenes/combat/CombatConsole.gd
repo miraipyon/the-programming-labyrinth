@@ -3,17 +3,19 @@ extends CanvasLayer
 
 const CODE_FIX_UI_SCRIPT := preload("res://scenes/combat/CodeFixUI.gd")
 const BLOCK_ASSEMBLY_UI_SCRIPT := preload("res://scenes/combat/BlockAssemblyUI.gd")
-const PLAYER_BATTLE_SPRITE := "res://assets/MC/attack.png"
-const ENEMY_BATTLE_SPRITE_MAP := {
-	"syntax_slime": "res://assets/syntax_slime/attack.png",
-	"semicolon_wisp": "res://assets/semicolon_wisp/attack.png",
-	"null_shadow": "res://assets/null_shadow/attack.png",
-	"branch_phantom": "res://assets/branch_phantom/attack.png",
-	"type_mismatch_medusa": "res://assets/type_mismatch_medusa/attack.png",
-	"infinite_golem": "res://assets/infinite_golem/attack.png",
-	"boundary_hydra": "res://assets/boundary_hydra/attack.png",
-	"flow_architect": "res://assets/flow_architect/attack.png",
-	"logic_bomb_boss": "res://assets/logic_bomb_boss/attack.png",
+const PORTRAIT_ANIM_FPS: float = 10.0
+const PLAYER_HIT_ANIM_FPS: float = 16.0
+const LOW_TIME_THRESHOLD: float = 30.0
+const COMBAT_TIME_ICON_PATH := "res://assets_2/png/Counter/Icon/Time.png"
+# Fallback static sprites (dùng khi không có animated frames)
+const PLAYER_BATTLE_SPRITE := "res://assets/MC/attack_right.png"
+const PLAYER_COMBAT_IDLE_ANIM := {
+	"base": "res://assets/MC/Animation/Idle/attack_right_idle/attack_right_idle_animation",
+	"count": 9,
+}
+const PLAYER_HIT_ANIM := {
+	"base": "res://assets/MC/Animation/Hit/hit",
+	"count": 11,
 }
 const PORTRAIT_SIZE := Vector2(128, 128)
 const DAMAGE_FLASH_COLOR := Color(1.0, 0.45, 0.45, 1.0)
@@ -32,6 +34,8 @@ var _turn_label: Label = null
 var _hp_row: HBoxContainer = null
 var _hp_label: Label = null
 var _hp_bar: TextureProgressBar = null
+var _time_group: HBoxContainer = null
+var _time_label: Label = null
 var _hp_tween: Tween = null
 var _status_label: Label = null
 var _quick_inventory: HBoxContainer = null
@@ -41,6 +45,14 @@ var _player_portrait: TextureRect = null
 var _enemy_portrait: TextureRect = null
 var _battle_line_label: Label = null
 var _resolved_code_lines: Dictionary = {}
+
+## Frame-animated portrait data
+var _player_anim_frames: Array[Texture2D] = []
+var _player_hit_frames: Array[Texture2D] = []
+var _enemy_anim_frames: Array[Texture2D] = []
+var _portrait_elapsed: float = 0.0
+var _player_hit_elapsed: float = 0.0
+var _player_hit_active: bool = false
 
 
 func _ready() -> void:
@@ -82,6 +94,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 		_turn_label.text = ""
 		_turn_label.visible = false
 	_update_player_hp()
+	_refresh_combat_timer()
 	_update_battle_view(enemy_data, current_bug_data)
 
 	var code_ui := _get_code_fix_ui()
@@ -111,6 +124,12 @@ func hide_console() -> void:
 	visible = false
 	_reset_portrait_effect(_player_portrait)
 	_reset_portrait_effect(_enemy_portrait)
+	_player_anim_frames.clear()
+	_player_hit_frames.clear()
+	_enemy_anim_frames.clear()
+	_portrait_elapsed = 0.0
+	_player_hit_elapsed = 0.0
+	_player_hit_active = false
 	if _root_control != null:
 		_root_control.visible = false
 
@@ -199,6 +218,34 @@ func _on_completed(_success: bool) -> void:
 		_turn_label.text = ""
 		_turn_label.visible = false
 	hide_console()
+
+
+## Animate portraits every frame when combat is active.
+func _process(delta: float) -> void:
+	if not is_active:
+		return
+	_refresh_combat_timer()
+	_portrait_elapsed += delta
+	
+	if _player_portrait != null:
+		var player_tex: Texture2D = null
+		if _player_hit_active and not _player_hit_frames.is_empty():
+			_player_hit_elapsed += delta
+			var hit_idx := int(floor(_player_hit_elapsed * PLAYER_HIT_ANIM_FPS))
+			if hit_idx >= _player_hit_frames.size():
+				_player_hit_active = false
+				_player_hit_elapsed = 0.0
+			else:
+				player_tex = _player_hit_frames[hit_idx]
+		if player_tex == null and not _player_anim_frames.is_empty():
+			player_tex = SpriteAnimator.current_texture(_player_anim_frames, _portrait_elapsed, PORTRAIT_ANIM_FPS)
+		if player_tex != null:
+			_player_portrait.texture = player_tex
+			
+	if _enemy_portrait != null and not _enemy_anim_frames.is_empty():
+		var tex := SpriteAnimator.current_texture(_enemy_anim_frames, _portrait_elapsed, PORTRAIT_ANIM_FPS)
+		if tex != null:
+			_enemy_portrait.texture = tex
 
 
 func _on_submit_pressed() -> void:
@@ -346,6 +393,7 @@ func _ensure_layout() -> void:
 	_hp_bar.texture_under = load("res://assets_4/bg.png")
 	_hp_bar.texture_progress = load("res://assets_4/green.png")
 	_hp_row.add_child(_hp_bar)
+	_bind_or_create_time_widgets(info_h)
 	_normalize_top_info_layout(info_h)
 
 	# --- Battle View (Portraits) ---
@@ -460,6 +508,7 @@ func _bind_existing_layout() -> bool:
 	var hp_h := get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer")
 	if hp_h is BoxContainer:
 		_bind_or_create_hp_widgets(hp_h)
+		_bind_or_create_time_widgets(hp_h)
 		_normalize_top_info_layout(hp_h)
 	
 	var vbox_node := get_node_or_null("CombatRoot/Panel/VBox")
@@ -576,6 +625,8 @@ func _normalize_top_info_layout(container: BoxContainer) -> void:
 		return
 	if _hp_row != null and _hp_row.get_parent() == container:
 		container.move_child(_hp_row, 0)
+	if _time_group != null and _time_group.get_parent() == container:
+		container.move_child(_time_group, 1)
 	if _turn_label != null:
 		_turn_label.text = ""
 		_turn_label.visible = false
@@ -585,6 +636,73 @@ func _normalize_top_info_layout(container: BoxContainer) -> void:
 		_enemy_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if _enemy_label.get_parent() == container:
 			container.move_child(_enemy_label, container.get_child_count() - 1)
+
+
+func _bind_or_create_time_widgets(container: BoxContainer) -> void:
+	_time_group = container.get_node_or_null("TimeGroup") as HBoxContainer
+	if _time_group == null:
+		_time_group = HBoxContainer.new()
+		_time_group.name = "TimeGroup"
+		container.add_child(_time_group)
+
+	_time_group.add_theme_constant_override("separation", 4)
+	_time_group.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+
+	var icon_container := _time_group.get_node_or_null("TimeIconContainer") as MarginContainer
+	if icon_container == null:
+		icon_container = MarginContainer.new()
+		icon_container.name = "TimeIconContainer"
+		icon_container.add_theme_constant_override("margin_right", 2)
+		_time_group.add_child(icon_container)
+
+	var icon := icon_container.get_node_or_null("TimeIcon") as TextureRect
+	if icon == null:
+		icon = TextureRect.new()
+		icon.name = "TimeIcon"
+		icon.custom_minimum_size = Vector2(20, 20)
+		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		icon_container.add_child(icon)
+
+	if ResourceLoader.exists(COMBAT_TIME_ICON_PATH):
+		icon.texture = load(COMBAT_TIME_ICON_PATH)
+
+	_time_label = _time_group.get_node_or_null("TimeLabel") as Label
+	if _time_label == null:
+		_time_label = Label.new()
+		_time_label.name = "TimeLabel"
+		_time_group.add_child(_time_label)
+
+	_time_label.text = "--:--"
+	_time_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_time_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_time_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+
+func _refresh_combat_timer() -> void:
+	if _time_label == null:
+		return
+	var htm: Node = get_node_or_null("/root/HPTimeManager")
+	if htm == null:
+		_time_label.text = "--:--"
+		_time_label.modulate = Color.WHITE
+		return
+	_update_combat_timer(float(htm.get("time_remaining")))
+
+
+func _update_combat_timer(time_left: float) -> void:
+	if _time_label == null:
+		return
+	var safe_time := maxf(0.0, time_left)
+	var total_seconds := int(ceil(safe_time))
+	var minutes := total_seconds / 60
+	var seconds := total_seconds % 60
+	_time_label.text = "%02d:%02d" % [minutes, seconds]
+	if safe_time < LOW_TIME_THRESHOLD:
+		_time_label.modulate = Color(1.0, 0.35, 0.35)
+	else:
+		_time_label.modulate = Color.WHITE
 
 
 func _normalize_battle_layout() -> void:
@@ -740,7 +858,9 @@ func _on_turn_evaluated(result: Dictionary) -> void:
 		_status_label.text = " | ".join(status_parts)
 
 	if player_hp_loss > 0:
+		_play_player_hit_animation()
 		_play_damage_effect(_player_portrait)
+			
 	if int(result.get("enemy_hp_loss", 0)) > 0:
 		_play_damage_effect(_enemy_portrait)
 	_update_player_hp()
@@ -778,6 +898,15 @@ func _play_damage_effect(portrait: TextureRect) -> void:
 		portrait.modulate = Color.WHITE
 		portrait.set_meta("_damage_tween", null)
 	)
+
+
+func _play_player_hit_animation() -> void:
+	if _player_hit_frames.is_empty():
+		return
+	_player_hit_active = true
+	_player_hit_elapsed = 0.0
+	if _player_portrait != null:
+		_player_portrait.texture = _player_hit_frames[0]
 
 
 func _reset_portrait_effect(portrait: TextureRect) -> void:
@@ -844,10 +973,34 @@ func _sanitize_goal_text(goal: String) -> String:
 
 
 func _update_battle_view(_enemy_data: Dictionary, _bug_data: Dictionary) -> void:
-	_set_portrait_texture(_player_portrait, PLAYER_BATTLE_SPRITE)
 	var enemy_id := str(_enemy_data.get("id", "")).strip_edges()
-	var enemy_sprite_path := str(ENEMY_BATTLE_SPRITE_MAP.get(enemy_id, ""))
-	_set_portrait_texture(_enemy_portrait, enemy_sprite_path)
+	_portrait_elapsed = 0.0
+
+	# --- Player portrait: animated attack-right-idle ---
+	_player_anim_frames = SpriteAnimator.load_frames(PLAYER_COMBAT_IDLE_ANIM)
+	_player_hit_frames = SpriteAnimator.load_frames(PLAYER_HIT_ANIM)
+	_player_hit_active = false
+	_player_hit_elapsed = 0.0
+	if _player_anim_frames.is_empty():
+		# Fallback đến sprite tĩnh
+		_set_portrait_texture(_player_portrait, PLAYER_BATTLE_SPRITE)
+	elif _player_portrait != null:
+		_player_portrait.texture = _player_anim_frames[0]
+
+	# --- Enemy portrait: animated attack loop ---
+	_enemy_anim_frames.clear()
+	
+	if SpriteAnimator.ENEMY_ANIM.has(enemy_id):
+		var anim_data: Dictionary = SpriteAnimator.ENEMY_ANIM[enemy_id]
+		_enemy_anim_frames = SpriteAnimator.load_frames(anim_data.get("attack", {}))
+		
+	if _enemy_anim_frames.is_empty():
+		# Fallback đến attack tĩnh
+		var fallback_path := "res://assets/%s/attack.png" % enemy_id
+		_set_portrait_texture(_enemy_portrait, fallback_path)
+	elif _enemy_portrait != null:
+		_enemy_portrait.texture = _enemy_anim_frames[0]
+
 	if _battle_line_label != null:
 		_battle_line_label.text = ""
 		_battle_line_label.visible = false
@@ -888,11 +1041,16 @@ func _apply_compact_panel(panel: PanelContainer) -> void:
 func _configure_portrait(portrait: TextureRect, _enemy_side: bool) -> void:
 	if portrait == null:
 		return
+	# Kích thước cố định — texture sẽ scale vừa vào hộp này, không thay đổi layout
 	portrait.custom_minimum_size = PORTRAIT_SIZE
+	portrait.size = PORTRAIT_SIZE
+	# STRETCH_KEEP_ASPECT_CENTERED: giữ tỷ lệ không bị méo, căn giữa
 	portrait.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	portrait.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	# EXPAND_FIT_WIDTH_PROPORTIONAL: giữ size cố định, không phụ thuộc texture
+	portrait.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	portrait.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	portrait.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	portrait.clip_contents = true
 	portrait.flip_h = false
 	portrait.scale = Vector2.ONE
 	portrait.rotation_degrees = 0.0

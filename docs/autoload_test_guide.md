@@ -1,6 +1,6 @@
 # Hướng dẫn kiểm thử Autoloads & kết nối Signal (chi tiết)
 
-Mục tiêu: xác nhận 5 autoload chính trong dự án khởi tạo đúng, trả lời method/API mong đợi, và biết cách kết nối signal trong Editor lẫn bằng code.
+Mục tiêu: xác nhận các autoload chính trong dự án khởi tạo đúng, trả lời method/API mong đợi, và biết cách kết nối signal trong Editor lẫn bằng code.
 
 Autoload cần kiểm tra (dự án này):
 - `DataManager`
@@ -8,6 +8,9 @@ Autoload cần kiểm tra (dự án này):
 - `HPTimeManager`
 - `InventoryManager`
 - `TelemetryManager`
+- `BackgroundMusicManager`
+- `SoundManager`
+- `SpriteAnimator`
 
 ---
 
@@ -28,8 +31,14 @@ sed -n '/\[autoload\]/, /\[/{p}' project.godot
 Kết quả mong đợi (ví dụ):
 ```
 [autoload]
-DataManager="res://autoload/DataManager.gd"
-GameManager="res://autoload/GameManager.gd"
+GameManager="*res://autoload/GameManager.gd"
+HPTimeManager="*res://autoload/HPTimeManager.gd"
+InventoryManager="*res://autoload/InventoryManager.gd"
+DataManager="*res://autoload/DataManager.gd"
+TelemetryManager="*res://autoload/TelemetryManager.gd"
+BackgroundMusicManager="*res://autoload/BackgroundMusicManager.gd"
+SoundManager="*res://autoload/SoundManager.gd"
+SpriteAnimator="*res://autoload/SpriteAnimator.gd"
 ...
 ```
 
@@ -47,8 +56,11 @@ which godot || which godot4
 # chạy headless (hoặc chỉ khởi động project để thấy lỗi)
 godot --path . --headless
 
-# hoặc chạy một script test cụ thể (xem phần 3)
-godot --path . -s res://tools/test_autoloads.gd
+# chạy full suite trong repo
+godot --headless --path . --script tests/test_all.gd
+
+# chạy runner scene cho entity tests
+godot --headless --path . tests/test_runner.tscn
 ```
 
 Nếu có lỗi script lúc startup, đọc stack trace để biết file và dòng, rồi mở file đó trong Editor.
@@ -65,7 +77,7 @@ Tạo file `res://tools/test_autoloads.gd` (nếu chưa có) với nội dung sa
 extends SceneTree
 
 func _initialize():
-    var names = ["DataManager","GameManager","InventoryManager","HPTimeManager","TelemetryManager"]
+    var names = ["DataManager","GameManager","InventoryManager","HPTimeManager","TelemetryManager","BackgroundMusicManager","SoundManager","SpriteAnimator"]
     var root = get_root()
     for name in names:
         var exists = root.has_node(name)
@@ -86,6 +98,9 @@ func _initialize():
                 "InventoryManager": g = InventoryManager
                 "HPTimeManager": g = HPTimeManager
                 "TelemetryManager": g = TelemetryManager
+                "BackgroundMusicManager": g = BackgroundMusicManager
+                "SoundManager": g = SoundManager
+                "SpriteAnimator": g = SpriteAnimator
             print(name, "global var exists:", g != null)
     quit()
 ```
@@ -170,8 +185,10 @@ Lưu ý: đảm bảo chữ ký hàm (số/kiểu tham số) tương ứng với
 
 ---
 
-## Muốn tôi làm tiếp?
-- Tôi có thể tạo luôn `res://tools/test_autoloads.gd` trong repo và chạy headless để report đầu ra cho bạn.
-- Hoặc bạn có thể thử theo guide này rồi copy lỗi/log báo lại để tôi giúp sửa.
+## 9) Lệnh kiểm thử repo
 
-File này được lưu ở: `docs/autoload_test_guide.md` trong workspace.
+```bash
+godot --headless --path . --script tests/test_all.gd
+godot --headless --path . tests/test_runner.tscn
+python3 scripts/check_resource_refs.py
+```

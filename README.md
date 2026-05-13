@@ -17,6 +17,9 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
 - Puzzle combat modes:
   - Multi-bug Python code fix (chapter 1-3)
   - Block assembly algorithm (chapter 4)
+- Frame-by-frame character animation via `SpriteAnimator`:
+  - Directional player idle/walk on the maze map.
+  - Animated player/enemy portraits in combat UI.
 - Inventory system with consumables and artifacts.
 - Failure rules:
   - Lose when `HP = 0` or `timer = 0`.
@@ -31,19 +34,19 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
 
 ## Tech Stack
 
-- Engine: **Godot 4.6.1 stable**
+- Engine: **Godot 4.6.x stable** (tested locally with `4.6.2`)
 - Language: **GDScript**
 - Data: JSON-driven content (`data/*.json`)
 - Validation helper: Python 3 script (`scripts/check_resource_refs.py`)
 
 ## Project Structure
 
-- `autoload/`: global managers (state, hp/time, inventory, data, telemetry, BGM, SFX)
+- `autoload/`: global managers (state, hp/time, inventory, data, telemetry, BGM, SFX, animation metadata)
 - `scenes/`: menus, maze, combat, entities, UI
 - `scripts/`: reusable gameplay systems
 - `data/`: enemies, stages, bugs, rules, loot tables
 - `tests/`: headless tests and embedded suites
-- `assets/`, `assets_2/`: game art assets
+- `assets/`, `assets_2/`: game art assets, including `assets/MC/Animation/` and enemy `Animation/` frame sequences
 - `music/background_music/`: background music tracks (MP3)
 - `music/audio/`: sound effect library (OGG)
 - `docs/`: GDD and project documentation
@@ -103,6 +106,8 @@ python3 scripts/check_resource_refs.py
 - Stage generation tests verify unique route and required enemy/chest distribution.
 - Menu/game-flow tests verify unlock logic, victory/game-over flow, star persistence, and UI hooks.
 - Audio tests verify all BGM tracks and SFX files exist and are reachable.
+- Animation health checks verify every declared player/enemy frame sequence exists and loads.
+- `scripts/check_resource_refs.py` understands `SpriteAnimator` frame-sequence prefixes like `idle1.png`, `idle2.png`, ...
 
 ## Contributing
 

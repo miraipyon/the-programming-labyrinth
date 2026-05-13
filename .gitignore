@@ -31,6 +31,15 @@
 *.swp
 *~
 
+# Local one-off Godot scratch scripts; canonical suites live under the tests directory.
+/test.gd
+/test.gd.uid
+/test[0-9]*.gd
+/test[0-9]*.gd.uid
+
+# Local export presets may contain machine-specific paths/signing config.
+/export_presets.cfg
+
 # OS/editor noise
 .DS_Store
 Thumbs.db

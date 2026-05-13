@@ -24,6 +24,7 @@ func _run_suite() -> void:
 	_test_hygiene_files()
 	_test_stage_catalog()
 	_test_item_icon_assets()
+	_test_animation_catalog_assets()
 	await _test_generated_maze_quality()
 	await _test_scene_contracts()
 
@@ -120,6 +121,29 @@ func _test_item_icon_assets() -> void:
 		_assert_true(ResourceLoader.exists(icon_path), "Item icon asset exists: %s" % item_id)
 
 
+func _test_animation_catalog_assets() -> void:
+	var sprite_animator: Node = get_node_or_null("/root/SpriteAnimator")
+	_assert_true(sprite_animator != null, "SpriteAnimator exists for animation catalog validation")
+	if sprite_animator == null:
+		return
+
+	var player_idle: Dictionary = sprite_animator.call("get_player_idle_dirs")
+	var player_walk: Dictionary = sprite_animator.call("get_player_walk_dirs")
+	var player_combat: Dictionary = sprite_animator.call("get_player_combat_anims")
+	var enemy_anim: Dictionary = sprite_animator.call("get_enemy_anim_catalog")
+
+	for direction in ["down", "up", "left", "right"]:
+		_assert_animation_frames(sprite_animator, "Player idle %s" % direction, player_idle.get(direction, {}))
+		_assert_animation_frames(sprite_animator, "Player walk %s" % direction, player_walk.get(direction, {}))
+	_assert_animation_frames(sprite_animator, "Player combat attack idle", player_combat.get("attack_idle_right", {}))
+	_assert_animation_frames(sprite_animator, "Player combat hit", player_combat.get("hit", {}))
+
+	for enemy_id in enemy_anim.keys():
+		var anim_data: Dictionary = enemy_anim[enemy_id]
+		_assert_animation_frames(sprite_animator, "%s idle" % enemy_id, anim_data.get("idle", {}))
+		_assert_animation_frames(sprite_animator, "%s combat attack" % enemy_id, anim_data.get("attack", {}))
+
+
 func _test_scene_contracts() -> void:
 	await _assert_scene_contract("res://scenes/menus/MainMenu.tscn", "", [
 		"VBox/NewGameButton",
@@ -154,7 +178,10 @@ func _test_scene_contracts() -> void:
 		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/EnemyLabel",
 		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/TurnLabel",
 		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/HPHeart",
-		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar"
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/HPRow/CombatHPBar",
+		"CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeLabel",
+		"CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait",
+		"CombatRoot/Panel/VBox/BattleView/Portraits/EnemyPortrait"
 	])
 	await _assert_scene_contract("res://scenes/combat/CodeFixUI.tscn", "CodeFixUI", [
 		"VBox/MainFrame/CodeMargin/InlineHost/CodeScroll",
@@ -444,6 +471,20 @@ func _has_enough_answers_for_test(bug_data: Dictionary) -> bool:
 		if Array(accepted_variant).is_empty() or Array(distractors_variant).size() < 3:
 			return false
 	return true
+
+
+func _assert_animation_frames(sprite_animator: Node, label: String, anim_info: Dictionary) -> void:
+	var expected_count := int(anim_info.get("count", 0))
+	var base := str(anim_info.get("base", "")).strip_edges()
+	_assert_true(not base.is_empty(), "%s animation has a base path" % label)
+	_assert_true(expected_count > 0, "%s animation declares a positive frame count" % label)
+	if base.is_empty() or expected_count <= 0:
+		return
+
+	var first_frame := "%s1.png" % base
+	_assert_true(ResourceLoader.exists(first_frame), "%s first frame exists" % label)
+	var frames: Array = sprite_animator.call("load_frames", anim_info)
+	_assert_eq(frames.size(), expected_count, "%s loads all declared frames" % label)
 
 
 func _assert_scene_contract(scene_path: String, root_name: String, required_paths: Array) -> void:

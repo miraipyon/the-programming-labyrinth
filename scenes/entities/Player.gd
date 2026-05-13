@@ -7,37 +7,28 @@ signal chest_interacted(chest_node: Node2D)
 signal portal_reached
 
 # --- Constants & Exports ---
-const PLAYER_IDLE_FRAMES := [
-	"res://assets/MC/idle1.png",
-	"res://assets/MC/idle2.png",
-	"res://assets/MC/idle3.png",
-	"res://assets/MC/idle4.png"
-]
-const PLAYER_WALKING_BASE_PATHS := {
-	"down": "assets/MC/MC_animation/walking-downward/walking",
-	"up": "assets/MC/MC_animation/walking-upward/walking",
-	"right": "assets/MC/MC_animation/walking-right/walking",
-	"left": "assets/MC/MC_animation/walking-left/walking"
-}
-const PLAYER_WALKING_FRAME_COUNTS := {
-	"down": 10,
-	"up": 8,
-	"right": 13,
-	"left": 13
-}
+# Animation data delegated to SpriteAnimator autoload.
+# Tất cả idle / walking sử dụng frame-by-frame sequences từ Animation/ subfolders.
 const PLAYER_TARGET_PX: float = 48.0
 const MIN_RENDER_SCALE: float = 0.01
 @export var move_speed: float = 200.0
 @export var walk_animation_fps: float = 12.0
-@export_range(0.2, 1.0, 0.01) var walk_scale_multiplier: float = 0.72
+@export_range(0.2, 1.0, 0.01) var walk_scale_multiplier: float = 1.0
 
 # --- State ---
 var can_move: bool = true
 var interactable_nearby: Node2D = null  # Chest gần nhất để interact
-var _idle_textures: Array[Texture2D] = []
+## Per-direction idle frame arrays  {"down": [...], ...}
+var _idle_textures: Dictionary = {}
+## Per-direction walking frame arrays {"down": [...], ...}
 var _walking_textures: Dictionary = {}
+## Pre-computed scale per direction (tính một lần từ frame[0], dùng mãi)
+var _idle_scale: Dictionary = {}      # {"down": Vector2, ...}
+var _walk_scale: Dictionary = {}      # {"down": Vector2, ...}
 var _facing: String = "down"
 var _walk_elapsed: float = 0.0
+## Elapsed time for idle animation (independent of walk timer)
+var _idle_elapsed: float = 0.0
 
 
 # --- Lifecycle ---
@@ -59,6 +50,7 @@ func _physics_process(delta: float) -> void:
 	if not can_move:
 		velocity = Vector2.ZERO
 		_walk_elapsed = 0.0
+		_idle_elapsed += delta
 		_apply_facing_texture(_facing, false)
 		return
 
@@ -76,8 +68,10 @@ func _physics_process(delta: float) -> void:
 			_walk_elapsed = 0.0
 		_facing = new_facing
 		_walk_elapsed += delta
+		_idle_elapsed = 0.0
 	else:
 		_walk_elapsed = 0.0
+		_idle_elapsed += delta
 
 	_apply_facing_texture(_facing, is_moving)
 
@@ -97,6 +91,7 @@ func disable_movement() -> void:
 	velocity = Vector2.ZERO
 	_walk_elapsed = 0.0
 	_apply_facing_texture(_facing, false)
+	_idle_elapsed = 0.0
 
 
 func enable_movement() -> void:
@@ -104,18 +99,22 @@ func enable_movement() -> void:
 
 
 # --- Visual Scale ---
+## Tính scale vector từ texture và target_px (không thay đổi sprite).
+func _compute_scale(tex: Texture2D, target_px: float) -> Vector2:
+	if tex == null:
+		var s := maxf(target_px / 64.0, MIN_RENDER_SCALE)
+		return Vector2(s, s)
+	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
+	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
+	return Vector2(s, s)
+
+
+## Áp dụng scale và TEXTURE_FILTER_NEAREST (chỉ gọi khi cần thay đổi).
 func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
 	if sprite == null:
 		return
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var tex: Texture2D = sprite.texture
-	if tex == null:
-		var fallback_scale := maxf(target_px / 64.0, MIN_RENDER_SCALE)
-		sprite.scale = Vector2(fallback_scale, fallback_scale)
-		return
-	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
-	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
-	sprite.scale = Vector2(s, s)
+	sprite.scale = _compute_scale(sprite.texture, target_px)
 
 
 # --- Callbacks ---
@@ -145,27 +144,24 @@ func _on_detection_area_area_exited(area: Area2D) -> void:
 
 func _load_idle_textures() -> void:
 	_idle_textures.clear()
-	for path in PLAYER_IDLE_FRAMES:
-		if ResourceLoader.exists(path):
-			var texture := load(path)
-			if texture is Texture2D:
-				_idle_textures.append(texture)
+	_idle_scale.clear()
+	for dir in SpriteAnimator.MC_IDLE_DIRS.keys():
+		var frames := SpriteAnimator.load_frames(SpriteAnimator.MC_IDLE_DIRS[dir])
+		_idle_textures[dir] = frames
+		# Scale cố định từ frame đầu tiên
+		var ref_tex: Texture2D = frames[0] if not frames.is_empty() else null
+		_idle_scale[dir] = _compute_scale(ref_tex, PLAYER_TARGET_PX)
 
 
 func _load_walking_textures() -> void:
 	_walking_textures.clear()
-	for facing in PLAYER_WALKING_BASE_PATHS.keys():
-		var base_path := str(PLAYER_WALKING_BASE_PATHS[facing])
-		var frame_count := int(PLAYER_WALKING_FRAME_COUNTS.get(facing, 0))
-		var frames: Array[Texture2D] = []
-		for idx in range(1, frame_count + 1):
-			var frame_path := "res://" + base_path + str(idx) + ".png"
-			if not ResourceLoader.exists(frame_path):
-				continue
-			var texture := load(frame_path)
-			if texture is Texture2D:
-				frames.append(texture)
-		_walking_textures[str(facing)] = frames
+	_walk_scale.clear()
+	for dir in SpriteAnimator.MC_WALK_DIRS.keys():
+		var frames := SpriteAnimator.load_frames(SpriteAnimator.MC_WALK_DIRS[dir])
+		_walking_textures[dir] = frames
+		# Scale cố định từ frame đầu tiên
+		var ref_tex: Texture2D = frames[0] if not frames.is_empty() else null
+		_walk_scale[dir] = _compute_scale(ref_tex, _walking_target_px())
 
 
 func _determine_facing(direction: Vector2) -> String:
@@ -190,19 +186,22 @@ func _apply_facing_texture(facing: String, is_moving: bool) -> void:
 			var walk_frame_idx := _walking_frame_index(walking_frames.size())
 			if walk_frame_idx >= 0 and walk_frame_idx < walking_frames.size():
 				sprite.texture = walking_frames[walk_frame_idx]
-			_apply_target_scale(sprite, _walking_target_px())
+			# Dùng scale đã cache — không tính lại mỗi frame
+			sprite.scale = _walk_scale.get(facing, Vector2.ONE)
 			sprite.flip_h = false
 			return
 
+	# --- Idle animation (directional, 7-frame) ---
 	if _idle_textures.is_empty():
 		_load_idle_textures()
-	if _idle_textures.is_empty():
+	var idle_frames: Array[Texture2D] = _idle_textures.get(facing, [])
+	if idle_frames.is_empty():
 		return
-
-	var frame_idx := _frame_index_for_facing(facing)
-	if frame_idx >= 0 and frame_idx < _idle_textures.size():
-		sprite.texture = _idle_textures[frame_idx]
-	_apply_target_scale(sprite, PLAYER_TARGET_PX)
+	var idle_idx := SpriteAnimator.frame_index(_idle_elapsed, walk_animation_fps, idle_frames.size())
+	if idle_idx >= 0 and idle_idx < idle_frames.size():
+		sprite.texture = idle_frames[idle_idx]
+	# Dùng scale đã cache — không tính lại mỗi frame
+	sprite.scale = _idle_scale.get(facing, Vector2.ONE)
 	sprite.flip_h = false
 
 
@@ -215,17 +214,3 @@ func _walking_frame_index(frame_count: int) -> int:
 
 func _walking_target_px() -> float:
 	return maxf(PLAYER_TARGET_PX * walk_scale_multiplier, MIN_RENDER_SCALE)
-
-
-func _frame_index_for_facing(facing: String) -> int:
-	match facing:
-		"down":
-			return 0 # S -> idle1
-		"up":
-			return 1 # W -> idle2
-		"right":
-			return 2 # D -> idle3
-		"left":
-			return 3 # A -> idle4
-		_:
-			return 0

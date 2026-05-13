@@ -99,7 +99,7 @@ func _test_no_todo_pass_markers() -> void:
 
 func _test_autoloads_basic() -> void:
 	var root := get_root()
-	var names := ["DataManager", "GameManager", "HPTimeManager", "InventoryManager", "TelemetryManager", "BackgroundMusicManager", "SoundManager"]
+	var names := ["DataManager", "GameManager", "HPTimeManager", "InventoryManager", "TelemetryManager", "BackgroundMusicManager", "SoundManager", "SpriteAnimator"]
 	for name in names:
 		var node := root.get_node_or_null(name)
 		_assert_true(node != null, "Autoload exists: %s" % name)
@@ -109,6 +109,7 @@ func _test_autoloads_basic() -> void:
 	var hp_time_manager: Node = root.get_node_or_null("HPTimeManager")
 	var inventory_manager: Node = root.get_node_or_null("InventoryManager")
 	var telemetry_manager: Node = root.get_node_or_null("TelemetryManager")
+	var sprite_animator: Node = root.get_node_or_null("SpriteAnimator")
 
 	if data_manager != null:
 		var stage_data_variant: Variant = data_manager.call("get_stage_data", "ch1_stage1")
@@ -135,6 +136,17 @@ func _test_autoloads_basic() -> void:
 	if game_manager != null:
 		game_manager.call("start_stage", 1, "ch1_stage1")
 		_assert_eq(int(game_manager.get("current_state")), 1, "GameManager enters PLAYING after start_stage")
+
+	if sprite_animator != null:
+		var player_combat: Dictionary = sprite_animator.call("get_player_combat_anims")
+		var enemy_anim: Dictionary = sprite_animator.call("get_enemy_anim_catalog")
+		var combat_player_frames: Array = sprite_animator.call("load_frames", player_combat.get("attack_idle_right", {}))
+		var combat_hit_frames: Array = sprite_animator.call("load_frames", player_combat.get("hit", {}))
+		var slime_data: Dictionary = enemy_anim.get("syntax_slime", {})
+		var slime_attack_frames: Array = sprite_animator.call("load_frames", slime_data.get("attack", {}))
+		_assert_eq(combat_player_frames.size(), 9, "SpriteAnimator loads player combat idle frames")
+		_assert_eq(combat_hit_frames.size(), 11, "SpriteAnimator loads player hit frames")
+		_assert_eq(slime_attack_frames.size(), 14, "SpriteAnimator loads enemy combat attack frames")
 
 
 func _test_audio_managers() -> void:
@@ -243,6 +255,10 @@ func _test_ui_components() -> void:
 	root.add_child(block_ui)
 	await process_frame
 	block_ui.call("populate_blocks", {"blocks": ["a", "b", "c"]})
+	var block_goal_label := block_ui.get_node_or_null("VBox/GoalLabel") as Label
+	_assert_true(block_goal_label != null and block_goal_label.text.find("How to play") == -1, "BlockAssemblyUI hides How to play helper line")
+	if block_goal_label != null:
+		_assert_eq(block_goal_label.horizontal_alignment, HORIZONTAL_ALIGNMENT_CENTER, "BlockAssemblyUI centers objective text")
 	var order_variant: Variant = block_ui.call("get_user_answer")
 	var order: Array = order_variant if typeof(order_variant) == TYPE_ARRAY else []
 	_assert_eq(order.size(), 3, "BlockAssemblyUI default answer size")
@@ -342,9 +358,11 @@ func _test_ui_components() -> void:
 	var top_hbox := combat_hp_row.get_parent() as HBoxContainer if combat_hp_row != null else null
 	var combat_enemy_label := console.find_child("EnemyLabel", true, false) as Label
 	var combat_turn_label := console.find_child("TurnLabel", true, false) as Label
+	var combat_time_label := console.find_child("TimeLabel", true, false) as Label
 	_assert_true(top_hbox != null and combat_hp_row != null and combat_hp_row.get_index() == 0, "CombatConsole places HP on the left")
 	_assert_true(top_hbox != null and combat_enemy_label != null and combat_enemy_label.get_index() == top_hbox.get_child_count() - 1 and combat_enemy_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_RIGHT, "CombatConsole places enemy name on the right")
 	_assert_true(combat_turn_label != null and not combat_turn_label.visible, "CombatConsole hides turn label from combat HUD")
+	_assert_true(combat_time_label != null and combat_time_label.text.find(":") != -1, "CombatConsole shows live timer label in combat HUD")
 	console.call("hide_console")
 	_assert_true(not console.visible, "CombatConsole hides correctly")
 	wrapper.queue_free()
@@ -360,6 +378,9 @@ func _test_ui_components() -> void:
 	var console_real := console_scene.instantiate()
 	wrapper_scene.add_child(console_real)
 	await process_frame
+	var hp_time_manager_scene: Node = root.get_node_or_null("HPTimeManager")
+	if hp_time_manager_scene != null:
+		hp_time_manager_scene.set("time_remaining", 125.0)
 	console_real.call("show_console", {"id": "syntax_slime", "name": "Syntax Slime"}, {
 		"type": "code_fix",
 		"goal": "Initialize character info and print it.",
@@ -370,9 +391,29 @@ func _test_ui_components() -> void:
 	var real_skip := console_real.get_node_or_null("CombatRoot/Panel/VBox/SkipButton") as Button
 	var real_rows := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/AnswerRows/RowsVBox") as VBoxContainer
 	var real_req := console_real.get_node_or_null("CombatRoot/Panel/VBox/CodeFixUI/VBox/MainFrame/CodeMargin/InlineHost/RequirementLabel") as Label
+	var real_player_portrait := console_real.get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/PlayerPortrait") as TextureRect
+	var real_enemy_portrait := console_real.get_node_or_null("CombatRoot/Panel/VBox/BattleView/Portraits/EnemyPortrait") as TextureRect
+	var real_time_label := console_real.get_node_or_null("CombatRoot/TopInfo/MarginContainer/HBoxContainer/TimeGroup/TimeLabel") as Label
 	_assert_true(real_skip != null and real_skip.visible, "CombatConsole scene keeps Skip button visible")
 	_assert_true(real_rows != null and real_rows.get_child_count() > 0, "CombatConsole scene renders code rows in combat")
 	_assert_true(real_req != null and real_req.visible and real_req.text.find("Objective:") != -1, "CombatConsole scene shows combat objective")
+	_assert_true(real_time_label != null and real_time_label.text == "02:05", "CombatConsole scene renders current real timer")
+	var real_player_frames: Array = console_real.get("_player_anim_frames")
+	var real_player_hit_frames: Array = console_real.get("_player_hit_frames")
+	var real_enemy_frames: Array = console_real.get("_enemy_anim_frames")
+	_assert_eq(real_player_frames.size(), 9, "CombatConsole loads player combat idle animation")
+	_assert_eq(real_player_hit_frames.size(), 11, "CombatConsole loads player hit animation")
+	_assert_eq(real_enemy_frames.size(), 14, "CombatConsole loads enemy combat attack animation")
+	_assert_true(real_player_portrait != null and real_player_portrait.texture != null, "CombatConsole displays animated player portrait")
+	_assert_true(real_enemy_portrait != null and real_enemy_portrait.texture != null, "CombatConsole displays animated enemy portrait")
+	if real_enemy_portrait != null:
+		var first_enemy_texture := real_enemy_portrait.texture
+		console_real.call("_process", 0.2)
+		_assert_true(real_enemy_portrait.texture != first_enemy_texture, "CombatConsole advances enemy portrait animation")
+	if hp_time_manager_scene != null and real_time_label != null:
+		hp_time_manager_scene.call("restore_time", 15.0)
+		console_real.call("_process", 0.016)
+		_assert_true(real_time_label.text == "02:20", "CombatConsole timer updates after time changes")
 	wrapper_scene.queue_free()
 
 	# InventoryPanel

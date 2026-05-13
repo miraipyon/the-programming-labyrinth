@@ -8,27 +8,19 @@ signal encounter_triggered(enemy: Node2D)
 @export var enemy_id: String = ""
 @export var bug_id: String = ""
 
-# --- Constants: Sprite mapping: enemy_id → tile file ---
-const SPRITE_MAP := {
-	"syntax_slime": "res://assets/syntax_slime/idle.png",
-	"semicolon_wisp": "res://assets/semicolon_wisp/idle.png",
-	"null_shadow": "res://assets/null_shadow/idle.png",
-	"branch_phantom": "res://assets/branch_phantom/idle.png",
-	"type_mismatch_medusa": "res://assets/type_mismatch_medusa/idle.png",
-	"infinite_golem": "res://assets/infinite_golem/idle.png",
-	"boundary_hydra": "res://assets/boundary_hydra/idle.png",
-	"flow_architect": "res://assets/flow_architect/idle.png",
-	"logic_bomb_boss": "res://assets/logic_bomb_boss/idle.png",
-}
-
 # Tất cả quái cùng kích cỡ để nhìn đồng đều trên map.
 # Player = 48px → quái = 40px (nhỏ hơn một chút để player nổi bật).
 const TARGET_PX_ALL: float = 40.0
 const MIN_RENDER_SCALE: float = 0.01
+const IDLE_FPS: float = 8.0
 
 # --- State ---
 var enemy_data: Dictionary = {}
 var is_defeated: bool = false
+var _anim_elapsed: float = 0.0
+var _idle_frames: Array[Texture2D] = []
+## Scale cố định tính từ frame[0] — không thay đổi giữa các frame
+var _cached_scale: Vector2 = Vector2.ONE
 
 
 # --- Lifecycle ---
@@ -37,6 +29,20 @@ func _ready() -> void:
 	if not enemy_id.is_empty():
 		enemy_data = DataManager.get_enemy_data(enemy_id).duplicate(true)
 		_update_appearance()
+
+
+func _process(delta: float) -> void:
+	if is_defeated or _idle_frames.is_empty():
+		return
+	_anim_elapsed += delta
+	if not has_node("Sprite"):
+		return
+	var sprite := $Sprite as Sprite2D
+	if sprite == null:
+		return
+	var idx := SpriteAnimator.frame_index(_anim_elapsed, IDLE_FPS, _idle_frames.size())
+	if idx >= 0 and idx < _idle_frames.size():
+		sprite.texture = _idle_frames[idx]
 
 
 # --- Setup ---
@@ -69,13 +75,12 @@ func defeat() -> void:
 		$CollisionShape.set_deferred("disabled", true)
 
 	if has_node("Sprite"):
-		var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
-		if not sprite_path.is_empty():
-			var dead_path := sprite_path.replace("idle.png", "dead.png")
-			if ResourceLoader.exists(dead_path):
-				$Sprite.texture = load(dead_path)
-			else:
-				$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.5)
+		# Tìm dead.png cho enemy_id hiện tại
+		var dead_path := "res://assets/%s/dead.png" % enemy_id
+		if ResourceLoader.exists(dead_path):
+			$Sprite.texture = load(dead_path)
+		else:
+			$Sprite.modulate = Color(0.4, 0.4, 0.4, 0.5)
 
 
 # --- Appearance ---
@@ -83,25 +88,42 @@ func _update_appearance() -> void:
 	if not has_node("Sprite"):
 		return
 
-	var sprite_path: String = SPRITE_MAP.get(enemy_id, "")
-	if not sprite_path.is_empty() and ResourceLoader.exists(sprite_path):
-		$Sprite.texture = load(sprite_path)
-		$Sprite.modulate = Color.WHITE
+	# Ưu tiên dùng animated idle nếu có trong SpriteAnimator
+	_idle_frames.clear()
+	if SpriteAnimator.ENEMY_ANIM.has(enemy_id):
+		var anim_data: Dictionary = SpriteAnimator.ENEMY_ANIM[enemy_id]
+		_idle_frames = SpriteAnimator.load_frames(anim_data.get("idle", {}))
 
-	# Tất cả quái dùng cùng target_px để đồng bộ khích cỡ trên map.
-	_apply_target_scale($Sprite, TARGET_PX_ALL)
+	if not _idle_frames.is_empty():
+		$Sprite.texture = _idle_frames[0]
+		$Sprite.modulate = Color.WHITE
+	else:
+		# Fallback: dùng sprite tĩnh idle.png
+		var sprite_path := "res://assets/%s/idle.png" % enemy_id
+		if ResourceLoader.exists(sprite_path):
+			$Sprite.texture = load(sprite_path)
+			$Sprite.modulate = Color.WHITE
+
+	# Tính scale một lần từ frame[0] và cache lại
+	$Sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_cached_scale = _compute_scale($Sprite.texture, TARGET_PX_ALL)
+	$Sprite.scale = _cached_scale
 
 
 # --- Visual Scale ---
+## Tính scale vector từ texture (không thay đổi sprite).
+func _compute_scale(tex: Texture2D, target_px: float) -> Vector2:
+	if tex == null:
+		var s := maxf(target_px / 64.0, MIN_RENDER_SCALE)
+		return Vector2(s, s)
+	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
+	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
+	return Vector2(s, s)
+
+
+## Giữ lại _apply_target_scale để dùng khi hiển thị dead sprite.
 func _apply_target_scale(sprite: Sprite2D, target_px: float) -> void:
 	if sprite == null:
 		return
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	var tex: Texture2D = sprite.texture
-	if tex == null:
-		var fallback_scale := maxf(target_px / 64.0, MIN_RENDER_SCALE)
-		sprite.scale = Vector2(fallback_scale, fallback_scale)
-		return
-	var tex_size := float(maxi(maxi(tex.get_width(), tex.get_height()), 1))
-	var s := maxf(target_px / tex_size, MIN_RENDER_SCALE)
-	sprite.scale = Vector2(s, s)
+	sprite.scale = _compute_scale(sprite.texture, target_px)
