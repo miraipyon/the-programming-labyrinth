@@ -5,6 +5,7 @@ signal item_use_requested(item_id: String)
 
 var _item_list: VBoxContainer = null
 var _close_button: Button = null
+const GAME_STATE_COMBAT := 3
 
 const ITEM_ICON_PATHS := {
 	"green_tea": "res://assets/items/green_tea.png",
@@ -116,6 +117,7 @@ func _refresh() -> void:
 		var use_btn := Button.new()
 		use_btn.text = "Use"
 		use_btn.tooltip_text = tooltip
+		use_btn.disabled = _is_combat_state()
 		var captured_id := item_id
 		use_btn.pressed.connect(func(): _on_item_use_pressed(captured_id))
 		hbox.add_child(use_btn)
@@ -192,16 +194,17 @@ func _effect_summary(effect: String, value: Variant) -> String:
 
 
 func _on_item_use_pressed(item_id: String) -> void:
+	if _is_combat_state():
+		item_use_requested.emit(item_id)
+		return
+
 	var data_manager: Node = get_node_or_null("/root/DataManager")
 	var item_data: Dictionary = {}
 	if data_manager != null and data_manager.has_method("get_item_data"):
 		var item_variant: Variant = data_manager.call("get_item_data", item_id)
 		if typeof(item_variant) == TYPE_DICTIONARY:
 			item_data = item_variant
-	var effect := str(item_data.get("effect", ""))
-	if effect == "hint" or effect == "auto_snap":
-		item_use_requested.emit(item_id)
-		return
+	var effect_key := str(item_data.get("effect", "")).strip_edges().to_lower()
 
 	var inventory_manager: Node = get_node_or_null("/root/InventoryManager")
 	if inventory_manager == null or not inventory_manager.has_method("use_item"):
@@ -212,6 +215,14 @@ func _on_item_use_pressed(item_id: String) -> void:
 	var result: Dictionary = result_variant if typeof(result_variant) == TYPE_DICTIONARY else {}
 	if not bool(result.get("success", false)):
 		item_use_requested.emit(item_id)
+		return
+
+	if effect_key == "hint" or effect_key == "auto_snap":
+		if inventory_manager.has_method("queue_assist"):
+			var stack_amount := maxi(int(result.get("value", item_data.get("value", 1))), 1)
+			inventory_manager.call("queue_assist", effect_key, stack_amount)
+		item_use_requested.emit(item_id)
+		_refresh()
 		return
 
 	var hp_time_manager: Node = get_node_or_null("/root/HPTimeManager")
@@ -236,3 +247,10 @@ func _on_item_use_pressed(item_id: String) -> void:
 
 	item_use_requested.emit(item_id)
 	_refresh()
+
+
+func _is_combat_state() -> bool:
+	var gm := get_node_or_null("/root/GameManager")
+	if gm == null:
+		return false
+	return int(gm.get("current_state")) == GAME_STATE_COMBAT

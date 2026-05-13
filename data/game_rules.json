@@ -35,7 +35,7 @@
 	"hint_chip": {
 	  "name": "Hint Chip",
 	  "type": "consumable",
-	  "description": "Highlight 1 bug line",
+	  "description": "Queue 1 auto-hint for the next code-fix combat puzzle",
 	  "effect": "hint",
 	  "value": 1,
 	  "icon": "res://assets/items/hint_chip.png"
@@ -43,7 +43,7 @@
 	"block_snap_chip": {
 	  "name": "Block Snap Chip",
 	  "type": "consumable",
-	  "description": "Automatically place 1 block in the correct position (Chapter 4 only)",
+	  "description": "Queue 1 auto-snap for the next block-assembly puzzle (Chapter 4 only)",
 	  "effect": "auto_snap",
 	  "value": 1,
 	  "icon": "res://assets/items/blocksnap_chip.png"

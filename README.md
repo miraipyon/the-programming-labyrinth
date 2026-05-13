@@ -21,6 +21,7 @@ Players clear maze stages, fight bug-themed enemies through programming puzzles,
   - Directional player idle/walk on the maze map.
   - Animated player/enemy portraits in combat UI.
 - Inventory system with consumables and artifacts.
+- `Hint Chip` and `Block Snap Chip` are consumed in maze HUD, then auto-applied in the next matching combat puzzle (no direct item use inside combat UI).
 - Failure rules:
   - Lose when `HP = 0` or `timer = 0`.
   - Temporary loot is discarded on failure/retry.

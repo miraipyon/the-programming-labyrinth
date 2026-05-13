@@ -110,6 +110,7 @@ func show_console(enemy_data: Dictionary, bug_data: Dictionary) -> void:
 			code_ui.hide()
 			block_ui.show()
 			block_ui.call("populate_blocks", current_bug_data)
+	_apply_queued_assists()
 	if _submit_button != null:
 		_apply_submit_button_skin(_submit_button)
 
@@ -683,6 +684,67 @@ func _status_result(success: bool, message: String) -> Dictionary:
 	if _status_label != null:
 		_status_label.text = message
 	return {"success": success, "message": message}
+
+
+func _apply_queued_assists() -> void:
+	var inv_manager: Node = get_node_or_null("/root/InventoryManager")
+	if inv_manager == null:
+		return
+
+	var status_parts: Array[String] = []
+	if current_mode == "code_fix":
+		var code_ui := _get_code_fix_ui()
+		var hints_applied := _apply_queued_hints(inv_manager, code_ui)
+		if hints_applied > 0:
+			status_parts.append("Hint Chip auto-used x%d" % hints_applied)
+	elif current_mode == "block_assembly":
+		var block_ui := _get_block_assembly_ui()
+		var snaps_applied := _apply_queued_block_snaps(inv_manager, block_ui)
+		if snaps_applied > 0:
+			status_parts.append("Block Snap auto-used x%d" % snaps_applied)
+
+	if not status_parts.is_empty() and _status_label != null:
+		_status_label.text = " | ".join(status_parts)
+
+
+func _apply_queued_hints(inv_manager: Node, code_ui: Control) -> int:
+	if code_ui == null or not code_ui.has_method("reveal_hint"):
+		return 0
+	if not inv_manager.has_method("get_pending_assist") or not inv_manager.has_method("consume_pending_assist"):
+		return 0
+
+	var pending := maxi(int(inv_manager.call("get_pending_assist", "hint")), 0)
+	var applied := 0
+	for _i in range(pending):
+		var reveal_variant: Variant = code_ui.call("reveal_hint")
+		if typeof(reveal_variant) != TYPE_DICTIONARY:
+			break
+		var reveal: Dictionary = reveal_variant
+		if not bool(reveal.get("success", false)):
+			break
+		inv_manager.call("consume_pending_assist", "hint", 1)
+		applied += 1
+	return applied
+
+
+func _apply_queued_block_snaps(inv_manager: Node, block_ui: Control) -> int:
+	if block_ui == null or not block_ui.has_method("snap_next_correct"):
+		return 0
+	if not inv_manager.has_method("get_pending_assist") or not inv_manager.has_method("consume_pending_assist"):
+		return 0
+
+	var pending := maxi(int(inv_manager.call("get_pending_assist", "auto_snap")), 0)
+	var applied := 0
+	for _i in range(pending):
+		var snap_variant: Variant = block_ui.call("snap_next_correct")
+		if typeof(snap_variant) != TYPE_DICTIONARY:
+			break
+		var snap: Dictionary = snap_variant
+		if not bool(snap.get("success", false)):
+			break
+		inv_manager.call("consume_pending_assist", "auto_snap", 1)
+		applied += 1
+	return applied
 
 
 func set_status_message(message: String) -> void:

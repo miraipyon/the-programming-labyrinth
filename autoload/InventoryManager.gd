@@ -13,12 +13,14 @@ signal item_used(item_id: String, result: Dictionary)
 var permanent_inventory: Dictionary = {}  # {"item_id": count}
 var temporary_inventory: Dictionary = {}  # {"item_id": count}
 var _used_artifacts_in_stage: Dictionary = {}  # {"artifact_id": used_count}
+var _pending_assists: Dictionary = {}  # {"hint": count, "auto_snap": count}
 
 
 func reset_all_progress() -> void:
 	permanent_inventory.clear()
 	temporary_inventory.clear()
 	_used_artifacts_in_stage.clear()
+	_pending_assists.clear()
 	inventory_changed.emit()
 
 
@@ -94,6 +96,65 @@ func get_all_permanent() -> Dictionary:
 func get_all_temporary() -> Dictionary:
 	# Trả về temporary_inventory
 	return temporary_inventory.duplicate(true)
+
+
+func get_pending_assist(effect: String) -> int:
+	var key := effect.strip_edges().to_lower()
+	if key != "hint" and key != "auto_snap":
+		return 0
+	return maxi(int(_pending_assists.get(key, 0)), 0)
+
+
+func get_all_pending_assists() -> Dictionary:
+	var result: Dictionary = {}
+	for key_variant in _pending_assists.keys():
+		var key := str(key_variant).strip_edges().to_lower()
+		var count := maxi(int(_pending_assists.get(key_variant, 0)), 0)
+		if count > 0:
+			result[key] = count
+	return result
+
+
+func queue_assist(effect: String, amount: int = 1) -> Dictionary:
+	var key := effect.strip_edges().to_lower()
+	var safe_amount := maxi(amount, 1)
+	var result := {
+		"success": false,
+		"effect": key,
+		"queued": 0,
+		"pending": 0,
+		"message": ""
+	}
+
+	if key != "hint" and key != "auto_snap":
+		result.message = "Unsupported assist effect."
+		return result
+
+	_pending_assists[key] = get_pending_assist(key) + safe_amount
+	result.success = true
+	result.queued = safe_amount
+	result.pending = get_pending_assist(key)
+	result.message = "Assist queued."
+	inventory_changed.emit()
+	return result
+
+
+func consume_pending_assist(effect: String, amount: int = 1) -> int:
+	var key := effect.strip_edges().to_lower()
+	var safe_amount := maxi(amount, 1)
+	var available := get_pending_assist(key)
+	if available <= 0:
+		return 0
+
+	var consumed := mini(available, safe_amount)
+	var remaining := available - consumed
+	if remaining > 0:
+		_pending_assists[key] = remaining
+	else:
+		_pending_assists.erase(key)
+
+	inventory_changed.emit()
+	return consumed
 
 
 func has_item(item_id: String) -> bool:

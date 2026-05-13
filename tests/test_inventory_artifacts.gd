@@ -65,6 +65,7 @@ func _test_inventory_panel_applies_consumables() -> void:
 		return
 
 	inventory.call("init_for_stage")
+	inventory.set("_pending_assists", {})
 	inventory.set("permanent_inventory", {"green_tea": 1, "focus_pill": 1, "hint_chip": 1})
 	hp_time.call("init_for_stage", 1)
 	hp_time.call("take_damage", 40)
@@ -85,7 +86,8 @@ func _test_inventory_panel_applies_consumables() -> void:
 	var permanent: Dictionary = inventory.get("permanent_inventory")
 	_assert_true(not permanent.has("green_tea"), "Green Tea removed after use")
 	_assert_true(not permanent.has("focus_pill"), "Focus Pill removed after use")
-	_assert_eq(int(permanent.get("hint_chip", 0)), 1, "Hint Chip is not consumed outside combat in InventoryPanel")
+	_assert_true(not permanent.has("hint_chip"), "Hint Chip is consumed when armed from InventoryPanel")
+	_assert_eq(int(inventory.call("get_pending_assist", "hint")), 1, "Hint Chip adds one queued hint assist")
 
 	panel.queue_free()
 	await get_tree().process_frame
@@ -135,10 +137,12 @@ func _test_maze_hud_applies_items_immediately() -> void:
 		return
 
 	inventory.call("init_for_stage")
+	inventory.set("_pending_assists", {})
 	inventory.set("permanent_inventory", {
 		"green_tea": 1,
 		"focus_pill": 1,
 		"hint_chip": 1,
+		"block_snap_chip": 1,
 		"runtime_patch": 1
 	})
 	hp_time.call("init_for_stage", 1)
@@ -156,8 +160,12 @@ func _test_maze_hud_applies_items_immediately() -> void:
 	_assert_eq(int(round(float(hp_time.get("time_remaining")))), 130, "Focus Pill from in-maze HUD restores time immediately")
 
 	hud.call("_on_maze_use_item", "hint_chip", "consumable", "hint", 1, inventory, hp_time, null)
+	hud.call("_on_maze_use_item", "block_snap_chip", "consumable", "auto_snap", 1, inventory, hp_time, null)
 	var permanent: Dictionary = inventory.get("permanent_inventory")
-	_assert_eq(int(permanent.get("hint_chip", 0)), 1, "Hint Chip is not consumed outside combat")
+	_assert_true(not permanent.has("hint_chip"), "Hint Chip is consumed when armed from maze HUD")
+	_assert_true(not permanent.has("block_snap_chip"), "Block Snap Chip is consumed when armed from maze HUD")
+	_assert_eq(int(inventory.call("get_pending_assist", "hint")), 1, "Maze HUD queues one hint assist")
+	_assert_eq(int(inventory.call("get_pending_assist", "auto_snap")), 1, "Maze HUD queues one block snap assist")
 
 	hud.call("_on_maze_use_item", "runtime_patch", "artifact", "skip_hit", 1, inventory, hp_time, null)
 	var active_artifacts: Dictionary = hp_time.get("active_artifacts")
@@ -205,6 +213,7 @@ func _capture_state() -> void:
 		_snapshot["permanent_inventory"] = inventory.get("permanent_inventory").duplicate(true)
 		_snapshot["temporary_inventory"] = inventory.get("temporary_inventory").duplicate(true)
 		_snapshot["used_artifacts_in_stage"] = inventory.get("_used_artifacts_in_stage").duplicate(true)
+		_snapshot["pending_assists"] = inventory.get("_pending_assists").duplicate(true)
 	if hp_time != null:
 		_snapshot["max_hp"] = int(hp_time.get("max_hp"))
 		_snapshot["current_hp"] = int(hp_time.get("current_hp"))
@@ -221,6 +230,8 @@ func _restore_state() -> void:
 		inventory.set("temporary_inventory", _snapshot["temporary_inventory"])
 		if _snapshot.has("used_artifacts_in_stage"):
 			inventory.set("_used_artifacts_in_stage", _snapshot["used_artifacts_in_stage"])
+		if _snapshot.has("pending_assists"):
+			inventory.set("_pending_assists", _snapshot["pending_assists"])
 		if inventory.has_signal("inventory_changed"):
 			inventory.emit_signal("inventory_changed")
 	if hp_time != null and _snapshot.has("current_hp"):

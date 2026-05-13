@@ -16,6 +16,7 @@ var _inv_visible: bool = false
 var _artifact_bar: Label = null
 # Pending consumable indicator
 var _pending_label: Label = null
+var _pending_message: String = ""
 var _hp_tween: Tween = null
 
 const ITEM_ICON_PATHS := {
@@ -34,6 +35,7 @@ const CHAPTER_NAMES := {
 	4: "The Final Kernel"
 }
 const TIME_ICON_PATH := "res://assets_2/png/Counter/Icon/Time.png"
+const GAME_STATE_COMBAT := 3
 
 
 func _ready() -> void:
@@ -234,6 +236,7 @@ func _refresh_inv_panel() -> void:
 		empty.text = "Inventory is empty"
 		empty.modulate = Color(0.6, 0.6, 0.6)
 		_inv_list.add_child(empty)
+		_refresh_pending_label(inv_manager)
 		return
 
 	var keys: Array = items.keys()
@@ -283,6 +286,7 @@ func _refresh_inv_panel() -> void:
 		use_btn.text = "Use"
 		use_btn.custom_minimum_size = Vector2(54, 0)
 		use_btn.tooltip_text = tooltip
+		use_btn.disabled = _is_combat_state()
 		var captured_id := item_id
 		var captured_type := item_type
 		var captured_effect := effect
@@ -291,6 +295,8 @@ func _refresh_inv_panel() -> void:
 			_on_maze_use_item(captured_id, captured_type, captured_effect, captured_value,
 				inv_manager, hp_time_manager, data_manager))
 		row.add_child(use_btn)
+
+	_refresh_pending_label(inv_manager)
 
 
 func _on_maze_use_item(
@@ -305,28 +311,46 @@ func _on_maze_use_item(
 	if inv_manager == null or not inv_manager.has_method("use_item"):
 		return
 
-	if item_type == "consumable" and (effect == "hint" or effect == "auto_snap"):
-		_update_pending_label("Cannot use %s outside combat." % item_id)
+	if _is_combat_state():
+		_update_pending_label("Items and artifacts cannot be used in combat UI.", inv_manager)
+		return
+
+	if item_type == "consumable" and (effect == "hint" or effect == "auto_snap") and not inv_manager.has_method("queue_assist"):
+		_update_pending_label("Assist system is unavailable.", inv_manager)
 		return
 
 	var use_result_variant: Variant = inv_manager.call("use_item", item_id)
 	var use_result: Dictionary = use_result_variant if typeof(use_result_variant) == TYPE_DICTIONARY else {}
 	if not bool(use_result.get("success", false)):
-		_update_pending_label("Cannot use item: %s" % str(use_result.get("message", "")))
+		_update_pending_label("Cannot use item: %s" % str(use_result.get("message", "")), inv_manager)
 		return
 
+	var effect_key := effect.strip_edges().to_lower()
 	if item_type == "consumable":
-		match effect:
+		match effect_key:
 			"heal":
 				if hp_time_manager != null and hp_time_manager.has_method("heal"):
 					hp_time_manager.call("heal", int(value))
-				_update_pending_label("✓ %s used: HP restored immediately." % item_id)
+				_update_pending_label("✓ %s used: HP restored immediately." % item_id, inv_manager)
 			"restore_time":
 				if hp_time_manager != null and hp_time_manager.has_method("restore_time"):
 					hp_time_manager.call("restore_time", float(value))
-				_update_pending_label("✓ %s used: time restored immediately." % item_id)
+				_update_pending_label("✓ %s used: time restored immediately." % item_id, inv_manager)
+			"hint", "auto_snap":
+				var stack_amount := maxi(int(use_result.get("value", value)), 1)
+				var queue_result_variant: Variant = inv_manager.call("queue_assist", effect_key, stack_amount)
+				if typeof(queue_result_variant) == TYPE_DICTIONARY:
+					var queue_result: Dictionary = queue_result_variant
+					if bool(queue_result.get("success", false)):
+						var pending := int(queue_result.get("pending", 0))
+						var pending_text := "hint" if effect_key == "hint" else "block snap"
+						_update_pending_label("✓ %s armed: +%d %s queued (ready: %d)." % [item_id, stack_amount, pending_text, pending], inv_manager)
+					else:
+						_update_pending_label(str(queue_result.get("message", "Cannot queue assist.")), inv_manager)
+				else:
+					_update_pending_label("✓ %s armed for next combat puzzle." % item_id, inv_manager)
 			_:
-				_update_pending_label("Cannot use %s in the maze." % item_id)
+				_update_pending_label("Cannot use %s in the maze." % item_id, inv_manager)
 	elif item_type == "artifact":
 		# Activate immediately — lasts whole stage
 		if hp_time_manager != null and hp_time_manager.has_method("activate_artifact"):
@@ -336,20 +360,64 @@ func _on_maze_use_item(
 				if bool(activate_result.get("success", false)):
 					if inv_manager.has_method("register_artifact_use"):
 						inv_manager.call("register_artifact_use", item_id)
-					_update_pending_label("✓ %s activated -> active for this stage." % item_id)
+					_update_pending_label("✓ %s activated -> active for this stage." % item_id, inv_manager)
 				else:
-					_update_pending_label(str(activate_result.get("message", "Cannot activate artifact.")))
+					_update_pending_label(str(activate_result.get("message", "Cannot activate artifact.")), inv_manager)
 			else:
 				if inv_manager.has_method("register_artifact_use"):
 					inv_manager.call("register_artifact_use", item_id)
-				_update_pending_label("✓ %s activated -> active for this stage." % item_id)
+				_update_pending_label("✓ %s activated -> active for this stage." % item_id, inv_manager)
 
 	_refresh_inv_panel()
 
 
-func _update_pending_label(msg: String) -> void:
-	if _pending_label != null:
-		_pending_label.text = msg
+func _update_pending_label(msg: String, inv_manager: Node = null) -> void:
+	_pending_message = msg.strip_edges()
+	_refresh_pending_label(inv_manager)
+
+
+func _refresh_pending_label(inv_manager: Node = null) -> void:
+	if _pending_label == null:
+		return
+	if inv_manager == null:
+		inv_manager = get_node_or_null("/root/InventoryManager")
+
+	var assist_summary := _pending_assist_summary(inv_manager)
+	if _pending_message.is_empty():
+		_pending_label.text = assist_summary
+	elif assist_summary.is_empty():
+		_pending_label.text = _pending_message
+	else:
+		_pending_label.text = "%s\n%s" % [_pending_message, assist_summary]
+
+
+func _pending_assist_summary(inv_manager: Node) -> String:
+	if inv_manager == null:
+		return ""
+	if not inv_manager.has_method("get_all_pending_assists"):
+		return ""
+	var pending_variant: Variant = inv_manager.call("get_all_pending_assists")
+	if typeof(pending_variant) != TYPE_DICTIONARY:
+		return ""
+
+	var pending: Dictionary = pending_variant
+	var hint_count := maxi(int(pending.get("hint", 0)), 0)
+	var snap_count := maxi(int(pending.get("auto_snap", 0)), 0)
+	var parts: Array[String] = []
+	if hint_count > 0:
+		parts.append("Queued Hint: %d" % hint_count)
+	if snap_count > 0:
+		parts.append("Queued Block Snap: %d" % snap_count)
+	if parts.is_empty():
+		return ""
+	return "Next combat assist -> %s" % " | ".join(parts)
+
+
+func _is_combat_state() -> bool:
+	var gm := get_node_or_null("/root/GameManager")
+	if gm == null:
+		return false
+	return int(gm.get("current_state")) == GAME_STATE_COMBAT
 
 
 func _make_inventory_icon(item_id: String, item_data: Dictionary = {}) -> TextureRect:
@@ -392,7 +460,7 @@ func _usage_text(item_type: String, effect: String) -> String:
 		"heal", "restore_time":
 			return "Use in the maze to apply this effect immediately."
 		"hint", "auto_snap":
-			return "Use during combat only."
+			return "Use in the maze to queue this assist for the next matching combat puzzle."
 		_:
 			return "Use in the correct context to apply its effect."
 

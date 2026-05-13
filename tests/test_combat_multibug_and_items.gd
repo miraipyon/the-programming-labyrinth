@@ -27,6 +27,7 @@ func _run_suite() -> void:
 	_test_partial_fix_updates_snippet_and_remaining_bugs()
 	_test_wrong_line_penalty_damage()
 	await _test_block_snap_ui()
+	await _test_queued_assists_auto_apply_in_console()
 	await _test_combat_console_no_quick_inventory()
 	_restore_state()
 
@@ -200,6 +201,57 @@ func _test_combat_console_no_quick_inventory() -> void:
 	await get_tree().process_frame
 
 
+func _test_queued_assists_auto_apply_in_console() -> void:
+	var inventory := _inventory_manager()
+	_assert_true(inventory != null, "InventoryManager exists for queued assist flow")
+	if inventory == null:
+		return
+	inventory.set("_pending_assists", {"hint": 1, "auto_snap": 1})
+
+	var wrapper := Node.new()
+	wrapper.name = "CombatQueuedAssistWrapper"
+	get_tree().root.add_child(wrapper)
+
+	var encounter: Node = load("res://scripts/combat/EncounterManager.gd").new()
+	encounter.name = "EncounterManager"
+	wrapper.add_child(encounter)
+
+	var console_scene: PackedScene = load("res://scenes/combat/CombatConsole.tscn")
+	var console := console_scene.instantiate()
+	wrapper.add_child(console)
+	await get_tree().process_frame
+
+	console.call("show_console", {"name": "Syntax Slime"}, {
+		"type": "code_fix",
+		"snippet": ["print(name"],
+		"bugs": [{"line": 0, "accepted_fixes": ["print(name)"]}]
+	})
+	await get_tree().process_frame
+
+	_assert_eq(int(inventory.call("get_pending_assist", "hint")), 0, "Queued hint is consumed at code-fix combat start")
+	_assert_eq(int(inventory.call("get_pending_assist", "auto_snap")), 1, "Block snap queue waits for block-assembly combat")
+	var code_ui := console.find_child("CodeFixUI", true, false)
+	if code_ui != null and code_ui.has_method("has_line_selection"):
+		_assert_true(bool(code_ui.call("has_line_selection")), "Queued hint auto-selects at least one bug line")
+
+	console.call("show_console", {"name": "Flow Architect"}, {
+		"type": "block_assembly",
+		"goal": "Build a loop",
+		"blocks": ["start", "loop", "end"],
+		"correct_order": [0, 1, 2]
+	})
+	await get_tree().process_frame
+
+	_assert_eq(int(inventory.call("get_pending_assist", "auto_snap")), 0, "Queued block snap is consumed at block-assembly combat start")
+	var block_ui := console.find_child("BlockAssemblyUI", true, false)
+	if block_ui != null:
+		var order: Array = block_ui.call("get_user_answer")
+		_assert_true(order.size() >= 1 and int(order[0]) == 0, "Queued block snap auto-places first mismatched block")
+
+	wrapper.queue_free()
+	await get_tree().process_frame
+
+
 func _capture_state() -> void:
 	var inventory := _inventory_manager()
 	var hp_time := _hp_time_manager()
@@ -207,6 +259,7 @@ func _capture_state() -> void:
 	if inventory != null:
 		_snapshot["permanent_inventory"] = inventory.get("permanent_inventory").duplicate(true)
 		_snapshot["temporary_inventory"] = inventory.get("temporary_inventory").duplicate(true)
+		_snapshot["pending_assists"] = inventory.get("_pending_assists").duplicate(true)
 	if hp_time != null:
 		_snapshot["max_hp"] = int(hp_time.get("max_hp"))
 		_snapshot["current_hp"] = int(hp_time.get("current_hp"))
@@ -221,6 +274,8 @@ func _restore_state() -> void:
 	if inventory != null and _snapshot.has("permanent_inventory"):
 		inventory.set("permanent_inventory", _snapshot["permanent_inventory"])
 		inventory.set("temporary_inventory", _snapshot["temporary_inventory"])
+		if _snapshot.has("pending_assists"):
+			inventory.set("_pending_assists", _snapshot["pending_assists"])
 		if inventory.has_signal("inventory_changed"):
 			inventory.emit_signal("inventory_changed")
 	if hp_time != null and _snapshot.has("current_hp"):
