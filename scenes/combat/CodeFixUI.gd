@@ -487,8 +487,8 @@ func _render_snippet() -> void:
 
 	if _snippet_rich != null:
 		var text := ""
-		for line in snippet_lines:
-			text += "[center]%s[/center]\n" % _format_single_python_line_bbcode(snippet_lines, snippet_lines.find(line))
+		for i in range(snippet_lines.size()):
+			text += "[center]%s[/center]\n" % _format_single_python_line_bbcode(snippet_lines, i)
 		_snippet_rich.text = text
 	else:
 		_snippet_label.text = ""

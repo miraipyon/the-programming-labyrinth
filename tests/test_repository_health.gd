@@ -23,6 +23,7 @@ func _run_suite() -> void:
 	_test_required_files()
 	_test_hygiene_files()
 	_test_stage_catalog()
+	_test_bug_goal_catalog()
 	_test_item_icon_assets()
 	_test_animation_catalog_assets()
 	await _test_generated_maze_quality()
@@ -102,6 +103,52 @@ func _test_stage_catalog() -> void:
 				if exists:
 					stage_specific_bug_count += 1
 	_assert_eq(stage_specific_bug_count, 80, "Stage-specific bug count is 80")
+
+
+func _test_bug_goal_catalog() -> void:
+	var data_manager: Node = get_node_or_null("/root/DataManager")
+	_assert_true(data_manager != null, "DataManager exists for bug goal normalization check")
+	if data_manager == null:
+		return
+
+	var allowed_goals := {
+		"Initialize character info and print it.": true,
+		"Check the condition and print the first item in the list.": true,
+		"Concatenate strings to display class and level information.": true,
+		"Write a function to calculate damage based on attack and defense.": true,
+		"Check whether the first element of a nested list (2D list) is positive.": true,
+		"Evaluate the character's HP status.": true,
+		"Grant access if the user has a key, or if the VIP account also meets the level requirement.": true,
+		"Calculate physical damage as base damage + bonus * multiplier.": true,
+		"Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.": true,
+		"Handle HP: if poisoned, subtract 5 HP; otherwise restore 5 HP. Ensure HP never goes below 0.": true,
+		"Use a while loop to print each item in the list.": true,
+		"Traverse the list from end to start to safely remove matching enemies.": true,
+		"Simulate walking energy consumption and print distance when energy is depleted.": true,
+		"Iterate through a rectangular (non-square) matrix and sum all elements.": true,
+		"Reverse the password string by traversing indices backward in a loop.": true,
+		"Use Binary Search to find `target` in sorted array `arr`. Return index or -1.": true,
+		"Two-Pointers technique: merge two sorted arrays `a` and `b` into one sorted array `result`.": true,
+		"Check whether the text string `s` is a palindrome.": true,
+		"Sort numeric array `nums` in ascending order using Selection Sort.": true,
+		"Dynamic Programming: return the Fibonacci number at position n (F(0)=0, F(1)=1).": true,
+	}
+
+	var observed_goals := {}
+	for chapter in [1, 2, 3, 4]:
+		var bugs_variant: Variant = data_manager.call("get_bugs_by_chapter", chapter)
+		_assert_true(typeof(bugs_variant) == TYPE_ARRAY, "Bug goals load as an array for chapter %d" % chapter)
+		if typeof(bugs_variant) != TYPE_ARRAY:
+			continue
+		for bug_variant in bugs_variant:
+			if typeof(bug_variant) != TYPE_DICTIONARY:
+				continue
+			var bug: Dictionary = bug_variant
+			var goal := str(bug.get("goal", "")).strip_edges()
+			_assert_true(allowed_goals.has(goal), "Normalized goal uses canonical wording: %s" % goal)
+			observed_goals[goal] = true
+
+	_assert_eq(observed_goals.size(), allowed_goals.size(), "Bug goals use the canonical normalized set")
 
 
 func _test_item_icon_assets() -> void:

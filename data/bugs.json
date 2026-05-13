@@ -450,7 +450,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -492,7 +492,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -534,7 +534,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and rank information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "rank = 10",
@@ -576,7 +576,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -618,7 +618,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -1320,7 +1320,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -1345,7 +1345,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_002_v2",
@@ -1353,7 +1353,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -1378,7 +1378,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_002_v3",
@@ -1386,7 +1386,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND rank >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -1411,7 +1411,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-rank gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_002_v4",
@@ -1419,7 +1419,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -1444,7 +1444,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_002_v5",
@@ -1452,7 +1452,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -1477,7 +1477,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_003_v1",
@@ -1485,7 +1485,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -1517,7 +1517,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -1549,7 +1549,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -1581,7 +1581,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -1613,7 +1613,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -1645,7 +1645,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -1679,7 +1679,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -1713,7 +1713,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by points: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "points = 85",
       "rank = ''",
@@ -1747,7 +1747,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -1781,7 +1781,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -1970,7 +1970,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -2014,7 +2014,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (loot).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "loot = ['map', 'compass', 'key']",
       "i = 1",
@@ -2058,7 +2058,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (storage).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "storage = ['map', 'compass', 'key']",
       "i = 1",
@@ -2102,7 +2102,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (inventory).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "inventory = ['map', 'compass', 'key']",
       "i = 1",
@@ -2146,7 +2146,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -2190,7 +2190,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -2220,7 +2220,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -2250,7 +2250,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -2280,7 +2280,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -2310,7 +2310,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -4060,7 +4060,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "easy",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -4102,7 +4102,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "easy",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -4144,7 +4144,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "easy",
-    "goal": "Concatenate strings to display class and rank information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "rank = 10",
@@ -4186,7 +4186,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "easy",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -4228,7 +4228,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "easy",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -4695,7 +4695,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "medium",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -4737,7 +4737,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "medium",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -4779,7 +4779,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "medium",
-    "goal": "Concatenate strings to display class and rank information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "rank = 10",
@@ -4821,7 +4821,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "medium",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -4863,7 +4863,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "medium",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -5325,7 +5325,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -5367,7 +5367,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -5409,7 +5409,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and rank information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "rank = 10",
@@ -5451,7 +5451,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -5493,7 +5493,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "hard",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -7705,7 +7705,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "boss",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -7747,7 +7747,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "boss",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -7789,7 +7789,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "boss",
-    "goal": "Concatenate strings to display class and rank information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "rank = 10",
@@ -7831,7 +7831,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "boss",
-    "goal": "Concatenate strings to display class and stage information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "stage = 10",
@@ -7873,7 +7873,7 @@
     "language": "python",
     "topic": "syntax_string",
     "difficulty": "boss",
-    "goal": "Concatenate strings to display class and tier information.",
+    "goal": "Concatenate strings to display class and level information.",
     "snippet": [
       "job = 'Mage",
       "tier = 10",
@@ -8155,7 +8155,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8180,7 +8180,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q02_v2",
@@ -8188,7 +8188,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8213,7 +8213,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q02_v3",
@@ -8221,7 +8221,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND rank >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8246,7 +8246,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-rank gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q02_v4",
@@ -8254,7 +8254,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8279,7 +8279,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q02_v5",
@@ -8287,7 +8287,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8312,7 +8312,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q03_v1",
@@ -8320,7 +8320,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8352,7 +8352,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8384,7 +8384,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8416,7 +8416,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8448,7 +8448,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8480,7 +8480,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -8514,7 +8514,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -8548,7 +8548,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by points: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "points = 85",
       "rank = ''",
@@ -8582,7 +8582,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -8616,7 +8616,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -8650,7 +8650,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8675,7 +8675,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q01_v2",
@@ -8683,7 +8683,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8708,7 +8708,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q01_v3",
@@ -8716,7 +8716,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND rank >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8741,7 +8741,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-rank gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q01_v4",
@@ -8749,7 +8749,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8774,7 +8774,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q01_v5",
@@ -8782,7 +8782,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -8807,7 +8807,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q02_v1",
@@ -8815,7 +8815,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8847,7 +8847,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8879,7 +8879,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8911,7 +8911,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8943,7 +8943,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -8975,7 +8975,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -9009,7 +9009,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -9043,7 +9043,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by points: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "points = 85",
       "rank = ''",
@@ -9077,7 +9077,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -9111,7 +9111,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -9300,7 +9300,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -9332,7 +9332,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -9364,7 +9364,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -9396,7 +9396,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -9428,7 +9428,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -9460,7 +9460,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -9494,7 +9494,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -9528,7 +9528,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by points: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "points = 85",
       "rank = ''",
@@ -9562,7 +9562,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -9596,7 +9596,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -10025,7 +10025,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -10059,7 +10059,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -10093,7 +10093,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by points: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "points = 85",
       "rank = ''",
@@ -10127,7 +10127,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "rank = ''",
@@ -10161,7 +10161,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by result: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "result = 85",
       "rank = ''",
@@ -10590,7 +10590,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -10615,7 +10615,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage4_q04_v2",
@@ -10623,7 +10623,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -10648,7 +10648,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage4_q04_v3",
@@ -10656,7 +10656,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND rank >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -10681,7 +10681,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-rank gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage4_q04_v4",
@@ -10689,7 +10689,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -10714,7 +10714,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage4_q04_v5",
@@ -10722,7 +10722,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -10747,7 +10747,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q01_v1",
@@ -11150,7 +11150,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -11175,7 +11175,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q03_v2",
@@ -11183,7 +11183,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -11208,7 +11208,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q03_v3",
@@ -11216,7 +11216,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND rank >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -11241,7 +11241,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-rank gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q03_v4",
@@ -11249,7 +11249,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND stage >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -11274,7 +11274,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-stage gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q03_v5",
@@ -11282,7 +11282,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND tier >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -11307,7 +11307,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-tier gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q04_v1",
@@ -11315,7 +11315,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -11347,7 +11347,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -11379,7 +11379,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -11411,7 +11411,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -11443,7 +11443,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -11475,7 +11475,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -11519,7 +11519,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (loot).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "loot = ['map', 'compass', 'key']",
       "i = 1",
@@ -11563,7 +11563,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (storage).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "storage = ['map', 'compass', 'key']",
       "i = 1",
@@ -11607,7 +11607,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (inventory).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "inventory = ['map', 'compass', 'key']",
       "i = 1",
@@ -11651,7 +11651,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -11695,7 +11695,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -11725,7 +11725,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -11755,7 +11755,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -11785,7 +11785,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -11815,7 +11815,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -12165,7 +12165,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -12195,7 +12195,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -12225,7 +12225,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -12255,7 +12255,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -12285,7 +12285,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -13265,7 +13265,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -13309,7 +13309,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each inventory item (loot).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "loot = ['map', 'compass', 'key']",
       "i = 1",
@@ -13353,7 +13353,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each inventory item (storage).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "storage = ['map', 'compass', 'key']",
       "i = 1",
@@ -13397,7 +13397,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each inventory item (inventory).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "inventory = ['map', 'compass', 'key']",
       "i = 1",
@@ -13441,7 +13441,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -13800,7 +13800,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -13844,7 +13844,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each inventory item (loot).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "loot = ['map', 'compass', 'key']",
       "i = 1",
@@ -13888,7 +13888,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each inventory item (storage).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "storage = ['map', 'compass', 'key']",
       "i = 1",
@@ -13932,7 +13932,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each inventory item (inventory).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "inventory = ['map', 'compass', 'key']",
       "i = 1",
@@ -13976,7 +13976,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -14020,7 +14020,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14050,7 +14050,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14080,7 +14080,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14110,7 +14110,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14140,7 +14140,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14325,7 +14325,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -14369,7 +14369,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each inventory item (loot).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "loot = ['map', 'compass', 'key']",
       "i = 1",
@@ -14413,7 +14413,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each inventory item (storage).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "storage = ['map', 'compass', 'key']",
       "i = 1",
@@ -14457,7 +14457,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each inventory item (inventory).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "inventory = ['map', 'compass', 'key']",
       "i = 1",
@@ -14501,7 +14501,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each inventory item (bag).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "bag = ['map', 'compass', 'key']",
       "i = 1",
@@ -14545,7 +14545,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14575,7 +14575,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14605,7 +14605,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14635,7 +14635,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -14665,7 +14665,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'slime' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['slime', 'slime', 'bat']",
       "for i in range(len(enemies)):",
@@ -18318,7 +18318,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -18343,7 +18343,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_logic_003",
@@ -18351,7 +18351,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -18383,7 +18383,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "level = ''",
@@ -18409,7 +18409,7 @@
         ]
       }
     ],
-    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+    "explanation": "In mutually exclusive ranking logic, `elif` prevents lower conditions from overriding an earlier true condition."
   },
   {
     "id": "ch2_logic_005",
@@ -18448,7 +18448,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each items item (items).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "items = ['map', 'compass', 'key']",
       "i = 1",
@@ -18492,7 +18492,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['enemy', 'enemy', 'bat']",
       "for i in range(len(enemies)):",
@@ -19685,7 +19685,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "easy",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -19710,7 +19710,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage1_q03",
@@ -19718,7 +19718,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "easy",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -19750,7 +19750,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "easy",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "level = ''",
@@ -19776,7 +19776,7 @@
         ]
       }
     ],
-    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+    "explanation": "In mutually exclusive ranking logic, `elif` prevents lower conditions from overriding an earlier true condition."
   },
   {
     "id": "ch2_stage2_q01",
@@ -19784,7 +19784,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "medium",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -19809,7 +19809,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage2_q02",
@@ -19817,7 +19817,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "medium",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -19849,7 +19849,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "medium",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "level = ''",
@@ -19875,7 +19875,7 @@
         ]
       }
     ],
-    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+    "explanation": "In mutually exclusive ranking logic, `elif` prevents lower conditions from overriding an earlier true condition."
   },
   {
     "id": "ch2_stage2_q04",
@@ -19914,7 +19914,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "hard",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -19946,7 +19946,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "level = ''",
@@ -19972,7 +19972,7 @@
         ]
       }
     ],
-    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+    "explanation": "In mutually exclusive ranking logic, `elif` prevents lower conditions from overriding an earlier true condition."
   },
   {
     "id": "ch2_stage3_q03",
@@ -20059,7 +20059,7 @@
     "language": "python",
     "topic": "branching_logic",
     "difficulty": "very_hard",
-    "goal": "Rank by value: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
+    "goal": "Rank the score: 90+ is 'S', 70+ is 'A', otherwise 'B'.",
     "snippet": [
       "value = 85",
       "level = ''",
@@ -20085,7 +20085,7 @@
         ]
       }
     ],
-    "explanation": "In mutually exclusive leveling logic, `elif` prevents lower conditions from overriding an earlier true condition."
+    "explanation": "In mutually exclusive ranking logic, `elif` prevents lower conditions from overriding an earlier true condition."
   },
   {
     "id": "ch2_stage4_q02",
@@ -20172,7 +20172,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "very_hard",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -20197,7 +20197,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q01",
@@ -20284,7 +20284,7 @@
     "language": "python",
     "topic": "boolean_logic",
     "difficulty": "boss",
-    "goal": "Grant access if the user has a key, OR (is a VIP account AND level >= 10).",
+    "goal": "Grant access if the user has a key, or if the VIP account also meets the level requirement.",
     "snippet": [
       "has_key = False",
       "is_vip = True",
@@ -20309,7 +20309,7 @@
         ]
       }
     ],
-    "explanation": "The `and` operator requires both conditions to be true, which is exactly the needed VIP-level gating logic."
+    "explanation": "The `and` operator requires both conditions to be true, which is exactly the intended VIP access gate."
   },
   {
     "id": "ch2_stage5_q04",
@@ -20317,7 +20317,7 @@
     "language": "python",
     "topic": "type_mismatch",
     "difficulty": "boss",
-    "goal": "Calculate physical damage as (Base Damage + bonus * multiplier).",
+    "goal": "Calculate physical damage as base damage + bonus * multiplier.",
     "snippet": [
       "base_dmg = '50'",
       "bonus = 20",
@@ -20349,7 +20349,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "easy",
-    "goal": "Use a while loop to print each items item (items).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "items = ['map', 'compass', 'key']",
       "i = 1",
@@ -20393,7 +20393,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "easy",
-    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['enemy', 'enemy', 'bat']",
       "for i in range(len(enemies)):",
@@ -20487,7 +20487,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "medium",
-    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['enemy', 'enemy', 'bat']",
       "for i in range(len(enemies)):",
@@ -20707,7 +20707,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "hard",
-    "goal": "Use a while loop to print each items item (items).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "items = ['map', 'compass', 'key']",
       "i = 1",
@@ -20814,7 +20814,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "very_hard",
-    "goal": "Use a while loop to print each items item (items).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "items = ['map', 'compass', 'key']",
       "i = 1",
@@ -20858,7 +20858,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "very_hard",
-    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['enemy', 'enemy', 'bat']",
       "for i in range(len(enemies)):",
@@ -20919,7 +20919,7 @@
     "language": "python",
     "topic": "off_by_one",
     "difficulty": "boss",
-    "goal": "Use a while loop to print each items item (items).",
+    "goal": "Use a while loop to print each item in the list.",
     "snippet": [
       "items = ['map', 'compass', 'key']",
       "i = 1",
@@ -20963,7 +20963,7 @@
     "language": "python",
     "topic": "array_mutation",
     "difficulty": "boss",
-    "goal": "Traverse the list from end to start to safely remove 'enemy' enemies.",
+    "goal": "Traverse the list from end to start to safely remove matching enemies.",
     "snippet": [
       "enemies = ['enemy', 'enemy', 'bat']",
       "for i in range(len(enemies)):",
